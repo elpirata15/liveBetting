@@ -10,10 +10,7 @@ var winston = require("winston");
 
 var app = express();
 
-//app.use(bodyParser.raw());
 app.use(bodyParser.json());
-//app.use(bodyParser.text());
-//app.use(bodyParser.urlencoded({ extended: false }));
 
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
@@ -26,7 +23,7 @@ var optionEntity = new Schema({
 
 var bidEntity = new Schema({
     gameId:  ObjectId,
-    gameDescription: String,
+    gameName: String,
     bidDescription: String,
     bidType: String,
     bidOptions: [optionEntity],
@@ -35,7 +32,7 @@ var bidEntity = new Schema({
     ttl: Number
 });
 
-var bidModel = mongoose.model('bids', bidEntity);
+//var bidModel = mongoose.model('bids', bidEntity);
 
 var gameEntity = new Schema({
     gameName: String,
@@ -75,9 +72,29 @@ mongoose.connect("mongodb://root:elirankon86@ds047050.mongolab.com:47050/heroku_
 // Active games cache
 var activeGames = {};
 
+gameModel.find({status: 'Active'}, function(err, doc){
+    for(var ind in doc){
+        activeGames[doc[ind].id] = doc[ind];
+    }
+    winston.info('currently active games: ' + Object.keys(activeGames).length);
+});
+
+
 app.get('/', function(request, response) {
   response.send('Hello World!')
 });
+
+// ##### GAME ACTIONS #####
+
+app.get('/getGames', function(req, res){
+    var arrActiveGames = [];
+    for(gameId in activeGames){
+        arrActiveGames.push(activeGames[gameId]);
+    }
+    return res.status(200).send(arrActiveGames);
+});
+
+// ## Create game entity in DB and start game
 
 app.post('/initGame', function(request, response){
     winston.info("Initializing game: " + request.body.gameName);
@@ -103,8 +120,53 @@ app.post('/initGame', function(request, response){
     });
 });
 
-app.get('/getGames', function(req, res){
-    return res.status(200).send(activeGames);
+app.post('/closeGame', function(req, res){
+    winston.info("Closing game: " + req.body.id);
+    gameModel.findOne({id: req.body.id}, function(err, doc){
+        if(!err){
+            doc.status = "Inactive";
+            doc.save(function(err, game){
+                if(!err){
+                    res.status(200).send(game);
+                } else{
+                    res.status(500).send(err);
+                }
+            });
+        } else{
+            res.status(500).send(err);
+        }
+
+    });
+});
+
+// #### BID FUNCTIONS #####
+
+// Adds bid entity to game (receives bid entity as parameter)
+app.post('/addBid', function(req, res){
+    winston.info("new bid opened in game " + req.body.gameName+": "+req.body.bidDescription);
+    gameModel.findOne({id: req.body.gameId}, function(err, doc){
+        if(!err){
+            doc.bids.push({
+                gameId: doc.id,
+                gameName: doc.gameName,
+                bidDescription: req.body.bidDescription,
+                bidType: req.body.bidType,
+                bidOptions: req.body.bidOptions,
+                timestamp: Date.now(),
+                status: "Active",
+                ttl: req.body.ttl
+            });
+            doc.save(function(err){
+                if(!err){
+                    res.status(200).send(doc.bids[doc.bids.length -1]);
+                } else{
+                    res.status(500).send(err);
+                }
+            })
+        }else{
+            res.status(500).send(err);
+        }
+    });
 });
 
 app.listen(app.get('port'), function() {
