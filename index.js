@@ -83,10 +83,30 @@ gameModel.find({status: 'Active'}, function(err, doc){
     logger.info('currently active games: ' + Object.keys(activeGames).length);
 });
 
+// #### LOGGER SOCKET TO ADMIN UI ######
+pubnub.subscribe({
+    channel : 'adminSocket',
+    error: function(data){
+        logger.error(data);
+    },
+    connect: function(data){
+        logger.info(data);
+        publishAdminMessage("Admin UI Connected");
+    },
+    disconnect: function(data){
+        logger.warn(data);
+    },
+    callback: function(){
 
-app.get('/', function(request, response) {
-  response.send('Hello World!')
+    }
 });
+
+var publishAdminMessage = function(message){
+    pubnub.publish({
+        channel   : 'adminSocket',
+        message   : message
+    });
+};
 
 // ##### GAME ACTIONS #####
 
