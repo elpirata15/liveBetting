@@ -1,4 +1,5 @@
 var express = require('express');
+var cors = require('cors');
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 var pubnub = require("pubnub").init({
@@ -17,6 +18,7 @@ var logger = new (winston.Logger)({
 var app = express();
 
 app.use(bodyParser.json());
+app.use(cors());
 
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
@@ -85,7 +87,7 @@ gameModel.find({status: 'Active'}, function(err, doc){
 
 // #### LOGGER SOCKET TO ADMIN UI ######
 pubnub.subscribe({
-    channel : 'adminSocket',
+    channel : "adminSocket",
     error: function(data){
         logger.error(data);
     },
@@ -96,15 +98,17 @@ pubnub.subscribe({
     disconnect: function(data){
         logger.warn(data);
     },
-    callback: function(){
-
+    message: function(msg){
+        logger.info(msg);
     }
 });
 
 var publishAdminMessage = function(message){
     pubnub.publish({
         channel   : 'adminSocket',
-        message   : message
+        message   : message,
+        callback  : function(e) { console.log( "SUCCESS!", e ); },
+        error     : function(e) { console.log( "FAILED! RETRY PUBLISH!", e ); }
     });
 };
 
