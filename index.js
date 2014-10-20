@@ -139,7 +139,7 @@ app.post('/initGame', function(request, response){
         if(!err){
             // Subscribe to game message socket
             pubnub.subscribe({
-                channel : game.gameName,
+                channel : game.gameName.replace(/\s/gi,'_'),
                 message : receiveBid,
                 error: function(data){
                     logger.error(game.gameName+": "+data);
@@ -164,13 +164,14 @@ app.post('/initGame', function(request, response){
 
 app.post('/closeGame/:id', function(req, res){
     logger.info("Closing game:", req.params.id);
-    gameModel.findOne({id: req.params.id}, function(err, doc){
-        if(!err){
+    gameModel.findOne({_id: req.params.id}, function(err, doc){
+        if(!err || !doc || doc == undefined){
             doc.status = "Inactive";
             doc.save(function(err, game){
                 if(!err){
-                    logger.info("closed game",req.params.id,"successfully");
-                    res.status(200).send(game);
+                    delete activeGames[req.params.id];
+                    logger.info("closed game",game.gameName,"successfully");
+                    res.status(200).end();
                 } else{
                     logger.error(err);
                     res.status(500).send(err);
@@ -189,7 +190,7 @@ app.post('/closeGame/:id', function(req, res){
 // Adds bid entity to game (receives bid entity as parameter)
 app.post('/addBid', function(req, res){
     logger.info("new bid opened in game " + req.body.gameName+": "+req.body.bidDescription);
-    gameModel.findOne({id: req.body.gameId}, function(err, doc){
+    gameModel.findOne({_id: req.body.gameId}, function(err, doc){
         if(!err){
             doc.bids.push({
                 gameId: doc.id,
@@ -218,7 +219,7 @@ app.post('/addBid', function(req, res){
 });
 
 app.get('/closeBid', function(req, res){
-    gameModel.findOne({id: req.body.gameId}, function(err, doc){
+    gameModel.findOne({_id: req.body.gameId}, function(err, doc){
         if(!err){
             doc.bids.id(req.body.bidId).status = "Inactive";
         } else {
@@ -231,7 +232,7 @@ app.get('/closeBid', function(req, res){
 // ## receive bid request object from user through game message socket and add to db
 var receiveBid = function(message, envelope, channel){
     logger.info("received bid request for game: "+channel);
-    gameModel.findOne({id: message.gameId}, function(err, doc){
+    gameModel.findOne({_id: message.gameId}, function(err, doc){
        if(!err){
            if(doc.bids.id(message.bidId).status == "Active"){
                doc.bids.bidRequests.push({
