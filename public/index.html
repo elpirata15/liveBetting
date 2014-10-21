@@ -1,16 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html style="height:100%">
 <head lang="en">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>LiveBetting manager</title>
-<!--<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootswatch/3.2.0/lumen/bootstrap.min.css">-->
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        .red{
+            color:red;
+            font-size: 24px;
+        }
+        .green {
+            color:greenyellow;
+            font-size: 24px;
+        }
+    </style>
 </head>
-<body ng-app="liveBetManager">
-    <div class="well well-lg" ng-view></div>
+<body ng-app="liveBetManager" style="height:100%">
+    <div class="well well-lg" ng-view style="height:100%"></div>
 
 
-    <!-- VENDOR SCRIPTS -->
+<!-- VENDOR SCRIPTS -->
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src=http://cdn.pubnub.com/pubnub.min.js ></script>
     <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
