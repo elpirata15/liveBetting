@@ -40,7 +40,7 @@ angular.module('liveBetManager').controller('eventController',['$scope','$rootSc
                 modal.element.modal();
                 modal.close.then(function(result) {
                     if(result == "Yes"){
-                        betManagerService.closeGame($rootScope.activeGame).success(function(){
+                        betManagerService.closeGame($scope.game).success(function(){
                             alert('Game Closed');
                             window.location = "#/startGame";
                         });
