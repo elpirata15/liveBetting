@@ -5,6 +5,7 @@ angular.module('liveBetManager').controller('eventController',['$scope','$rootSc
         $scope.game = localStorageService.get('game');
         $scope.betSyntax = [];
         $scope.teamRosters = {};
+        $scope.selectedTeamIndex = 0;
         PubNub.ngSubscribe({
             channel : $scope.game.gameName.replace(/\s/gi,'_'),
             message : function(message){
@@ -25,8 +26,9 @@ angular.module('liveBetManager').controller('eventController',['$scope','$rootSc
           $scope.betSyntax[index] = $event.currentTarget.innerHTML;
         };
 
-        $scope.selectTeamName = function($event){
+        $scope.selectTeamName = function($event, index){
           $scope.setSyntax($event, 1);
+            $scope.selectTeamIndex = index;
             betManagerService.getTeamRoster($scope.game.teams).success(function(data){
                 $scope.teamRosters = data;
             });

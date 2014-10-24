@@ -32,13 +32,13 @@
         </div>
         <div class="col-xs-2">
             <div class="btn-group-vertical">
-                <button type="button" ng-click="selectTeamName($event)" class="btn btn-info btn-lg">{{game.teams[0]}}</button>
-                <button type="button" ng-click="selectTeamName($event)" class="btn btn-info btn-lg">{{game.teams[1]}}</button>
+                <button type="button" ng-click="selectTeamName($event,0)" class="btn btn-info btn-lg">{{game.teams[0]}}</button>
+                <button type="button" ng-click="selectTeamName($event,1)" class="btn btn-info btn-lg">{{game.teams[1]}}</button>
             </div>
         </div>
         <div class="col-xs-2">
             <div class="btn-group-vertical">
-                <button type="button" ng-repeat="player in teamRosters[betSyntax[1].toLowerCase()]" class="btn btn-success btn-lg">{{player}}</button>
+                <button type="button" ng-repeat="player in teamRosters[selectedTeamIndex]" class="btn btn-success btn-lg">{{player}}</button>
             </div>
         </div>
         <div class="col-xs-2"></div>
