@@ -340,29 +340,29 @@ var bidChanged = function (message) {
             currentBid.status = "Inactive";
             currentBid.winningOption = req.body.winningOption;
             updateDb(doc, function () {
-                if(checkBids(currentBid.bidRequests, currentBid.winningOption, currentBid.bidOptions[currentBid.winningOption])) {
-                    pubnub.publish({
-                        channel: message.bidId,
-                        message: "OK",
-                        callback: function () {
-                            logger.info("Replied OK to bid ",message.bidId);
-                        },
-                        error: function (e) {
-                            logger.error("FAILED! RETRY PUBLISH!", e);
-                        }
-                    });
-                } else {
-                    pubnub.publish({
-                        channel: message.bidId,
-                        message: "Error",
-                        callback: function () {
-                            logger.info("Replied Error to bid ",message.bidId);
-                        },
-                        error: function (e) {
-                            logger.error("FAILED! RETRY PUBLISH!", e);
-                        }
-                    });
-                }
+                 return checkBids(currentBid.bidRequests, message.bidId, currentBid.winningOption, currentBid.bidOptions[currentBid.winningOption], function(bidId){
+                     pubnub.publish({
+                         channel: bidId,
+                         message: "OK",
+                         callback: function () {
+                             logger.info("Replied OK to bid ",bidId);
+                         },
+                         error: function (e) {
+                             logger.error("FAILED! RETRY PUBLISH!", e);
+                         }
+                     });
+                 }, function(bidId) {
+                     pubnub.publish({
+                         channel: bidId,
+                         message: "Error",
+                         callback: function () {
+                             logger.info("Replied Error to bid ", bidId);
+                         },
+                         error: function (e) {
+                             logger.error("FAILED! RETRY PUBLISH!", e);
+                         }
+                     });
+                 });
             }, function(err){
                 pubnub.publish({
                     channel: message.bidId,
@@ -424,7 +424,7 @@ var receiveBid = function (message, envelope, channel) {
     }
 };
 
-var checkBids = function(bidsRequestsToCheck, winningOption, odds){
+var checkBids = function(bidsRequestsToCheck, bidId, winningOption, odds, callback, errCallback){
     for(var i in bidsRequestsToCheck){
         var currentBidRequest = bidsRequestsToCheck[i];
         if(currentBidRequest.bidOption == winningOption){
@@ -435,26 +435,26 @@ var checkBids = function(bidsRequestsToCheck, winningOption, odds){
             currentBidRequest.status = "Lose";
             currentBidRequest.winAmount = -1 * currentBidRequest.betAmount;
         }
-        return updateUserBalance(currentBidRequest.userId, currentBidRequest.winAmount);
+        return updateUserBalance(currentBidRequest.userId, currentBidRequest.winAmount, bidId, callback, errCallback);
     }
 };
 
-var updateUserBalance = function(user, amount){
+var updateUserBalance = function(user, amount, callback, errCallback){
   userModel.findOne({_id:user}, function(err,doc){
       if(!err){
           doc.balance += amount;
           doc.save(function(err, doc){
             if(!err){
                 logger.info("updated user: ", user, " balance ",amount);
-                return true;
+                return callback(bidId);
             } else {
                 logger.error(err);
-                return false;
+                return errCallback(bidId);
             }
           });
       } else {
           logger.error(err);
-          return false;
+          return errCallback(bidId);
       }
   });
 };
