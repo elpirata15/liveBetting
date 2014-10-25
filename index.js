@@ -35,7 +35,8 @@ var bidRequestEntity = new Schema({
     gameId: ObjectId,
     bidOption: Number,
     status: String,
-    winAmount: Number
+    winAmount: Number,
+    betAmount: Number
 });
 
 var bidEntity = new Schema({
@@ -44,6 +45,7 @@ var bidEntity = new Schema({
     bidDescription: String,
     bidType: String,
     bidOptions: [optionEntity],
+    winningOption: Number,
     timestamp: Date,
     status: String,
     bidRequests: [bidRequestEntity],
@@ -65,7 +67,8 @@ var gameModel = mongoose.model('games', gameEntity);
 var userEntity = new Schema({
     email: String,
     pass: String,
-    fullName: String
+    fullName: String,
+    balance: Number
 });
 
 var userModel = mongoose.model('users', userEntity);
@@ -75,41 +78,49 @@ mongoose.connect("mongodb://root:elirankon86@ds047050.mongolab.com:47050/heroku_
 // #################################################################################################
 
 // Active games cache
-var activeGames = {};
+var cache = {
+    activeGames: {}
+};
 
 // ** DB FUNCTION WITH CACHING **
-var updateDb = function (entity, callback) {
+var updateDb = function (entity, callback, errCallback) {
     return entity.save(function (err, savedEntity) {
         if (!err) {
             callback(savedEntity);
         } else {
             logger.error(err);
-            return response.status(500).send(err);
+            return errCallback(err);
         }
     });
 };
 
-var getEntity = function (entityId) {
-    if (activeGames.hasOwnProperty(entityId)) {
-        return activeGames[entityId];
-    } else {
-        gameModel.findOne({_id: entityId}, function (err, doc) {
-            if (!err || !doc || doc != undefined) {
-                return doc;
-            }
-            else {
-                return false;
-            }
-        });
+var getEntity = function (entityId, cacheType) {
+    var cacheString = cacheType ? cacheType : "activeGames";
+    if (cache[cacheString].hasOwnProperty(entityId)) {
+        return cache[cacheString][entityId];
     }
+    gameModel.findOne({_id: entityId}, function (err, doc) {
+        if (!err || !doc || doc != undefined) {
+            cacheEntity(cacheType ? cacheType : "activeGames", doc);
+            return doc;
+        }
+        else {
+            return false;
+        }
+    });
+
+};
+
+var cacheEntity = function (cacheType, entity) {
+    return cache[cacheType][entity._id] = entity;
 };
 
 // Find active games on server load - in case server fails
 gameModel.find({status: 'Active'}, function (err, doc) {
     for (var ind in doc) {
-        activeGames[doc[ind].id] = doc[ind];
+        cacheEntity("activeGames", doc[ind]);
     }
-    logger.info('currently active games: ' + Object.keys(activeGames).length);
+    logger.info('currently active games: ' + doc.length);
 });
 
 // #### LOGGER SOCKET TO ADMIN UI ######
@@ -145,32 +156,80 @@ var publishAdminMessage = function (message) {
 
 // ##### GAME ACTIONS #####
 
+// For client - get games you can subscribe to
 app.get('/getGames', function (req, res) {
-    var arrActiveGames = [];
-    for (gameId in activeGames) {
-        arrActiveGames.push({gameName: activeGames[gameId].gameName, id: activeGames[gameId]._id});
-    }
-    return res.status(200).send(arrActiveGames);
+    gameModel.where('status').in(['Active', 'Waiting']).exec(function (err, docs) {
+        if (!err && docs.length > 0) {
+            return res.status(200).send(docs);
+        }
+        else {
+            if (docs.length == 0) {
+                logger.info("No games found");
+                return res.status(404).send("No games found");
+            } else {
+                logger.error(err);
+                return res.status(500).send(err);
+            }
+        }
+    });
+});
+
+// For event managers - get waiting events
+app.get('/getWaitingGames', function (req, res) {
+    gameModel.find({status: "Waiting", assignedTo: req.body.id}, function (err, docs) {
+        if (!err && docs.length > 0) {
+            return res.status(200).send(docs);
+        }
+        else {
+            if (docs.length == 0) {
+                logger.info("No games found");
+                return res.status(404).send("No games found");
+            } else {
+                logger.error(err);
+                return res.status(500).send(err);
+            }
+        }
+    });
 });
 
 // ## Create game entity in DB and start game
 
-app.post('/initGame', function (request, response) {
-    logger.info("Initializing game: " + request.body.gameName);
+app.post('/createGame', function (request, response) {
+    logger.info("Creating game: " + request.body.gameName);
     var newGame = new gameModel({
         gameName: request.body.gameName,
         teams: request.body.teams,
         timestamp: Date.now(),
         location: request.body.location,
         type: request.body.type,
-        status: "Active"
+        status: "Waiting"
     });
 
     newGame.save(function (err, game) {
         if (!err) {
+            logger.info("Game created with id " + game.id);
+            return response.status(200).send(game);
+        }
+        else {
+            logger.error(err);
+            return response.status(500).send(err);
+        }
+    });
+});
+
+// Initialize previously created game
+app.post('/initGame/:id', function (req, res) {
+    var game = getEntity(req.params.id);
+    if (game) {
+        game.status = "Active";
+        updateDb(game, function (game) {
+
+            // Add to active games cache
+            cacheEntity("activeGames", game);
+
             // Subscribe to game message socket
             pubnub.subscribe({
-                channel: game.gameName.replace(/\s/gi, '_'),
+                channel: game._id,
                 message: receiveBid,
                 error: function (data) {
                     logger.error(game.gameName + ": " + data);
@@ -182,30 +241,32 @@ app.post('/initGame', function (request, response) {
                     logger.warn(game.gameName + ": " + data);
                 }
             });
-            logger.info("Game initialized with id " + game.id);
-            activeGames[game.id] = game;
-            return response.status(200).send(game);
-        }
-        else {
-            logger.error(err);
-            return response.status(500).send(err);
-        }
-    });
+
+            logger.info("Activated game: ", game.gameName);
+
+        }, function(err){
+            res.status(500).send(err);
+        });
+    } else {
+        res.status(404).end();
+    }
 });
+
 
 app.post('/closeGame/:id', function (req, res) {
     logger.info("Closing game:", req.params.id);
     var doc = getEntity(req.params.id);
-    if (doc != false) {
+    if (doc) {
         doc.status = "Inactive";
         updateDb(doc, function (game) {
             delete activeGames[req.params.id];
             logger.info("closed game", game.gameName, "successfully");
             res.status(200).end();
+        }, function(err){
+            res.status(500).send(err);
         });
     } else {
-        logger.error(err);
-        res.status(500).send(err);
+        res.status(404).end();
     }
 });
 
@@ -215,9 +276,9 @@ app.post('/closeGame/:id', function (req, res) {
 app.post('/addBid', function (req, res) {
     logger.info("new bid opened in game " + req.body.gameName + ": " + req.body.bidDescription);
     var doc = getEntity(req.body.gameId);
-    if (doc != false) {
+    if (doc) {
         doc.bids.push({
-            gameId: doc.id,
+            gameId: req.body.gameId,
             gameName: doc.gameName,
             bidDescription: req.body.bidDescription,
             bidType: req.body.bidType,
@@ -228,32 +289,115 @@ app.post('/addBid', function (req, res) {
         });
         updateDb(doc, function (doc) {
             logger.info("Bid opened successfully");
+            // publish bid to users
+            pubnub.publish({
+                channel: req.body.gameId,
+                message: doc,
+                callback: function () {
+                    logger.info("Published bid for game", doc.gameName);
+                },
+                error: function (e) {
+                    logger.error("FAILED! RETRY PUBLISH!", e);
+                }
+            });
+
+            // Subscribe to bid message socket
+            pubnub.subscribe({
+                channel: doc.bids[doc.bids.length - 1]._id,
+                message: bidChanged,
+                error: function (data) {
+                    logger.error("bid " +channel+": " + data);
+                },
+                connect: function (data) {
+                    logger.info("bid " +channel+ ": " + data);
+                },
+                disconnect: function (data) {
+                    logger.warn("bid " +channel+ ": " + data);
+                }
+            });
+
             res.status(200).send(doc.bids[doc.bids.length - 1]);
+        }, function(err){
+            res.status(500).send(err);
         });
     } else {
-        logger.error(err);
-        res.status(500).send(err);
+        res.status(404).end();
     }
 });
 
-app.get('/closeBid', function (req, res) {
-    var doc = getEntity(req.body.gameId);
-    if (doc != false) {
-        doc.bids.id(req.body.bidId).status = "Inactive";
-        updateDb(doc, function () {
-            res.status(200).end();
-        });
+// ## callback when manager notifies bid has changed - if he closes the bid, close = true. If he pressed a result (close the bid with the winning option)
+var bidChanged = function (message) {
+    var doc = getEntity(message.gameId);
+    var msg = "";
+    if (doc) {
+        var currentBid = doc.bids.id(message.bidId);
+        if (message.close) {
+            currentBid.status = "Inactive";
+        } else {
+            if(!req.body.winningOption){
+                return;
+            }
+            currentBid.status = "Inactive";
+            currentBid.winningOption = req.body.winningOption;
+            updateDb(doc, function () {
+                if(checkBids(currentBid.bidRequests, currentBid.winningOption, currentBid.bidOptions[currentBid.winningOption])) {
+                    pubnub.publish({
+                        channel: message.bidId,
+                        message: "OK",
+                        callback: function () {
+                            logger.info("Replied OK to bid ",message.bidId);
+                        },
+                        error: function (e) {
+                            logger.error("FAILED! RETRY PUBLISH!", e);
+                        }
+                    });
+                } else {
+                    pubnub.publish({
+                        channel: message.bidId,
+                        message: "Error",
+                        callback: function () {
+                            logger.info("Replied Error to bid ",message.bidId);
+                        },
+                        error: function (e) {
+                            logger.error("FAILED! RETRY PUBLISH!", e);
+                        }
+                    });
+                }
+            }, function(err){
+                pubnub.publish({
+                    channel: message.bidId,
+                    message: "ERROR",
+                    callback: function () {
+                        logger.info("Replied Error to bid ",message.bidId);
+                    },
+                    error: function (e) {
+                        logger.error("FAILED! RETRY PUBLISH!", e);
+                    }
+                });
+                return logger.error(err);
+            });
+        }
     } else {
-        logger.error(err);
-        return res.status(500).send(err);
+        pubnub.publish({
+            channel: message.bidId,
+            message: "ERROR",
+            callback: function () {
+                logger.info("Replied Error to bid ",message.bidId);
+            },
+            error: function (e) {
+                logger.error("FAILED! RETRY PUBLISH!", e);
+            }
+        });
+
+        return logger.error("could not find game ", message.gameId);
     }
-});
+};
 
 // ## receive bid request object from user through game message socket and add to db
 var receiveBid = function (message, envelope, channel) {
     logger.info("received bid request for game: " + channel);
     var doc = getEntity(message.gameId);
-    if (doc != false) {
+    if (doc) {
         if (doc.bids.id(message.bidId).status == "Active") {
             doc.bids.bidRequests.push({
                 userId: message.userId,
@@ -261,11 +405,14 @@ var receiveBid = function (message, envelope, channel) {
                 gameId: message.gameId,
                 bidOption: message.bidOption,
                 status: null,
+                betAmount: message.betAmount,
                 winAmount: 0
             });
             updateDb(doc, function () {
                 logger.info("bid request added successfully");
                 return res.status(200).end();
+            }, function(err){
+                return res.status(500).send(err);
             });
         } else {
             logger.warn("request made for inactive bid, request rejected");
@@ -273,11 +420,44 @@ var receiveBid = function (message, envelope, channel) {
             return res.status(403).send("Bid is inactive");
         }
     } else {
-        logger.error(err);
-        return res.status(500).send(err);
+        return res.status(404);
     }
 };
 
+var checkBids = function(bidsRequestsToCheck, winningOption, odds){
+    for(var i in bidsRequestsToCheck){
+        var currentBidRequest = bidsRequestsToCheck[i];
+        if(currentBidRequest.bidOption == winningOption){
+            currentBidRequest.status = "Win";
+            currentBidRequest.winAmount = currentBidRequest.betAmount * odds;
+
+        }else {
+            currentBidRequest.status = "Lose";
+            currentBidRequest.winAmount = -1 * currentBidRequest.betAmount;
+        }
+        return updateUserBalance(currentBidRequest.userId, currentBidRequest.winAmount);
+    }
+};
+
+var updateUserBalance = function(user, amount){
+  userModel.findOne({_id:user}, function(err,doc){
+      if(!err){
+          doc.balance += amount;
+          doc.save(function(err, doc){
+            if(!err){
+                logger.info("updated user: ", user, " balance ",amount);
+                return true;
+            } else {
+                logger.error(err);
+                return false;
+            }
+          });
+      } else {
+          logger.error(err);
+          return false;
+      }
+  });
+};
 
 app.listen(app.get('port'), function () {
     logger.info("Node app is running at localhost:" + app.get('port'));

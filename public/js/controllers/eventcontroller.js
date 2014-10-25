@@ -7,7 +7,7 @@ angular.module('liveBetManager').controller('eventController',['$scope','$rootSc
         $scope.teamRosters = {};
         $scope.selectedTeamIndex = 0;
         PubNub.ngSubscribe({
-            channel : $scope.game.gameName.replace(/\s/gi,'_'),
+            channel : $scope.game._id,
             message : function(message){
 
             },
