@@ -351,46 +351,30 @@ var bidChanged = function (message) {
                              logger.error("FAILED! RETRY PUBLISH!", e);
                          }
                      });
-                 }, function(bidId) {
-                     pubnub.publish({
-                         channel: bidId,
-                         message: "Error",
-                         callback: function () {
-                             logger.info("Replied Error to bid ", bidId);
-                         },
-                         error: function (e) {
-                             logger.error("FAILED! RETRY PUBLISH!", e);
-                         }
-                     });
-                 });
+                 }, publishErrorMsg);
             }, function(err){
-                pubnub.publish({
-                    channel: message.bidId,
-                    message: "ERROR",
-                    callback: function () {
-                        logger.info("Replied Error to bid ",message.bidId);
-                    },
-                    error: function (e) {
-                        logger.error("FAILED! RETRY PUBLISH!", e);
-                    }
-                });
+                publishErrorMsg(message.bidId);
                 return logger.error(err);
             });
         }
     } else {
-        pubnub.publish({
-            channel: message.bidId,
-            message: "ERROR",
-            callback: function () {
-                logger.info("Replied Error to bid ",message.bidId);
-            },
-            error: function (e) {
-                logger.error("FAILED! RETRY PUBLISH!", e);
-            }
-        });
-
+        publishErrorMsg(message.bidId);
         return logger.error("could not find game ", message.gameId);
     }
+};
+
+var publishErrorMsg = function(bidId){
+    pubnub.publish({
+        channel: bidId,
+        message: "ERROR",
+        callback: function () {
+            logger.info("Replied Error to bid ",message.bidId);
+        },
+        error: function (e) {
+            logger.error("FAILED! RETRY PUBLISH!", e);
+        }
+    });
+
 };
 
 // ## receive bid request object from user through game message socket and add to db

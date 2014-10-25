@@ -90,8 +90,8 @@
       <file leaf-file-name="index.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5195652" vertical-offset="7070" max-vertical-offset="7990">
-              <caret line="444" column="32" selection-start-line="444" selection-start-column="32" selection-end-line="444" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.8521739" vertical-offset="5268" max-vertical-offset="7718">
+              <caret line="356" column="41" selection-start-line="356" selection-start-column="41" selection-end-line="356" selection-end-column="41" />
               <folding />
             </state>
           </provider>
@@ -442,7 +442,7 @@
     </task>
     <task id="544a761520d0ef783de1fd2b" summary="subscribe to bid_id socket when receiving new bid from manager &amp; close popup when received &quot;close&quot; from manager">
       <changelist id="" name="544a761520d0ef783de1fd2b subscribe to bid_id socket when receiving new bid from manager &amp; close p..." comment="544a761520d0ef783de1fd2b subscribe to bid_id socket when receiving new bid from manager &amp; close popup when received &quot;close&quot; from manager" />
-      <created>1414247105636</created>
+      <created>1414249587550</created>
       <option name="issue" value="true" />
       <option name="number" value="544a761520d0ef783de1fd2b" />
       <updated>1414246561450</updated>
@@ -453,7 +453,13 @@
       <option name="project" value="LOCAL" />
       <updated>1414246654603</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="made checkBids() async using returns and callbacks">
+      <created>1414247407749</created>
+      <option name="number" value="00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1414247407749</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <option name="createBranch" value="false" />
     <servers>
       <Trello shared="false">
@@ -524,7 +530,8 @@
     <MESSAGE value="implemented caching for entity operations" />
     <MESSAGE value="fixed close game event" />
     <MESSAGE value="open bid_id socket for winning bets message on successful bet publish&#10;implement bid_id socket messages&#10;added bid publishing to users." />
-    <option name="LAST_COMMIT_MESSAGE" value="open bid_id socket for winning bets message on successful bet publish&#10;implement bid_id socket messages&#10;added bid publishing to users." />
+    <MESSAGE value="made checkBids() async using returns and callbacks" />
+    <option name="LAST_COMMIT_MESSAGE" value="made checkBids() async using returns and callbacks" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -912,8 +919,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5195652" vertical-offset="7070" max-vertical-offset="7990">
-          <caret line="444" column="32" selection-start-line="444" selection-start-column="32" selection-end-line="444" selection-end-column="32" />
+        <state vertical-scroll-proportion="0.8521739" vertical-offset="5268" max-vertical-offset="7718">
+          <caret line="356" column="41" selection-start-line="356" selection-start-column="41" selection-end-line="356" selection-end-column="41" />
           <folding />
         </state>
       </provider>
