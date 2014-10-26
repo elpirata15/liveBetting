@@ -8,6 +8,7 @@ var pubnub = require("pubnub").init({
 });
 var bodyParser = require('body-parser');
 var winston = require("winston");
+var async = require("async");
 
 var logger = new (winston.Logger)({
     transports: [
@@ -324,6 +325,37 @@ app.post('/addBid', function (req, res) {
         res.status(404).end();
     }
 });
+var checkBid = function(bidInfo, item, callback){
+    if(item.bidOption == bidInfo.winningBid){
+        item.status = "Win";
+        item.winAmount = item.betAmount * bidInfo.odds;
+    } else {
+        item.status = "Lose";
+        item.winAmount = -1 * item.betAmount;
+    }
+
+    callback();
+};
+
+var updateUserBalanceInDb = function(item, callback){
+    userModel.findOne({_id:item.userId}, function(err,doc){
+        if(!err){
+            doc.balance += item.winAmount;
+            doc.save(function(err, doc){
+                if(!err){
+                    logger.info("updated user: ", user, " balance ",amount);
+                    callback();
+                } else {
+                    logger.error(err);
+                    callback(err);
+                }
+            });
+        } else {
+            logger.error(err);
+            callback(err);
+        }
+    });
+};
 
 // ## callback when manager notifies bid has changed - if he closes the bid, close = true. If he pressed a result (close the bid with the winning option)
 var bidChanged = function (message) {
@@ -339,22 +371,26 @@ var bidChanged = function (message) {
             }
             currentBid.status = "Inactive";
             currentBid.winningOption = req.body.winningOption;
-            updateDb(doc, function () {
-                 return checkBids(currentBid.bidRequests, message.bidId, currentBid.winningOption, currentBid.bidOptions[currentBid.winningOption], function(bidId){
-                     pubnub.publish({
-                         channel: bidId,
-                         message: "OK",
-                         callback: function () {
-                             logger.info("Replied OK to bid ",bidId);
-                         },
-                         error: function (e) {
-                             logger.error("FAILED! RETRY PUBLISH!", e);
-                         }
-                     });
-                 }, publishErrorMsg);
-            }, function(err){
-                publishErrorMsg(message.bidId);
-                return logger.error(err);
+            var winningOdds = currentBid.bidOptions[currentBid.winningOption].odds;
+            async.each(currentBid.bidRequests, checkBid.bind(null, {winningBid: currentBid.winningOption, odds: winningOdds}),
+                function(err) {
+                    if(err){
+                        logger.error(err);
+                    } else {
+                        logger.info("Updated bid requests in bid");
+                    }
+                });
+            async.each(currentBid.bidRequests,updateUserBalanceInDb, function(err){
+                if(err){
+                    logger.error(err);
+                } else {
+                    logger.info("Successfully updated user balances");
+                }
+            });
+
+            // Update bid requests to db
+            return updateDb(doc, function () {
+                logger.info("Successfully updated game entity");
             });
         }
     } else {
@@ -406,41 +442,6 @@ var receiveBid = function (message, envelope, channel) {
     } else {
         return res.status(404);
     }
-};
-
-var checkBids = function(bidsRequestsToCheck, bidId, winningOption, odds, callback, errCallback){
-    for(var i in bidsRequestsToCheck){
-        var currentBidRequest = bidsRequestsToCheck[i];
-        if(currentBidRequest.bidOption == winningOption){
-            currentBidRequest.status = "Win";
-            currentBidRequest.winAmount = currentBidRequest.betAmount * odds;
-
-        }else {
-            currentBidRequest.status = "Lose";
-            currentBidRequest.winAmount = -1 * currentBidRequest.betAmount;
-        }
-        return updateUserBalance(currentBidRequest.userId, currentBidRequest.winAmount, bidId, callback, errCallback);
-    }
-};
-
-var updateUserBalance = function(user, amount, callback, errCallback){
-  userModel.findOne({_id:user}, function(err,doc){
-      if(!err){
-          doc.balance += amount;
-          doc.save(function(err, doc){
-            if(!err){
-                logger.info("updated user: ", user, " balance ",amount);
-                return callback(bidId);
-            } else {
-                logger.error(err);
-                return errCallback(bidId);
-            }
-          });
-      } else {
-          logger.error(err);
-          return errCallback(bidId);
-      }
-  });
 };
 
 app.listen(app.get('port'), function () {
