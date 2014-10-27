@@ -260,7 +260,7 @@ app.post('/closeGame/:id', function (req, res) {
     if (doc) {
         doc.status = "Inactive";
         updateDb(doc, function (game) {
-            delete activeGames[req.params.id];
+            delete cache.activeGames[req.params.id];
             logger.info("closed game", game.gameName, "successfully");
             res.status(200).end();
         }, function(err){
