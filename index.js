@@ -56,6 +56,7 @@ var bidEntity = new Schema({
 var gameEntity = new Schema({
     gameName: String,
     teams: [String],
+    assignedManager: ObjectId,
     location: String,
     timestamp: Date,
     type: String,
