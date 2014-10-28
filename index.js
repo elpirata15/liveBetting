@@ -177,7 +177,7 @@ app.post('/createGame', function (request, response) {
     var newGame = new gameModel({
         gameName: request.body.gameName,
         teams: request.body.teams,
-        timestamp: Date.now(),
+        timestamp: new Date(request.body.timestamp),
         location: request.body.location,
         type: request.body.type,
         status: "Waiting"
