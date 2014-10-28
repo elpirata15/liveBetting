@@ -1,5 +1,4 @@
 var express = require('express');
-var cors = require('cors');
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 var pubnub = require("pubnub").init({
@@ -7,19 +6,14 @@ var pubnub = require("pubnub").init({
     subscribe_key: "sub-c-9f28fbce-55f5-11e4-8cbc-02ee2ddab7fe"
 });
 var bodyParser = require('body-parser');
-var winston = require("winston");
 var async = require("async");
 
-var logger = new (winston.Logger)({
-    transports: [
-        new (winston.transports.Console)(),
-        new (winston.transports.File)({filename: 'default.log'})
-    ]
-});
+var serverLogger = require("./serverLogger");
+
+var logger = new serverLogger.ServerLogger();
 var app = express();
 
 app.use(bodyParser.json());
-app.use(cors());
 
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
@@ -79,9 +73,13 @@ mongoose.connect("mongodb://root:elirankon86@ds047050.mongolab.com:47050/heroku_
 
 // #################################################################################################
 
+// Game loggers
+var gameLoggers = {}
+
 // Active games cache
 var cache = {
     activeGames: {}
+
 };
 
 // ** DB FUNCTION WITH CACHING **
@@ -117,6 +115,15 @@ var cacheEntity = function (cacheType, entity) {
     return cache[cacheType][entity._id] = entity;
 };
 
+// #### GAME LOGGER HELPER OBJECT #####
+var setLogger = function(gameId){
+    gameLoggers[gameId] = new serverLogger.ServerLogger(gameId);
+};
+
+var removeLogger = function(gameId){
+    delete gameLoggers.gameId;
+};
+
 // Find active games on server load - in case server fails
 gameModel.find({status: 'Active'}, function (err, doc) {
     for (var ind in doc) {
@@ -124,37 +131,6 @@ gameModel.find({status: 'Active'}, function (err, doc) {
     }
     logger.info('currently active games: ' + doc.length);
 });
-
-// #### LOGGER SOCKET TO ADMIN UI ######
-pubnub.subscribe({
-    channel: "adminSocket",
-    error: function (data) {
-        logger.error(data);
-    },
-    connect: function (data) {
-        logger.info(data);
-        publishAdminMessage("Admin UI Connected");
-    },
-    disconnect: function (data) {
-        logger.warn(data);
-    },
-    message: function (msg) {
-        logger.info(msg);
-    }
-});
-
-var publishAdminMessage = function (message) {
-    pubnub.publish({
-        channel: 'adminSocket',
-        message: message,
-        callback: function (e) {
-            console.log("SUCCESS!", e);
-        },
-        error: function (e) {
-            console.log("FAILED! RETRY PUBLISH!", e);
-        }
-    });
-};
 
 // ##### GAME ACTIONS #####
 
@@ -243,8 +219,8 @@ app.post('/initGame/:id', function (req, res) {
                     logger.warn(game.gameName + ": " + data);
                 }
             });
-
-            logger.info("Activated game: ", game.gameName);
+            setLogger(game._id);
+            gameLoggers[game._id].info("Activated game: ", game.gameName);
             return res.status(200).end();
 
         }, function(err){
@@ -278,6 +254,7 @@ app.post('/closeGame/:id', function (req, res) {
         doc.status = "Inactive";
         updateDb(doc, function (game) {
             delete cache.activeGames[req.params.id];
+            removeLogger(game._id);
             logger.info("closed game", game.gameName, "successfully");
             res.status(200).end();
         }, function(err){
@@ -306,16 +283,16 @@ app.post('/addBid', function (req, res) {
             ttl: req.body.ttl
         });
         updateDb(doc, function (doc) {
-            logger.info("Bid opened successfully");
+            gameLoggers[doc._id].info("Bid opened successfully");
             // publish bid to users
             pubnub.publish({
                 channel: req.body.gameId,
                 message: doc,
                 callback: function () {
-                    logger.info("Published bid for game", doc.gameName);
+                    gameLoggers[doc._id].info("Published bid for game", doc.gameName);
                 },
                 error: function (e) {
-                    logger.error("FAILED! RETRY PUBLISH!", e);
+                    gameLoggers[doc._id].error("FAILED! RETRY PUBLISH!", e);
                 }
             });
 
@@ -324,13 +301,13 @@ app.post('/addBid', function (req, res) {
                 channel: doc.bids[doc.bids.length - 1]._id,
                 message: bidChanged,
                 error: function (data) {
-                    logger.error("bid " +channel+": " + data);
+                    gameLoggers[doc._id].error("bid " +channel+": " + data);
                 },
                 connect: function (data) {
-                    logger.info("bid " +channel+ ": " + data);
+                    gameLoggers[doc._id].info("bid " +channel+ ": " + data);
                 },
                 disconnect: function (data) {
-                    logger.warn("bid " +channel+ ": " + data);
+                    gameLoggers[doc._id].info("bid " +channel+ ": " + data);
                 }
             });
 
@@ -360,15 +337,15 @@ var updateUserBalanceInDb = function(item, callback){
             doc.balance += item.winAmount;
             doc.save(function(err, doc){
                 if(!err){
-                    logger.info("updated user: ", user, " balance ",amount);
+                    gameLoggers[doc._id].info("updated user: ", user, " balance ",amount);
                     callback();
                 } else {
-                    logger.error(err);
+                    gameLoggers[doc._id].error(err);
                     callback(err);
                 }
             });
         } else {
-            logger.error(err);
+            gameLoggers[doc._id].error(err);
             callback(err);
         }
     });
@@ -392,27 +369,27 @@ var bidChanged = function (message) {
             async.each(currentBid.bidRequests, checkBid.bind(null, {winningBid: currentBid.winningOption, odds: winningOdds}),
                 function(err) {
                     if(err){
-                        logger.error(err);
+                        gameLoggers[doc._id].error(err);
                     } else {
-                        logger.info("Updated bid requests in bid");
+                        gameLoggers[doc._id].info("Updated bid requests in bid");
                     }
                 });
             async.each(currentBid.bidRequests,updateUserBalanceInDb, function(err){
                 if(err){
-                    logger.error(err);
+                    gameLoggers[doc._id].error(err);
                 } else {
-                    logger.info("Successfully updated user balances");
+                    gameLoggers[doc._id].info("Successfully updated user balances");
                 }
             });
 
             // Update bid requests to db
             return updateDb(doc, function () {
-                logger.info("Successfully updated game entity");
+                gameLoggers[doc._id].info("Successfully updated game entity");
             });
         }
     } else {
         publishErrorMsg(message.bidId);
-        return logger.error("could not find game ", message.gameId);
+        return gameLoggers[doc._id].error("could not find game ", message.gameId);
     }
 };
 
@@ -421,10 +398,10 @@ var publishErrorMsg = function(bidId){
         channel: bidId,
         message: "ERROR",
         callback: function () {
-            logger.info("Replied Error to bid ",message.bidId);
+            gameLoggers[doc._id].info("Replied Error to bid ",message.bidId);
         },
         error: function (e) {
-            logger.error("FAILED! RETRY PUBLISH!", e);
+            gameLoggers[doc._id].error("FAILED! RETRY PUBLISH!", e);
         }
     });
 
@@ -432,7 +409,7 @@ var publishErrorMsg = function(bidId){
 
 // ## receive bid request object from user through game message socket and add to db
 var receiveBid = function (message, envelope, channel) {
-    logger.info("received bid request for game: " + channel);
+    gameLoggers[doc._id].info("received bid request for game: " + channel);
     var doc = getEntity(message.gameId);
     if (doc) {
         if (doc.bids.id(message.bidId).status == "Active") {
@@ -446,13 +423,13 @@ var receiveBid = function (message, envelope, channel) {
                 winAmount: 0
             });
             updateDb(doc, function () {
-                logger.info("bid request added successfully");
+                gameLoggers[doc._id].info("bid request added successfully");
                 return res.status(200).end();
             }, function(err){
                 return res.status(500).send(err);
             });
         } else {
-            logger.warn("request made for inactive bid, request rejected");
+            gameLoggers[doc._id].error("request made for inactive bid, request rejected");
             // send unauthorized code to client
             return res.status(403).send("Bid is inactive");
         }
