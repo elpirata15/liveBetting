@@ -176,8 +176,8 @@ app.get('/getGames', function (req, res) {
 });
 
 // For event managers - get waiting events
-app.get('/getWaitingGames', function (req, res) {
-    gameModel.find({status: "Waiting", assignedTo: req.body.id}, function (err, docs) {
+app.get('/getWaitingGames/:id', function (req, res) {
+    gameModel.find({status: "Waiting", assignedTo: req.params.id}, function (err, docs) {
         if (!err && docs.length > 0) {
             return res.status(200).send(docs);
         }
