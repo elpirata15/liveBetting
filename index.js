@@ -245,15 +245,31 @@ app.post('/initGame/:id', function (req, res) {
             });
 
             logger.info("Activated game: ", game.gameName);
+            return res.status(200).end();
 
         }, function(err){
-            res.status(500).send(err);
+            return res.status(500).send(err);
         });
     } else {
         res.status(404).end();
     }
 });
 
+// Assign specified game to specified manager
+app.get('/assignGame/:gameId/:managerId', function(req, res){
+    var game = getEntity(req.params.id);
+    if(game){
+        game.assignedManager = req.params.managerId;
+        updateDb(game, function(game){
+            logger.info("assigned game: ", game.gameName, " to manager ", game.assignedManager);
+            return res.status(200).end();
+        }, function(err){
+            return res.status(500).send(err);
+        })
+    } else {
+        res.status(404).end();
+    }
+});
 
 app.post('/closeGame/:id', function (req, res) {
     logger.info("Closing game:", req.params.id);
