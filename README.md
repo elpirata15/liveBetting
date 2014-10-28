@@ -3,10 +3,10 @@
 please install nodejs to run this locally
 
 after cloning repo - install all dependencies using NPM:  
-Let's say I cloned to c:\users\eliran\documents\liveBetting.  
+Let's say I cloned to `c:\users\eliran\documents\liveBetting`.  
 
-run cmd  
-navigate to c:\users\eliran\documents\liveBetting  
+run `cmd`  
+navigate to `c:\users\eliran\documents\liveBetting`  
 run `npm install`
 
 to run the server  
