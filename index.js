@@ -371,7 +371,7 @@ var bidChanged = function (message) {
             }
             currentBid.status = "Inactive";
             currentBid.winningOption = req.body.winningOption;
-            var winningOdds = currentBid.bidOptions[currentBid.winningOption].odds;
+            var winningOdds = currentBid.bidOptions[currentBid.winningOption].optionsOdds;
             async.each(currentBid.bidRequests, checkBid.bind(null, {winningBid: currentBid.winningOption, odds: winningOdds}),
                 function(err) {
                     if(err){
