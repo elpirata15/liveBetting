@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="JavaScriptLibraryMappings">
-    <file url="file://$PROJECT_DIR$" libraries="{node-js-getting-started node_modules}" />
-    <file url="file://$PROJECT_DIR$/index.js" libraries="{Node.js Globals}" />
-    <file url="PROJECT" libraries="{Node.js v0.10.26 Core Modules, body-parser-DefinitelyTyped, express-DefinitelyTyped, mongoose, mongoose-DefinitelyTyped, node-js-getting-started node_modules, winston-DefinitelyTyped}" />
-  </component>
-</project>
-
