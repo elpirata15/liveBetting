@@ -7,7 +7,7 @@ angular.module('liveBetManager', [
     'angularModalService',
     'pubnub.angular.service'
 ]).config(['$routeProvider', 'localStorageServiceProvider', function($routeProvider, localStorageServiceProvider){
-    $routeProvider.when('/', {templateUrl: 'partials/home.html'});
+    $routeProvider.when('/', {templateUrl: 'partials/home.html', controller:'homeController'});
     $routeProvider.when('/startGame', {templateUrl: 'partials/startgame.html', controller:'gameController'});
     $routeProvider.when('/eventManager', {templateUrl: 'partials/eventmanager.html', controller:'eventController'});
     $routeProvider.otherwise('/');

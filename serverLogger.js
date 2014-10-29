@@ -13,36 +13,39 @@ var logger = new (winston.Logger)({
 
 var ServerLogger = function ServerLogger(gameId){
 
-    ServerLogger.gameId = gameId;
-
-    ServerLogger.info = function(messages){
+    this.gameId = gameId || "";
+    this.info = function(messages){
         var pubnubMessages = [];
         pubnubMessages.push("Info: ");
-        pubnubMessages.concat(messages.slice());
+        pubnubMessages = pubnubMessages.concat(messages);
         pubnub.publish({
-            channel: ServerLogger.gameId + 'adminSocket',
-            message: pubnubMessages.join(),
+            channel: this.gameId + 'adminSocket',
+            message: pubnubMessages.join(' '),
             error: function(e){
                 logger.error("publishing info message to PubNub failed: ", e);
             }
         });
         logger.info(messages);
     };
-
-    ServerLogger.error = function(messages){
+    this.error = function(messages){
         var pubnubMessages = [];
         pubnubMessages.push("Error: ");
-        pubnubMessages.concat(messages.slice());
+        pubnubMessages = pubnubMessages.concat(messages);
         pubnub.publish({
-            channel: ServerLogger.gameId + 'adminSocket',
-            message: pubnubMessages.join(),
+            channel: this.gameId + 'adminSocket',
+            message: pubnubMessages.join(' '),
             error: function(e){
                 logger.error("publishing info message to PubNub failed: ", e);
             }
         });
         logger.error(messages);
     };
+
 };
+
+//ServerLogger.prototype.info =
+//
+//ServerLogger.prototype.error =
 
 module.exports = ServerLogger;
 

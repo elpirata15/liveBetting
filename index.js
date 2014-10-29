@@ -10,7 +10,7 @@ var async = require("async");
 
 var serverLogger = require("./serverLogger");
 
-var logger = new serverLogger.ServerLogger();
+var logger = new serverLogger();
 var app = express();
 
 app.use(bodyParser.json());

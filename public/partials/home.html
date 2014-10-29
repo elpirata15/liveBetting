@@ -1,6 +1,17 @@
-<div id="start" style="text-align: center; vertical-align: middle;">
-    <a class="btn btn-primary btn-lg" href="#/startGame">Start Game</a></li>
+<div class="col-xs-4 col-xs-offset-4" style="position:relative; top:35%">
+    <div class="panel panel-primary ">
+        <div class="panel-heading">
+            <h3 class="panel-title text-center">Log In As:</h3>
+        </div>
+        <div class="panel-body">
+            <input type="text" ng-model="userName" placeholder="Your name" class="form-control">
+            <br/>
+            <select class="form-control" name="role" ng-model="loginRole">
+                <option selected>Master</option>
+                <option>Manager</option>
+            </select>
+            <br />
+            <button type="button" ng-disabled="!userName || !loginRole" ng-click="doLogin()" class="col-xs-2 col-xs-offset-5 btn btn-large btn-primary">Log In</button>
+        </div>
+    </div>
 </div>
-<script>
-
-</script>
