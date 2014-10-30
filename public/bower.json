@@ -22,6 +22,7 @@
     "jquery": "~2.1.1",
     "pubnub": "~3.6.4",
     "pubnub-angular": "~1.1.0",
-    "angular-modal-service": "~0.4.0"
+    "angular-modal-service": "~0.4.0",
+    "eonasdan-bootstrap-datetimepicker": "~3.1.3"
   }
 }

@@ -8,6 +8,8 @@ angular.module('liveBetManager', [
     'pubnub.angular.service'
 ]).config(['$routeProvider', 'localStorageServiceProvider', function($routeProvider, localStorageServiceProvider){
     $routeProvider.when('/', {templateUrl: 'partials/home.html', controller:'homeController'});
+    $routeProvider.when('/gameMaster', {templateUrl: 'partials/gamemaster.html', controller:'gameMasterController'});
+    $routeProvider.when('/gameMaster/newGame', {templateUrl: 'partials/startgame.html', controller:'gameController'});
     $routeProvider.when('/startGame', {templateUrl: 'partials/startgame.html', controller:'gameController'});
     $routeProvider.when('/eventManager', {templateUrl: 'partials/eventmanager.html', controller:'eventController'});
     $routeProvider.otherwise('/');
@@ -23,4 +25,10 @@ angular.module('liveBetManager', [
     };
 
     PubNub.init(keys);
+}).controller('ModalController', function($scope, close) {
+
+    $scope.close = function(result) {
+        close(result, 500); // close, but give 500ms for bootstrap to animate
+    };
+
 });

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>LiveBetting manager</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootswatch/3.2.0/lumen/bootstrap.min.css">
     <style>
         .red{
             color:red;
@@ -17,11 +17,11 @@
     </style>
 </head>
 <body ng-app="liveBetManager" style="height:100%">
-    <div class="well well-lg" ng-view style="height:100%"></div>
+    <div class="container" ng-view style="padding-top:5px;"></div>
 
 
 <!-- VENDOR SCRIPTS -->
-    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src=http://cdn.pubnub.com/pubnub.min.js ></script>
     <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
@@ -36,6 +36,7 @@
     <script type="text/javascript" src="js/controllers/gamecontroller.js"></script>
     <script type="text/javascript" src="js/controllers/eventcontroller.js"></script>
     <script type="text/javascript" src="js/controllers/homecontroller.js"></script>
+    <script type="text/javascript" src="js/controllers/gamemastercontroller.js"></script>
     <script type="text/javascript" src="js/services/betmanagerservice.js"></script>
 </body>
 </html>

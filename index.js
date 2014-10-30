@@ -50,7 +50,7 @@ var bidEntity = new Schema({
 var gameEntity = new Schema({
     gameName: String,
     teams: [String],
-    assignedManager: ObjectId,
+    assignedTo: String,
     location: String,
     timestamp: Date,
     type: String,
@@ -178,6 +178,7 @@ app.post('/createGame', function (request, response) {
         gameName: request.body.gameName,
         teams: request.body.teams,
         timestamp: new Date(request.body.timestamp),
+        assignedTo: request.body.assignedTo,
         location: request.body.location,
         type: request.body.type,
         status: "Waiting"
@@ -235,9 +236,9 @@ app.post('/initGame/:id', function (req, res) {
 app.get('/assignGame/:gameId/:managerId', function(req, res){
     var game = getEntity(req.params.id);
     if(game){
-        game.assignedManager = req.params.managerId;
+        game.assignedTo = req.params.managerId;
         updateDb(game, function(game){
-            logger.info("assigned game: ", game.gameName, " to manager ", game.assignedManager);
+            logger.info("assigned game: ", game.gameName, " to manager ", game.assignedTo);
             return res.status(200).end();
         }, function(err){
             return res.status(500).send(err);
