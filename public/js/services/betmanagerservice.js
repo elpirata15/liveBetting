@@ -15,6 +15,11 @@ angular.module('liveBetManager').service('betManagerService', ['$http', function
         return $http.get('/sampleTeams.json');
     };
 
+    betManagerService.getManagers = function(){
+      // TODO: Add call to service to get real managing users
+        return ["elirankon","fishondor","adi.millis","pilpel"];
+    };
+
     betManagerService.getGames = function(){
         return $http.get('/getGames');
     };

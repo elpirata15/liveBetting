@@ -5,7 +5,8 @@ angular.module('liveBetManager', [
     'ngRoute',
     'LocalStorageModule',
     'angularModalService',
-    'pubnub.angular.service'
+    'pubnub.angular.service',
+    'ngGrid'
 ]).config(['$routeProvider', 'localStorageServiceProvider', function($routeProvider, localStorageServiceProvider){
     $routeProvider.when('/', {templateUrl: 'partials/home.html', controller:'homeController'});
     $routeProvider.when('/gameMaster', {templateUrl: 'partials/gamemaster.html', controller:'gameMasterController'});

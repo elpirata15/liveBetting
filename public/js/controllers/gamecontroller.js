@@ -14,4 +14,6 @@ angular.module('liveBetManager').controller('gameController',['$scope','$rootSco
             alert('game created');
         });
     };
+
+    $scope.managers = betManagerService.getManagers();
 }]);

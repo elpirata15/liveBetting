@@ -14,4 +14,6 @@ function ($scope, $rootScope, $cookieStore) {
                 $location.path("#/initGame");
         }
     };
+
+
 }]);
