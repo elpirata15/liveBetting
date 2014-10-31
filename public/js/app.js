@@ -26,9 +26,14 @@ angular.module('liveBetManager', [
     };
 
     PubNub.init(keys);
-}).controller('ModalController', function($scope, close) {
+}).controller('ModalController', function($scope, close,betManagerService) {
+
+    $scope.chosenName;
+
+    $scope.managers = betManagerService.getManagers();
 
     $scope.close = function(result) {
+        result = result || $scope.chosenName;
         close(result, 500); // close, but give 500ms for bootstrap to animate
     };
 

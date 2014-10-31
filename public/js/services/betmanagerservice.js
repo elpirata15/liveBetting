@@ -20,6 +20,10 @@ angular.module('liveBetManager').service('betManagerService', ['$http', function
         return ["elirankon","fishondor","adi.millis","pilpel"];
     };
 
+    betManagerService.assignGame = function(gameId, managerId){
+        return $http.get('/assignGame/'+gameId+'/'+managerId);
+    };
+
     betManagerService.getGames = function(){
         return $http.get('/getGames');
     };
