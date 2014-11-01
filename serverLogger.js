@@ -28,7 +28,7 @@ var ServerLogger = function ServerLogger(gameId){
                 logger.error("publishing info message to PubNub failed: ", e);
             }
         });
-        logger.info(pubnubMessages);
+        logger.info(pubnubMessages.join(''));
     };
     this.error = function(){
         var pubnubMessages = [];
@@ -43,14 +43,26 @@ var ServerLogger = function ServerLogger(gameId){
                 logger.error("publishing info message to PubNub failed: ", e);
             }
         });
-        logger.error(pubnubMessages);
+        logger.error(pubnubMessages.join(''));
     };
 
 };
 
-//ServerLogger.prototype.info =
-//
-//ServerLogger.prototype.error =
+// per game loggers
+var gameLoggers = {};
+
+exports.gameLogger = {
+    setLogger: function (gameId) {
+        gameLoggers[gameId] = new ServerLogger(gameId);
+    },
+    removeLogger: function (gameId) {
+        delete gameLoggers[gameId];
+    },
+    log: function(gameId){
+        return gameLoggers[gameId].info(arguments.slice(1));
+    }
+};
+
 
 module.exports = ServerLogger;
 
