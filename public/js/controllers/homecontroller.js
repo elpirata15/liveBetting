@@ -1,6 +1,6 @@
 'use strict';
-angular.module('liveBetManager').controller('homeController', ['$scope', '$rootScope', '$cookieStore',
-function ($scope, $rootScope, $cookieStore) {
+angular.module('liveBetManager').controller('homeController', ['$scope', '$rootScope', '$cookieStore','$location',
+function ($scope, $rootScope, $cookieStore, $location) {
 
     $scope.userName;
     $scope.loginRole;
