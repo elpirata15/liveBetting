@@ -72,9 +72,9 @@ exports.updateDb = function (entity, callback, errCallback) {
     return entity.save(function (err, savedEntity) {
         if (!err) {
             cacheEntity("activeGames", savedEntity);
-            return callback(savedEntity);
+            callback(savedEntity);
         } else {
-            return errCallback(err);
+            errCallback(err);
         }
     });
 };
@@ -87,10 +87,10 @@ exports.getEntity = function (entityId, cacheType, callback) {
     gameModel.findOne({_id: entityId}, function (err, doc) {
         if (!err || !doc || doc != undefined) {
             cacheEntity(cacheType ? cacheType : "activeGames", doc);
-            return callback(doc);
+            callback(doc);
         }
         else {
-            return callback(false);
+            callback(false);
         }
     });
 

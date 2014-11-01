@@ -1,5 +1,5 @@
 'use strict';
-angular.module('liveBetManager').controller('gameMasterController', ['$scope', '$rootScope', 'betManagerService', 'ModalService', function ($scope, $rootScope, betManagerService, ModalService) {
+angular.module('liveBetManager').controller('gameMasterController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', 'ModalService', '$timeout', function ($scope, $rootScope, PubNub, betManagerService, ModalService, $timeout) {
     $scope.selectedGame;
     $scope.games = [];
 
@@ -40,6 +40,18 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
         }
     };
 
+    $scope.messages = [];
+
+    PubNub.ngSubscribe({
+        channel: 'adminSocket',
+        message: function (message) {
+            $scope.messages.push(message[0]);
+            $timeout(function(){
+                $scope.$apply();
+            })
+        }
+    });
+
     $scope.reassign = function(){
         ModalService.showModal({
             templateUrl: 'modals/reassign.html',
@@ -49,7 +61,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
             modal.close.then(function(result) {
                 if(result){
                     betManagerService.assignGame($scope.selectedGame._id, result).success(function(){
-                        alert('Game assigned');
+                        //alert('Game assigned');
                         getData();
                     });
                 }
@@ -66,7 +78,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
             modal.close.then(function(result) {
                 if(result == "Yes"){
                     betManagerService.closeGame($scope.selectedGame).success(function(){
-                        alert('Game Closed');
+                        //alert('Game Closed');
                         getData();
                     });
                 }

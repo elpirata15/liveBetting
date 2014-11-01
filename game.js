@@ -115,9 +115,9 @@ exports.initGame = function (req, res) {
 
 // Assign specified game to specified manager
 exports.assignGame = function(req, res){
-    dbOperations.getEntity(req.params.gameId, null, function(game){
+    dbOperations.getEntity(req.body.gameId, null, function(game){
         if(game){
-            game.assignedTo = req.params.managerId;
+            game.assignedTo = req.body.managerId;
             dbOperations.updateDb(game, function(game){
                 logger.info("assigned game: ", game.gameName, " to manager ", game.assignedTo);
                 return res.status(200).end();

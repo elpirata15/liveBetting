@@ -21,7 +21,7 @@ angular.module('liveBetManager').service('betManagerService', ['$http', function
     };
 
     betManagerService.assignGame = function(gameId, managerId){
-        return $http.get('/assignGame/'+gameId+'/'+managerId);
+        return $http.post('/assignGame/', {gameId: gameId, managerId: managerId});
     };
 
     betManagerService.getGames = function(){

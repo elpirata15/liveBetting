@@ -26,7 +26,7 @@ app.post('/createGame', gameController.createGame);
 app.post('/initGame/:id', gameController.initGame);
 
 // Assign specified game to specified manager
-app.get('/assignGame/:gameId/:managerId', gameController.assignGame);
+app.post('/assignGame/', gameController.assignGame);
 
 app.post('/closeGame/:id', gameController.closeGame);
 
