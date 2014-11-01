@@ -81,8 +81,14 @@ exports.createGame = function (request, response) {
 
 // Initialize previously created game
 exports.initGame = function (req, res) {
-    dbOperations.getEntity(req.params.id, null, function(game){
-        if (game) {
+    var minDate = new Date(new Date().getTime() - 15 * 60000);
+    var maxDate = new Date(new Date().getTime() + 15 * 60000);
+    dbOperations.GameModel.findOne({
+        _id: req.params.id,
+        timestamp: {$gte: minDate, $lte: maxDate},
+        assignedTo: req.body.userId
+    }, function (err, game) {
+        if (!err && game) {
             game.status = "Active";
             dbOperations.updateDb(game, function (game) {
 
@@ -101,27 +107,24 @@ exports.initGame = function (req, res) {
                     }
                 });
                 serverLogger.gameLogger.setLogger(game._id);
-                serverLogger.gameLogger.log(game._id ,"Activated game: ", game.gameName);
-                return res.status(200).end();
-
-            }, function(err){
-                return res.status(500).send(err);
+                serverLogger.gameLogger.log(game._id, "Activated game: ", game.gameName);
+                return res.status(200).send(game);
             });
-        } else {
-            res.status(404).end();
+        }else {
+            res.status(500).send(err);
         }
     });
 };
 
 // Assign specified game to specified manager
-exports.assignGame = function(req, res){
-    dbOperations.getEntity(req.body.gameId, null, function(game){
-        if(game){
+exports.assignGame = function (req, res) {
+    dbOperations.getEntity(req.body.gameId, null, function (game) {
+        if (game) {
             game.assignedTo = req.body.managerId;
-            dbOperations.updateDb(game, function(game){
+            dbOperations.updateDb(game, function (game) {
                 logger.info("assigned game: ", game.gameName, " to manager ", game.assignedTo);
                 return res.status(200).end();
-            }, function(err){
+            }, function (err) {
                 return res.status(500).send(err);
             })
         } else {
@@ -132,15 +135,15 @@ exports.assignGame = function(req, res){
 
 exports.closeGame = function (req, res) {
     logger.info("Closing game:", req.params.id);
-    dbOperations.getEntity(req.params.id, null, function(doc){
+    dbOperations.getEntity(req.params.id, null, function (doc) {
         if (doc) {
             doc.status = "Inactive";
             dbOperations.updateDb(doc, function (game) {
-                dbOperations.uncacheEntity("activeGames",req.params.id);
+                dbOperations.uncacheEntity("activeGames", req.params.id);
                 serverLogger.gameLogger.removeLogger(game._id);
                 logger.info("closed game", game.gameName, "successfully");
                 res.status(200).end();
-            }, function(err){
+            }, function (err) {
                 res.status(500).send(err);
             });
         } else {
