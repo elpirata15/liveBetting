@@ -79,7 +79,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
         }).then(function(modal) {
             modal.element.modal();
             modal.close.then(function(result) {
-                if(result){
+                if(result.toLowerCase() != 'cancel'){
                     betManagerService.assignGame($scope.selectedGame._id, result).success(function(){
                         //alert('Game assigned');
                         getData();
