@@ -16,6 +16,9 @@ app.use(express.static(__dirname + '/public'));
 // For client - get games you can subscribe to
 app.get('/getGames', gameController.getGames);
 
+// Get single game info
+app.get('/getGame/:id', gameController.getGames);
+
 // For event managers - get waiting events
 app.get('/getWaitingGames/:id', gameController.getWaitingGames);
 
@@ -34,6 +37,10 @@ app.post('/closeGame/:id', gameController.closeGame);
 
 // Adds bid entity to game (receives bid entity as parameter)
 app.post('/addBid', bidController.addBid);
+
+app.get('/defaultLog', function(req, res){
+    res.sendFile('default.log');
+});
 
 app.listen(app.get('port'), function () {
     logger.info("Node app is running at localhost:" + app.get('port'));

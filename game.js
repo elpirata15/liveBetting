@@ -36,6 +36,18 @@ exports.getGames = function (req, res) {
     });
 };
 
+// Get single game info
+exports.getGame = function(req, res){
+  logger.info('getting game info for game ', req.res.id);
+    dbOperations.getEntity(req.params.id, null, function(game){
+     if(game){
+         return game;
+     } else {
+         res.status(404).end();
+     }
+  });
+};
+
 // For event managers - get waiting events
 exports.getWaitingGames = function (req, res) {
     dbOperations.GameModel.find({status: "Waiting", assignedTo: req.params.id}, function (err, docs) {
@@ -55,28 +67,49 @@ exports.getWaitingGames = function (req, res) {
 };
 
 // ## Create game entity in DB and start game
-exports.createGame = function (request, response) {
-    logger.info("Creating game: " + request.body.gameName);
-    var newGame = new dbOperations.GameModel({
-        gameName: request.body.gameName,
-        teams: request.body.teams,
-        timestamp: new Date(request.body.timestamp),
-        assignedTo: request.body.assignedTo,
-        location: request.body.location,
-        type: request.body.type,
-        status: "Waiting"
-    });
+exports.createGame = function (req, res) {
+    var newGame;
+    if(req.body._id){
+        logger.info("Updating game: ", req.body.gameName);
+        dbOperations.getEntity(req.body._id, null, function(game){
+            game.gameName = req.body.gameName;
+            game.teams = req.body.teams;
+            game.timestamp = new Date(req.body.timestamp);
+            game.assignedTo = req.body.assignedTo;
+            game.location = req.body.location;
+            game.type = req.body.type;
+            game.status = "Waiting";
+            dbOperations.updateDb(game, function(game){
+                logger.info("Updated game ", game.gameName);
+                return res.status(200).send(game);
+            }, function(err){
+                logger.error(err);
+                return res.status(500).send(err);
+            });
+        });
+    } else {
+        logger.info("Creating game: ", req.body.gameName);
+        newGame = new dbOperations.GameModel({
+            gameName: req.body.gameName,
+            teams: req.body.teams,
+            timestamp: new Date(req.body.timestamp),
+            assignedTo: req.body.assignedTo,
+            location: req.body.location,
+            type: req.body.type,
+            status: "Waiting"
+        });
 
-    newGame.save(function (err, game) {
-        if (!err) {
-            logger.info("Game created with id " + game.id);
-            return response.status(200).send(game);
-        }
-        else {
-            logger.error(err);
-            return response.status(500).send(err);
-        }
-    });
+        newGame.save(function (err, game) {
+            if (!err) {
+                logger.info("Game created with id " + game.id);
+                return res.status(200).send(game);
+            }
+            else {
+                logger.error(err);
+                return res.status(500).send(err);
+            }
+        });
+    }
 };
 
 // Initialize previously created game
