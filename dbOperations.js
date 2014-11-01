@@ -82,17 +82,18 @@ exports.updateDb = function (entity, callback, errCallback) {
 exports.getEntity = function (entityId, cacheType, callback) {
     var cacheString = cacheType ? cacheType : "activeGames";
     if (cache[cacheString].hasOwnProperty(entityId)) {
-        return cache[cacheString][entityId];
+        callback(cache[cacheString][entityId]);
+    } else {
+        gameModel.findOne({_id: entityId}, function (err, doc) {
+            if (!err || !doc || doc != undefined) {
+                cacheEntity(cacheType ? cacheType : "activeGames", doc);
+                callback(doc);
+            }
+            else {
+                callback(false);
+            }
+        });
     }
-    gameModel.findOne({_id: entityId}, function (err, doc) {
-        if (!err || !doc || doc != undefined) {
-            cacheEntity(cacheType ? cacheType : "activeGames", doc);
-            callback(doc);
-        }
-        else {
-            callback(false);
-        }
-    });
 
 };
 

@@ -81,10 +81,10 @@ exports.createGame = function (req, res) {
             game.status = "Waiting";
             dbOperations.updateDb(game, function(game){
                 logger.info("Updated game ", game.gameName);
-                return res.status(200).send(game);
+                res.status(200).send(game);
             }, function(err){
                 logger.error(err);
-                return res.status(500).send(err);
+                res.status(500).send(err);
             });
         });
     } else {
@@ -102,11 +102,11 @@ exports.createGame = function (req, res) {
         newGame.save(function (err, game) {
             if (!err) {
                 logger.info("Game created with id " + game.id);
-                return res.status(200).send(game);
+                res.status(200).send(game);
             }
             else {
                 logger.error(err);
-                return res.status(500).send(err);
+                res.status(500).send(err);
             }
         });
     }

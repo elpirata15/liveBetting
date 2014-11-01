@@ -3,6 +3,22 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
     $scope.selectedGame;
     $scope.games = [];
 
+    $scope.gameDate;
+    $scope.gameTime;
+    $scope.team1;
+    $scope.team2;
+    $scope.managers = betManagerService.getManagers();
+
+    $scope.startGame = function () {
+        $scope.selectedGame.gameName = $scope.team1 + " vs. " + $scope.team2 + " @ " + $scope.selectedGame.location;
+        $scope.selectedGame.teams = [$scope.team1, $scope.team2];
+        $scope.selectedGame.timestamp = new Date($scope.gameDate.getFullYear(), $scope.gameDate.getMonth(), $scope.gameDate.getDate(), $scope.gameTime.getHours(), $scope.gameTime.getMinutes());
+        betManagerService.gameInit($scope.selectedGame).success(function () {
+            alert('game saved');
+            getData();
+        });
+    };
+
     var getData = function () {
         $scope.selectedGame = null;
         betManagerService.getGames().success(function (data) {
@@ -17,7 +33,6 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
     };
 
     getData();
-
 
     $scope.columns = [
         {field: 'gameName', displayName: 'Name'},
@@ -37,6 +52,10 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
         plugins: [new ngGridFlexibleHeightPlugin()],
         afterSelectionChange: function (item, event) {
             $scope.selectedGame = $scope.games[item.rowIndex];
+            var date = new Date($scope.selectedGame.timestamp);
+            $scope.gameDate = $scope.gameTime = date;
+            $scope.team1 = $scope.selectedGame.teams[0];
+            $scope.team2 = $scope.selectedGame.teams[1];
         }
     };
 
@@ -45,7 +64,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
     PubNub.ngSubscribe({
         channel: 'adminSocket',
         message: function (message) {
-            $scope.messages.push(message[0]);
+            $scope.messages.push({id: uuid() ,text: message[0]});
             $timeout(function(){
                 $scope.$apply();
             })
