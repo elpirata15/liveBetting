@@ -6,6 +6,7 @@ var RedisStore = require('connect-redis')(session);
 var serverLogger = require('./serverLogger');
 var gameController = require('./game');
 var bidController = require('./bid');
+var userController = require('./user');
 
 var secretKey = "ELFcjUgNvdKyiiaXDg2mnjPUgVAx6uaVlbdcqANvqgoyZeZVIxmqlOVykkmr2hcs";
 
@@ -25,38 +26,86 @@ app.use(session({
     saveUninitialized: true,
     resave: true
 }));
+
+// #### USER GROUP RESTRICTION HELPER FUNCTIONS ######
+
+function ensureAdmin(req, res, next){
+    if(req.session && req.session.group == "Admins"){
+        return next();
+    } else {
+        res.status(403).send("Forbidden");
+    }
+}
+
+function ensureUser(req, res, next){
+    if(req.session){
+        return next();
+    } else{
+        res.status(403).send("Forbidden");
+    }
+}
+
+function ensureMaster(req, res, next){
+    if(req.session && (req.session.group == "Masters" || req.session.group == "Admins")){
+        return next();
+    } else{
+        res.status(403).send("Forbidden");
+    }
+}
+
+function ensureManager(req, res, next){
+    if(req.session && (req.session.group == "Masters" || req.session.group == "Admins" || req.session.group == "Managers" )){
+        return next();
+    } else{
+        res.status(403).send("Forbidden");
+    }
+}
+
 // ##### GAME ACTIONS #####
 
 // For client - get games you can subscribe to
-app.get('/getGames', gameController.getGames);
+app.get('/getGames', ensureUser, gameController.getGames);
 
 // Get single game info
-app.get('/getGame/:id', gameController.getGames);
+app.get('/getGame/:id', ensureUser, gameController.getGames);
 
 // For event managers - get waiting events
-app.get('/getWaitingGames/:id', gameController.getWaitingGames);
+app.get('/getWaitingGames/:id', ensureMaster, gameController.getWaitingGames);
 
 // ## Create game entity in DB and start game
-app.post('/createGame', gameController.createGame);
+app.post('/createGame', ensureMaster, gameController.createGame);
 
 // Initialize previously created game
-app.post('/initGame/:id', gameController.initGame);
+app.post('/initGame/:id', ensureManager, gameController.initGame);
 
 // Assign specified game to specified manager
-app.post('/assignGame/', gameController.assignGame);
+app.post('/assignGame/', ensureMaster, gameController.assignGame);
 
-app.post('/closeGame/:id', gameController.closeGame);
+app.post('/closeGame/:id', ensureManager, gameController.closeGame);
 
 // #### BID FUNCTIONS #####
 
 // Adds bid entity to game (receives bid entity as parameter)
-app.post('/addBid', bidController.addBid);
+app.post('/addBid', ensureManager, bidController.addBid);
 
-app.get('/defaultLog', function (req, res) {
+// ###### USER FUNCTIONS ######
+app.get('/getUsers', ensureAdmin, userController.getUsers);
+
+app.get('/getUser/:id', ensureAdmin, userController.getUserById);
+
+app.get('/login', userController.loginUser);
+
+app.get('/logout', userController.logoutUser);
+
+app.get('/register', userController.registerUser);
+
+
+
+
+
+app.get('/defaultLog', ensureAdmin, function (req, res) {
     res.sendFile('default.log');
 });
-
-
 
 app.listen(app.get('port'), function () {
     logger.info("Node app is running at localhost:" + app.get('port'));
