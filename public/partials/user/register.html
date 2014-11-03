@@ -11,16 +11,20 @@
                     <div class="panel-body">
                         <div class="alert alert-danger" ng-show="flash">
                             {{flash}}
-                        </div><br/>
-                        <input type="text" ng-model="fullName" placeholder="Full Name" class="form-control">
+                        </div>
                         <br/>
-                        <input type="email" ng-model="email" placeholder="E-mail" class="form-control">
-                        <br/>
-                        <input type="password" ng-model="pass" placeholder="Password" class="form-control">
-                        <br/>
-                        <button type="button" ng-disabled="!userName || !userPass" ng-click="doRegister()"
-                                class="col-xs-4 col-xs-offset-4 btn btn-large btn-primary">Register
-                        </button>
+
+                        <form class="form-horizontal"">
+                            <input type="text" ng-model="user.fullName" placeholder="Full Name" class="form-control"
+                                   required>
+                            <br/>
+                            <input type="email" ng-model="user.email" placeholder="E-mail" class="form-control" required>
+                            <br/>
+                            <input type="password" ng-model="user.pass" placeholder="Password" class="form-control" required>
+                            <br/>
+                            <button type="submit" class="col-xs-4 col-xs-offset-4 btn btn-large btn-primary" ng-click="doRegister()">Register
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

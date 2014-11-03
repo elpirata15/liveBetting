@@ -1,4 +1,4 @@
-angular.module('liveBetManager').service('betManagerService', ['$http', function($http){
+angular.module('liveBetManager').factory('betManagerService', ['$http', function($http){
     var betManagerService = {};
     var url = 'http://localhost:5000';
 

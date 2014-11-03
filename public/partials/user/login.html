@@ -12,11 +12,11 @@
                         <div class="alert alert-danger" ng-show="flash">
                             {{flash}}
                         </div><br/>
-                        <input type="email" ng-model="userName" placeholder="E-mail" class="form-control">
+                        <input type="email" ng-model="user.email" placeholder="E-mail" class="form-control">
                         <br/>
-                        <input type="password" ng-model="userPass" placeholder="Password" class="form-control">
+                        <input type="password" ng-model="user.pass" placeholder="Password" class="form-control">
                         <br/>
-                        <button type="button" ng-disabled="!userName || !userPass" ng-click="doLogin()"
+                        <button type="button" ng-click="doLogin()"
                                 class="col-xs-4 col-xs-offset-4 btn btn-large btn-primary">Log In
                         </button>
                     </div>

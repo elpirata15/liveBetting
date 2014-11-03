@@ -65,7 +65,7 @@ exports.registerUser = function (req, res) {
                     if (!err) {
                         logger.info("Registered user ", user.email, " with ID", user._id);
                         req.session["uid"] = user._id;
-                        res.session["group"] = user.group;
+                        req.session["group"] = user.group;
                         req.session.save(function (err) {
                             if (err) {
                                 return res.status(500).send(err);
@@ -80,13 +80,13 @@ exports.registerUser = function (req, res) {
                         user.email = req.body.email;
                         user.pass = hash;
                         user.fullName = req.body.fullName;
-                        user.group = req.body.group;
+                        user.group = req.body.group || "User";
 
                         user.save(function (err, user) {
                             if (!err) {
                                 logger.info("Updated user ", user.email);
                                 req.session["uid"] = user._id;
-                                res.session["group"] = user.group;
+                                req.session["group"] = user.group;
                                 req.session.save(function (err) {
                                     if (err) {
                                         return res.status(500).send(err);
@@ -111,18 +111,20 @@ exports.loginUser = function (req, res) {
     dbOperations.UserModel.findOne({email: req.body.email}, function (err, user) {
         if (!err) {
             if (user) {
-                bcrypt.compare(req.body.pass, user.pass, function (err, res) {
+                bcrypt.compare(req.body.pass, user.pass, function (err, result) {
                     if (!err) {
-                        if (res) {
+                        if (result) {
                             req.session["uid"] = user._id;
                             req.session["group"] = user.group;
                             req.session.save(function (err) {
                                 if (err) {
-                                    return res.status(500).send(err);
+                                    res.status(500).send(err);
+                                } else {
+                                    res.status(200).send(user);
                                 }
                             })
                         } else {
-                            return res.status(401).send("Passwords don't match");
+                            res.status(401).send("Passwords don't match");
                         }
                     } else {
                         res.status(500).send(err);
@@ -155,6 +157,24 @@ exports.deleteUser = function (req, res) {
             user.save(function (err, user) {
                 if (!err) {
                     res.status(200).end();
+                } else {
+                    res.status(500).send(err);
+                }
+            });
+        } else {
+            res.status(500).send(err);
+        }
+    });
+};
+
+exports.changeUserGroup = function (req, res) {
+    dbOperations.UserModel.findOne({email: req.body.email}, function (err, user) {
+        if (!err) {
+            user.group = req.body.group;
+            user.save(function (err, user) {
+                if (!err) {
+                    logger.info("changed user ", user.email, " group to ", user.group);
+                    res.status(200).send("Successful. please re-login.");
                 } else {
                     res.status(500).send(err);
                 }

@@ -93,14 +93,15 @@ app.get('/getUsers', ensureAdmin, userController.getUsers);
 
 app.get('/getUser/:id', ensureAdmin, userController.getUserById);
 
-app.get('/login', userController.loginUser);
+app.get('/getUsersByGroup', ensureManager, userController.getUsersByGroup);
 
-app.get('/logout', userController.logoutUser);
+app.post('/login', userController.loginUser);
 
-app.get('/register', userController.registerUser);
+app.post('/logout', userController.logoutUser);
 
+app.post('/register', userController.registerUser);
 
-
+app.post('/changeGroup', userController.changeUserGroup);
 
 
 app.get('/defaultLog', ensureAdmin, function (req, res) {
