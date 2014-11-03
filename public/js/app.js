@@ -30,9 +30,11 @@ angular.module('liveBetManager', [
 
     $rootScope.$on('$routeChangeStart', function(event, next, current) {
         $rootScope.flash = "";
-        if(next.restrict && next.restrict.indexOf(authService.group()) < 0  || !authService.isAuthenticated()){
-            $rootScope.returnUrl = current;
-            $location.path('/login');
+        if(authService.group() != "Admins"){
+            if(next.restrict && next.restrict.indexOf(authService.group()) < 0  || !authService.isAuthenticated()){
+                $rootScope.returnUrl = current;
+                $location.path('/login');
+            }
         }
     });
 }).controller('ModalController', function($scope, close,betManagerService) {

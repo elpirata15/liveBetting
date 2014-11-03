@@ -108,6 +108,7 @@ exports.registerUser = function (req, res) {
 };
 
 exports.loginUser = function (req, res) {
+    logger.info("login request by ", req.body.email);
     dbOperations.UserModel.findOne({email: req.body.email}, function (err, user) {
         if (!err) {
             if (user) {
@@ -118,15 +119,19 @@ exports.loginUser = function (req, res) {
                             req.session["group"] = user.group;
                             req.session.save(function (err) {
                                 if (err) {
+                                    logger.error(err);
                                     res.status(500).send(err);
                                 } else {
+                                    logger.info("request approved");
                                     res.status(200).send(user);
                                 }
                             })
                         } else {
+                            logger.error("request denied: Passwords don't match");
                             res.status(401).send("Passwords don't match");
                         }
                     } else {
+                        logger.error(err);
                         res.status(500).send(err);
                     }
 

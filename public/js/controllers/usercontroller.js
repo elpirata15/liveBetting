@@ -4,6 +4,7 @@ angular.module('liveBetManager').controller('userController', ['$scope', '$rootS
 
     $scope.doLogin = function () {
         if (authService.login({email:$scope.user.email, pass:$scope.user.pass})) {
+            alert('success');
             $location.path($rootScope.returnUrl);
         }
     };
