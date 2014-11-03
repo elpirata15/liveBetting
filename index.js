@@ -2,7 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
-var RedisStore = require('connect-redis')(express);
+var RedisStore = require('connect-redis')(session);
 var serverLogger = require('./serverLogger');
 var gameController = require('./game');
 var bidController = require('./bid');
@@ -15,11 +15,16 @@ var app = express();
 app.set('port', (process.env.PORT || 5000));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
-app.use(express.session({ store: new RedisStore({
-    host: 'pub-redis-18324.us-east-1-3.3.ec2.garantiadata.com',
-    port: 18324,
-    prefix: 'sess'
-}), secret: secretKey }));
+app.use(session({
+    store: new RedisStore({
+        host: 'pub-redis-18324.us-east-1-3.3.ec2.garantiadata.com',
+        pass: 'XrFsdyWE8JBsTKrM',
+        port: 18324,
+        prefix: 'sess'
+    }), secret: secretKey,
+    saveUninitialized: true,
+    resave: true
+}));
 // ##### GAME ACTIONS #####
 
 // For client - get games you can subscribe to
@@ -47,9 +52,11 @@ app.post('/closeGame/:id', gameController.closeGame);
 // Adds bid entity to game (receives bid entity as parameter)
 app.post('/addBid', bidController.addBid);
 
-app.get('/defaultLog', function(req, res){
+app.get('/defaultLog', function (req, res) {
     res.sendFile('default.log');
 });
+
+
 
 app.listen(app.get('port'), function () {
     logger.info("Node app is running at localhost:" + app.get('port'));

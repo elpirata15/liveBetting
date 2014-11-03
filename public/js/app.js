@@ -13,6 +13,8 @@ angular.module('liveBetManager', [
     $routeProvider.when('/gameMaster/newGame', {templateUrl: 'partials/startgame.html', controller:'gameController'});
     $routeProvider.when('/startGame', {templateUrl: 'partials/startgame.html', controller:'gameController'});
     $routeProvider.when('/eventManager', {templateUrl: 'partials/eventmanager.html', controller:'eventController'});
+    $routeProvider.when('/login', {templateUrl: 'partials/user/login.html'});
+    $routeProvider.when('/register', {templateUrl: 'partials/user/register.html'});
     $routeProvider.otherwise('/');
 
     localStorageServiceProvider.setPrefix('liveBetManager');

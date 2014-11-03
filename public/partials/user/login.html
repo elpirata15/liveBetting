@@ -1,0 +1,28 @@
+<div class="site-wrapper">
+
+    <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+            <div class="inner cover">
+                <div class="panel panel-primary col-xs-4 col-xs-offset-4">
+                    <div class="panel-heading">
+                        <h3 class="panel-title text-center">Log In:</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="alert alert-danger" ng-show="flash">
+                            {{flash}}
+                        </div><br/>
+                        <input type="email" ng-model="userName" placeholder="E-mail" class="form-control">
+                        <br/>
+                        <input type="password" ng-model="userPass" placeholder="Password" class="form-control">
+                        <br/>
+                        <button type="button" ng-disabled="!userName || !userPass" ng-click="doLogin()"
+                                class="col-xs-4 col-xs-offset-4 btn btn-large btn-primary">Log In
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

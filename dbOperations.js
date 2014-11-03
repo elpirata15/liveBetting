@@ -47,7 +47,9 @@ var userEntity = new Schema({
     email: String,
     pass: String,
     fullName: String,
-    balance: Number
+    balance: Number,
+    group: String, //Admins, Users, Managers, Masters
+    status: String // Active, Inactive
 });
 
 exports.UserModel = mongoose.model('users', userEntity);

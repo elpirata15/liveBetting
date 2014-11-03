@@ -1,0 +1,29 @@
+<div class="site-wrapper">
+
+    <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+            <div class="inner cover">
+                <div class="panel panel-primary col-xs-4 col-xs-offset-4">
+                    <div class="panel-heading">
+                        <h3 class="panel-title text-center">Register:</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="alert alert-danger" ng-show="flash">
+                            {{flash}}
+                        </div><br/>
+                        <input type="text" ng-model="fullName" placeholder="Full Name" class="form-control">
+                        <br/>
+                        <input type="email" ng-model="email" placeholder="E-mail" class="form-control">
+                        <br/>
+                        <input type="password" ng-model="pass" placeholder="Password" class="form-control">
+                        <br/>
+                        <button type="button" ng-disabled="!userName || !userPass" ng-click="doRegister()"
+                                class="col-xs-4 col-xs-offset-4 btn btn-large btn-primary">Register
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
