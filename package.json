@@ -4,7 +4,7 @@
   "description": "Livebetting application",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "test": "grunt travis --verbose"
   },
   "dependencies": {
     "async": "^0.9.0",
@@ -17,16 +17,14 @@
     "express-session": "^1.9.1",
     "mongoose": "^3.8.18",
     "pubnub": "^3.6.7",
-    "winston": "^0.8.1"
+    "winston": "^0.8.1",
+    "grunt": "^0.4.5"
   },
   "devDependencies": {
-    "grunt": "~0.4.0"
+    "grunt": "~0.4.5"
   },
   "engines": {
     "node": "0.10.x"
-  },
-  "scripts": {
-    "test":"grunt travis --verbose"
   },
   "repository": {
     "type": "git",
