@@ -1,3 +1,7 @@
+**Added event tester - sends out a free kick/close event/winning result**  
+http://plnkr.co/6u4a7xNNY8SAhpwRtZvj
+
+
 # liveBetting
 
 please install nodejs to run this locally
