@@ -11,7 +11,12 @@
                     <div class="panel-body">
                         <div class="alert alert-danger" ng-show="flash">
                             {{flash}}
-                        </div><br/>
+                            <br/>
+                        </div>
+                        <div class="alert alert-info" ng-show="loggedIn">
+                            Already logged in as {{user.email}}. Please <a ng-click="doLogout()" style="cursor: pointer">logout</a> before continuing.
+                            <br/>
+                        </div>
                         <input type="email" ng-model="user.email" placeholder="E-mail" class="form-control">
                         <br/>
                         <input type="password" ng-model="user.pass" placeholder="Password" class="form-control">

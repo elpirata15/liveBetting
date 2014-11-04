@@ -5,7 +5,7 @@
             class="glyphicon glyphicon-transfer"></span> Reassign</a>
     <a class="btn btn-danger" ng-disabled="!selectedGame" ng-click="closeGame()"><span
             class="glyphicon glyphicon-trash"></span> Delete</a>
-    <a ng-click="logout()" class="btn btn-default"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+    <a ng-controller="userController" ng-click="doLogout()" class="btn btn-default"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
 </div>
 <br/>
 <div class="panel panel-info">
