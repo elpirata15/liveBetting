@@ -87,7 +87,7 @@ exports.getEntity = function (entityId, cacheType, callback) {
         callback(cache[cacheString][entityId]);
     } else {
         gameModel.findOne({_id: entityId}, function (err, doc) {
-            if (!err || !doc || doc != undefined) {
+            if (!err || !doc || doc !== undefined) {
                 cacheEntity(cacheType ? cacheType : "activeGames", doc);
                 callback(doc);
             }
@@ -104,5 +104,5 @@ exports.uncacheEntity = function (cacheType, entity) {
 };
 
 var cacheEntity = exports.cacheEntity = function (cacheType, entity) {
-    return cache[cacheType][entity._id] = entity;
+    cache[cacheType][entity._id] = entity;
 };

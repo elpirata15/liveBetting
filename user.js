@@ -64,8 +64,8 @@ exports.registerUser = function (req, res) {
                 newUser.save(function (err, user) {
                     if (!err) {
                         logger.info("Registered user ", user.email, " with ID", user._id);
-                        req.session["uid"] = user._id;
-                        req.session["group"] = user.group;
+                        req.session.uid = user._id;
+                        req.session.group = user.group;
                         req.session.save(function (err) {
                             if (err) {
                                 return res.status(500).send(err);
@@ -85,8 +85,8 @@ exports.registerUser = function (req, res) {
                         user.save(function (err, user) {
                             if (!err) {
                                 logger.info("Updated user ", user.email);
-                                req.session["uid"] = user._id;
-                                req.session["group"] = user.group;
+                                req.session.uid = user._id;
+                                req.session.group = user.group;
                                 req.session.save(function (err) {
                                     if (err) {
                                         return res.status(500).send(err);
@@ -98,7 +98,7 @@ exports.registerUser = function (req, res) {
                     } else {
                         return res.status(500).send(err);
                     }
-                })
+                });
             }
 
         } else {
@@ -115,8 +115,8 @@ exports.loginUser = function (req, res) {
                 bcrypt.compare(req.body.pass, user.pass, function (err, result) {
                     if (!err) {
                         if (result) {
-                            req.session["uid"] = user._id;
-                            req.session["group"] = user.group;
+                            req.session.uid = user._id;
+                            req.session.group = user.group;
                             req.session.save(function (err) {
                                 if (err) {
                                     logger.error(err);
@@ -125,7 +125,7 @@ exports.loginUser = function (req, res) {
                                     logger.info("request approved");
                                     res.status(200).send(user);
                                 }
-                            })
+                            });
                         } else {
                             logger.error("request denied: Passwords don't match");
                             res.status(401).send("Passwords don't match");

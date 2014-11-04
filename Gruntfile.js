@@ -1,10 +1,12 @@
 module.exports = function(grunt){
     grunt.initConfig({
-       lint: {
+       jshint: {
            files: ['**.js']
        }
     });
 
-    grunt.registerTask('default', 'lint');
-    grunt.registerTask('travis', 'lint');
-}
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+
+    grunt.registerTask('default', 'jshint');
+    grunt.registerTask('travis', 'jshint');
+};

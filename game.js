@@ -25,7 +25,7 @@ exports.getGames = function (req, res) {
             return res.status(200).send(docs);
         }
         else {
-            if (docs.length == 0) {
+            if (docs.length === 0) {
                 logger.info("No games found");
                 return res.status(404).send("No games found");
             } else {
@@ -55,7 +55,7 @@ exports.getWaitingGames = function (req, res) {
             return res.status(200).send(docs);
         }
         else {
-            if (docs.length == 0) {
+            if (docs.length === 0) {
                 logger.info("No games found");
                 return res.status(404).send("No games found");
             } else {
@@ -159,7 +159,7 @@ exports.assignGame = function (req, res) {
                 return res.status(200).end();
             }, function (err) {
                 return res.status(500).send(err);
-            })
+            });
         } else {
             res.status(404).end();
         }
