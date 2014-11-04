@@ -19,12 +19,18 @@
     "pubnub": "^3.6.7",
     "winston": "^0.8.1"
   },
+  "devDependencies": {
+    "grunt": "~0.4.0"
+  },
   "engines": {
     "node": "0.10.x"
   },
+  "scripts": {
+    "test":"grunt travis --verbose"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
+    "url": "https://github.com/elirankon/liveBetting"
   },
   "keywords": [
     "node",
