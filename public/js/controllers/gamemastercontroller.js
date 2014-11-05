@@ -1,12 +1,13 @@
-'use strict';
+/* jshint ignore:start */
 angular.module('liveBetManager').controller('gameMasterController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', 'ModalService', '$timeout', function ($scope, $rootScope, PubNub, betManagerService, ModalService, $timeout) {
-    $scope.selectedGame;
+    /* jshint ignore:end */
+    $scope.selectedGame = null;
     $scope.games = [];
 
-    $scope.gameDate;
-    $scope.gameTime;
-    $scope.team1;
-    $scope.team2;
+    $scope.gameDate = undefined;
+    $scope.gameTime = undefined;
+    $scope.team1 = undefined;
+    $scope.team2 = undefined;
     $scope.managers = betManagerService.getManagers();
 
     $scope.startGame = function () {
@@ -60,27 +61,27 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
     };
 
     $scope.messages = [];
-	var counter = 0;
+    var counter = 0;
     PubNub.ngSubscribe({
         channel: 'adminSocket',
         message: function (message) {
-            $scope.messages.push({id: counter ,text: message[0]});
-			counter++;
-            $timeout(function(){
+            $scope.messages.push({id: counter, text: message[0]});
+            counter++;
+            $timeout(function () {
                 $scope.$apply();
-            })
+            });
         }
     });
 
-    $scope.reassign = function(){
+    $scope.reassign = function () {
         ModalService.showModal({
             templateUrl: 'modals/reassign.html',
             controller: "ModalController"
-        }).then(function(modal) {
+        }).then(function (modal) {
             modal.element.modal();
-            modal.close.then(function(result) {
-                if(result.toLowerCase() != 'cancel'){
-                    betManagerService.assignGame($scope.selectedGame._id, result).success(function(){
+            modal.close.then(function (result) {
+                if (result.toLowerCase() != 'cancel') {
+                    betManagerService.assignGame($scope.selectedGame._id, result).success(function () {
                         //alert('Game assigned');
                         getData();
                     });
@@ -89,21 +90,20 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
         });
     };
 
-    $scope.closeGame = function(){
+    $scope.closeGame = function () {
         ModalService.showModal({
             templateUrl: 'modals/yesno.html',
             controller: "ModalController"
-        }).then(function(modal) {
+        }).then(function (modal) {
             modal.element.modal();
-            modal.close.then(function(result) {
-                if(result == "Yes"){
-                    betManagerService.closeGame($scope.selectedGame).success(function(){
+            modal.close.then(function (result) {
+                if (result == "Yes") {
+                    betManagerService.closeGame($scope.selectedGame).success(function () {
                         //alert('Game Closed');
                         getData();
                     });
                 }
             });
         });
-
     };
 }]);

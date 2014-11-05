@@ -50,5 +50,5 @@ angular.module('liveBetManager').controller('eventController',['$scope','$rootSc
                 });
             });
 
-        }
+        };
     }]);

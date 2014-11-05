@@ -1,5 +1,3 @@
-'use strict';
-
 angular.module('liveBetManager').controller('serverCtrl',['$scope','$rootScope','PubNub', function($scope, $rootScope, PubNub){
     $scope.connected = false;
     $scope.messages = [];

@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
+var NodeCache = require("node-cache");
 
 var ObjectId = Schema.ObjectId;
 var optionEntity = new Schema({
@@ -65,8 +66,7 @@ mongoose.connect("mongodb://ds047050.mongolab.com:47050/heroku_app30774540", opt
 // ************** ENTITY CACHING *********************
 // Active games cache
 var cache = {
-    activeGames: {}
-
+    activeGames: new NodeCache({stdTTL: 300, checkPeriod: 60})
 };
 
 // ** DB FUNCTION WITH CACHING **
@@ -83,8 +83,9 @@ exports.updateDb = function (entity, callback, errCallback) {
 
 exports.getEntity = function (entityId, cacheType, callback) {
     var cacheString = cacheType ? cacheType : "activeGames";
-    if (cache[cacheString].hasOwnProperty(entityId)) {
-        callback(cache[cacheString][entityId]);
+    var cachedEntity = cache[cacheString].get(entityId);
+    if (cachedEntity) {
+        callback(cachedEntity);
     } else {
         gameModel.findOne({_id: entityId}, function (err, doc) {
             if (!err || !doc || doc !== undefined) {
@@ -100,9 +101,9 @@ exports.getEntity = function (entityId, cacheType, callback) {
 };
 
 exports.uncacheEntity = function (cacheType, entity) {
-    delete cache[cacheType][entity._id];
+    cache[cacheType].del([entity._id]);
 };
 
 var cacheEntity = exports.cacheEntity = function (cacheType, entity) {
-    cache[cacheType][entity._id] = entity;
+    cache[cacheType].set([entity._id], entity);
 };

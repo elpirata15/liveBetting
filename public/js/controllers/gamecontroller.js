@@ -1,4 +1,3 @@
-'use strict';
 angular.module('liveBetManager').controller('gameController', ['$scope', '$rootScope', '$location', 'PubNub', 'betManagerService', '$timeout', 'localStorageService',
     function ($scope, $rootScope, $location, PubNub, betManagerService, $timeout, localStorageService) {
         $scope.game = {};

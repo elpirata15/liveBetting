@@ -1,5 +1,3 @@
-'use strict';
-
 angular.module('liveBetManager', [
     'ngCookies',
     'ngRoute',
@@ -39,7 +37,7 @@ angular.module('liveBetManager', [
     });
 }).controller('ModalController', function($scope, close,betManagerService) {
 
-    $scope.chosenName;
+    $scope.chosenName = undefined;
 
     $scope.managers = betManagerService.getManagers();
 

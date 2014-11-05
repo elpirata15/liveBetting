@@ -1,9 +1,8 @@
-'use strict';
 angular.module('liveBetManager').controller('homeController', ['$scope', '$rootScope', '$cookieStore','$location',
 function ($scope, $rootScope, $cookieStore, $location) {
 
-    $scope.userName;
-    $scope.loginRole;
+    $scope.userName = "";
+    $scope.loginRole = "";
 
     $scope.doLogin = function () {
         if ($scope.userName && $scope.loginRole) {

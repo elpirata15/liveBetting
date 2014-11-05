@@ -2,3 +2,4 @@ node_modules
 default.log
 .idea
 .idea/workspace.xml
+public/bower_components
