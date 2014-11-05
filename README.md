@@ -6,7 +6,11 @@ http://plnkr.co/6u4a7xNNY8SAhpwRtZvj
 
 # liveBetting
 
-please install nodejs to run this locally
+please install nodejs and bower to run this locally
+
+```
+npm install -g bower
+```
 
 after cloning repo - install all dependencies using NPM:  
 Let's say I cloned to `c:\users\eliran\documents\liveBetting`.  
@@ -14,6 +18,9 @@ Let's say I cloned to `c:\users\eliran\documents\liveBetting`.
 run `cmd`  
 navigate to `c:\users\eliran\documents\liveBetting`  
 run `npm install`
+navigate to `c:\users\eliran\documents\liveBetting\public`  
+run `bower install`
+
 
 to run the server  
 `node index.js`
