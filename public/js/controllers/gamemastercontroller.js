@@ -1,5 +1,5 @@
 /* jshint ignore:start */
-angular.module('liveBetManager').controller('gameMasterController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', 'ModalService', '$timeout', function ($scope, $rootScope, PubNub, betManagerService, ModalService, $timeout) {
+angular.module('liveBetManager').controller('gameMasterController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', 'ModalService', '$timeout', 'dialogs', function ($scope, $rootScope, PubNub, betManagerService, ModalService, $timeout,dialogs) {
     /* jshint ignore:end */
     $scope.selectedGame = null;
     $scope.games = [];
@@ -15,7 +15,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
         $scope.selectedGame.teams = [$scope.team1, $scope.team2];
         $scope.selectedGame.timestamp = new Date($scope.gameDate.getFullYear(), $scope.gameDate.getMonth(), $scope.gameDate.getDate(), $scope.gameTime.getHours(), $scope.gameTime.getMinutes());
         betManagerService.gameInit($scope.selectedGame).success(function () {
-            alert('game saved');
+            dialogs.notify("Game Saved", "Game Saved.");
             getData();
         });
     };
@@ -82,8 +82,10 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
             modal.close.then(function (result) {
                 if (result.toLowerCase() != 'cancel') {
                     betManagerService.assignGame($scope.selectedGame._id, result).success(function () {
-                        //alert('Game assigned');
+                        dialogs.notify("Manager Assigned", "Manager was assigned");
                         getData();
+                    }).error(function(data){
+                        dialogs.error(data);
                     });
                 }
             });

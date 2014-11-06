@@ -27,25 +27,25 @@ exports.getGames = function (req, res) {
         else {
             if (docs.length === 0) {
                 logger.info("No games found");
-                return res.status(404).send("No games found");
+                res.status(404).send("No games found");
             } else {
                 logger.error(err);
-                return res.status(500).send(err);
+                res.status(500).send(err);
             }
         }
     });
 };
 
 // Get single game info
-exports.getGame = function(req, res){
-  logger.info('getting game info for game ', req.res.id);
-    dbOperations.getEntity(req.params.id, null, function(game){
-     if(game){
-         return game;
-     } else {
-         res.status(404).end();
-     }
-  });
+exports.getGame = function (req, res) {
+    logger.info('getting game info for game ', req.res.id);
+    dbOperations.getEntity(req.params.id, null, function (game) {
+        if (game) {
+            return game;
+        } else {
+            res.status(404).end();
+        }
+    });
 };
 
 // For event managers - get waiting events
@@ -57,10 +57,10 @@ exports.getWaitingGames = function (req, res) {
         else {
             if (docs.length === 0) {
                 logger.info("No games found");
-                return res.status(404).send("No games found");
+                res.status(404).send("No games found");
             } else {
                 logger.error(err);
-                return res.status(500).send(err);
+                res.status(500).send(err);
             }
         }
     });
@@ -69,9 +69,9 @@ exports.getWaitingGames = function (req, res) {
 // ## Create game entity in DB and start game
 exports.createGame = function (req, res) {
     var newGame;
-    if(req.body._id){
+    if (req.body._id) {
         logger.info("Updating game: ", req.body.gameName);
-        dbOperations.getEntity(req.body._id, null, function(game){
+        dbOperations.getEntity(req.body._id, null, function (game) {
             game.gameName = req.body.gameName;
             game.teams = req.body.teams;
             game.timestamp = new Date(req.body.timestamp);
@@ -79,10 +79,10 @@ exports.createGame = function (req, res) {
             game.location = req.body.location;
             game.type = req.body.type;
             game.status = "Waiting";
-            dbOperations.updateDb(game, function(game){
+            dbOperations.updateDb(game, function (game) {
                 logger.info("Updated game ", game.gameName);
                 res.status(200).send(game);
-            }, function(err){
+            }, function (err) {
                 logger.error(err);
                 res.status(500).send(err);
             });
@@ -141,9 +141,9 @@ exports.initGame = function (req, res) {
                 });
                 serverLogger.gameLogger.setLogger(game._id);
                 serverLogger.gameLogger.log(game._id, "Activated game: ", game.gameName);
-                return res.status(200).send(game);
+                res.status(200).send(game);
             });
-        }else {
+        } else {
             res.status(500).send(err);
         }
     });
@@ -153,13 +153,24 @@ exports.initGame = function (req, res) {
 exports.assignGame = function (req, res) {
     dbOperations.getEntity(req.body.gameId, null, function (game) {
         if (game) {
-            game.assignedTo = req.body.managerId;
-            dbOperations.updateDb(game, function (game) {
-                logger.info("assigned game: ", game.gameName, " to manager ", game.assignedTo);
-                return res.status(200).end();
-            }, function (err) {
-                return res.status(500).send(err);
-            });
+            // Check for games assigned to user +/- 10 hours before and after the newly assigned game
+            var gameDate = new Date(game.timestamp);
+            dbOperations.GameModel
+                .where('timestamp').lte(new Date(gameDate.setHours(gameDate.getHours() + 10))).gte(new Date(gameDate.setHours(gameDate.getHours() - 10)))
+                .where('assignedTo', req.body.managerId)
+                .exec(function (err, docs) {
+                    if (docs.length > 0) {
+                        res.status(500).send("Manager has a game assigned during this time");
+                    } else {
+                        game.assignedTo = req.body.managerId;
+                        dbOperations.updateDb(game, function (game) {
+                            logger.info("assigned game: ", game.gameName, " to manager ", game.assignedTo);
+                            res.status(200).end();
+                        }, function (err) {
+                            res.status(500).send(err);
+                        });
+                    }
+                });
         } else {
             res.status(404).end();
         }

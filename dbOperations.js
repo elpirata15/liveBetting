@@ -84,8 +84,8 @@ exports.updateDb = function (entity, callback, errCallback) {
 exports.getEntity = function (entityId, cacheType, callback) {
     var cacheString = cacheType ? cacheType : "activeGames";
     var cachedEntity = cache[cacheString].get(entityId);
-    if (cachedEntity) {
-        callback(cachedEntity);
+    if (Object.keys(cachedEntity).length) {
+        callback(cachedEntity[entityId]);
     } else {
         gameModel.findOne({_id: entityId}, function (err, doc) {
             if (!err || !doc || doc !== undefined) {
