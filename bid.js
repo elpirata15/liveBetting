@@ -9,39 +9,41 @@ var serverLogger = require("./serverLogger");
 // default server channel logger
 var logger = new serverLogger();
 
+var publishMessage = function(channel, message){
+    pubnub.publish({
+        channel: channel,
+        message: message
+    });
+};
+
 // Adds bid entity to game (receives bid entity as parameter)
-exports.addBid = function (req, res) {
-    logger.info("new bid opened in game " + req.body.gameName + ": " + req.body.bidDescription);
-    dbOperations.getEntity(req.body.gameId, null, function(doc){
+exports.addBid = function (message) {
+    dbOperations.getEntity(message.gameId, null, function(doc){
         if (doc) {
+            logger.info("new bid opened in game " + doc.gameName + ": " + message.bidDescription);
             doc.bids.push({
-                gameId: req.body.gameId,
+                gameId: message.gameId,
                 gameName: doc.gameName,
-                bidDescription: req.body.bidDescription,
-                bidType: req.body.bidType,
-                bidOptions: req.body.bidOptions,
+                bidDescription: message.bidDescription,
+                bidType: message.bidType,
+                bidOptions: message.bidOptions,
                 timestamp: Date.now(),
                 status: "Active",
-                ttl: req.body.ttl
+                ttl: message.ttl
             });
             dbOperations.updateDb(doc, function (doc) {
-                serverLogger.gameLogger.log(doc._id,"Bid opened successfully");
-                // publish bid to users
-                pubnub.publish({
-                    channel: req.body.gameId,
-                    message: doc,
-                    callback: function () {
-                        serverLogger.gameLogger.log(doc._id,"Published bid for game", doc.gameName);
-                    },
-                    error: function (e) {
-                        serverLogger.gameLogger.log(doc._id,"FAILED! RETRY PUBLISH!", e);
-                    }
-                });
+                serverLogger.gameLogger.log(doc._id,"Saved");
 
                 // Subscribe to bid message socket
                 pubnub.subscribe({
                     channel: doc.bids[doc.bids.length - 1]._id,
-                    message: bidChanged,
+                    message: function(message){
+                        if(message["uuid"].indexOf("console") > -1){
+                            bidChanged(message);
+                        } else {
+                            receiveBid(message);
+                        }
+                        },
                     error: function (data) {
                         serverLogger.gameLogger.log(doc._id,"bid " +channel+": " + data);
                     },
@@ -53,12 +55,12 @@ exports.addBid = function (req, res) {
                     }
                 });
 
-                res.status(200).send(doc.bids[doc.bids.length - 1]);
+                publishMessage(message.gameId, {bidId:doc.bids[doc.bids.length - 1]._id, success:true});
             }, function(err){
-                res.status(500).send(err);
+                publishMessage(message.gameId, {bidId:doc.bids[doc.bids.length - 1]._id, error:err});
             });
         } else {
-            res.status(404).end();
+            publishMessage(message.gameId, {bidId:doc.bids[doc.bids.length - 1]._id, gameNotFound:true});
         }
     });
 };
@@ -95,7 +97,7 @@ var updateUserBalanceInDb = function(item, callback){
 };
 
 // ## callback when manager notifies bid has changed - if he closes the bid, close = true. If he pressed a result (close the bid with the winning option)
-exports.bidChanged = function (message) {
+var bidChanged = exports.bidChanged = function (message) {
     dbOperations.getEntity(message.gameId, null, function(doc){
         if (doc) {
             var currentBid = doc.bids.id(message.bidId);
@@ -117,19 +119,19 @@ exports.bidChanged = function (message) {
                         }
                     });
                 // Update bid requests to db
-                return dbOperations.updateDb(doc, function () {
+                dbOperations.updateDb(doc, function () {
                     serverLogger.gameLogger.log(doc._id ,"Successfully updated game entity");
                 });
             }
         } else {
-            return serverLogger.gameLogger.log(doc._id ,"could not find game ", message.gameId);
+            serverLogger.gameLogger.log(doc._id ,"could not find game ", message.gameId);
         }
     });
 };
 
 // ## receive bid request object from user through game message socket and add to db
-exports.receiveBid = function (message, envelope, channel) {
-    serverLogger.gameLogger.log(doc._id ,"received bid request for game: " + channel);
+var receiveBid = exports.receiveBid = function (message) {
+    serverLogger.gameLogger.log(message.gameId ,"received bid request for game: " + channel);
     dbOperations.getEntity(message.gameId, function(doc){
         if (doc) {
             if (doc.bids.id(message.bidId).status == "Active") {
@@ -144,17 +146,19 @@ exports.receiveBid = function (message, envelope, channel) {
                 });
                 dbOperations.updateDb(doc, function () {
                     serverLogger.gameLogger.log(doc._id ,"bid request added successfully");
-                    return res.status(200).end();
+                    publishMessage(message.userId, {success:true});
                 }, function(err){
-                    return res.status(500).send(err);
+                    serverLogger.gameLogger.log(doc._id ,"bid request addition failed: ", err);
+                    publishMessage(message.userId, {error:err});
                 });
             } else {
                 serverLogger.gameLogger.log(doc._id ,"request made for inactive bid, request rejected");
                 // send unauthorized code to client
-                return res.status(403).send("Bid is inactive");
+                publishMessage(message.userId, {inactive:true});
             }
         } else {
-            return res.status(404);
+            publishMessage(message.gameId, {gameNotFound:true});
         }
     });
 };
+
