@@ -38,7 +38,7 @@ exports.addBid = function (message) {
                 pubnub.subscribe({
                     channel: doc.bids[doc.bids.length - 1]._id,
                     message: function(message){
-                        if(message["uuid"].indexOf("console") > -1){
+                        if(message.uuid && message.uuid.indexOf("console") > -1){
                             bidChanged(message);
                         } else {
                             receiveBid(message);
