@@ -79,6 +79,7 @@ var addParticipant = function (bidRequest, bidId) {
 
         // If the bid is active
         if (currentBid.status == "Active") {
+
             // Add participant to desired option
             currentBid.options[bidRequest.option].push({
                 userId: bidRequest.userId,
@@ -94,10 +95,12 @@ var addParticipant = function (bidRequest, bidId) {
 
             // Loop through all the options
             for (var i in currentBid.options) {
+
                 // If this is the last option (auto losers), stop the loop
                 if (i == currentBid.options.length - 1) {
                     break;
                 }
+
                 // Add total participants for option
                 serverMessage.options.push(currentBid.options[i].length);
             }
@@ -105,8 +108,9 @@ var addParticipant = function (bidRequest, bidId) {
             // Send the message on bid_id_msg channel
             publishMessage(bidId + "_msg", serverMessage);
 
-            // If the bid is inactive
+        // If the bid is inactive
         } else {
+
             // If the option was -1 (auto losers)
             if (bidRequest.option == -1) {
 
@@ -211,88 +215,115 @@ var updateUserBalances = function (bid) {
     }
     // Loop through the options
     for (var i in bid.options) {
+
         // If this is the winning option
         if (i == bid.winningOption) {
-            // Peform task in parallel for each winning participant
+
+            // Perform task in parallel for each winning participant
             async.each(bid.options[i].participants, function (participant, callback) {
+
                 // Find user entity
                 dbOperations.UserModel.findOne({_id: participant.userId}, function (err, user) {
+
                     // If no error and we found the user
                     if (!err && user) {
+
                         // Add the winning money to balance
                         user.balance += winningMoney;
+
                         // Save user
                         user.save(function (err, savedUser) {
+
                             // If there is no error
                             if (!err) {
+
                                 // Log success
                                 logger.info("Added " + winningMoney + " to user " + savedUser._id + " balance");
 
                                 // Return with no error
                                 callback();
                             } else {
+
                                 // Return with error
                                 callback(err);
                             }
                         });
                     } else {
+
                         // Return with error
                         callback(err);
                     }
                 });
             }, function (err) {
+
                 // If we have an error
                 if(err){
+
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
                     logger.error(err);
                     logger.error(activeBids[bid.id]);
                 } else {
+
                     // Log success
                     logger.info("Updated users balances");
                 }
             });
+
         // This is not a winning option
         } else {
-            // Peform task in parallel for each winning participant
+
+            // Perform task in parallel for each winning participant
             async.each(bid.options[i].participants, function (participant, callback) {
+
                 // Find user entity
                 dbOperations.UserModel.findOne({_id: participant.userId}, function (err, user) {
+
                     // If no error and we found the user
                     if (!err && user) {
+
                         // Add the winning money to balance
                         user.balance -= participant.amount;
+
                         // Save user
                         user.save(function (err, savedUser) {
+
                             // If there is no error
                             if (!err) {
+
                                 // Log success
                                 logger.info("Subtracted " + participant.amount + " to user " + savedUser._id + " balance");
 
                                 // Return with no error
                                 callback();
                             } else {
+
                                 // Return with error
                                 callback(err);
                             }
                         });
                     } else {
+
                         // Return with error
                         callback(err);
                     }
                 });
             }, function (err) {
+
                 // If we have an error
                 if(err){
+
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
                     logger.error(err);
                     logger.error(activeBids[bid.id]);
                 } else {
+
                     // Log success
                     logger.info("Updated users balances");
                 }
             });
         }
     }
+
     // Remove bid from active bids cache
     delete activeBids[bid.id];
 };
