@@ -2,8 +2,6 @@
 http://plnkr.co/6u4a7xNNY8SAhpwRtZvj
 
 
-[![Build Status](https://magnum.travis-ci.com/elirankon/liveBetting.svg?token=bZxyqWWnxqvoiWDwh2yz&branch=master)](https://magnum.travis-ci.com/elirankon/liveBetting)
-
 # liveBetting
 
 please install nodejs and bower to run this locally
