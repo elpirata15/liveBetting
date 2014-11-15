@@ -33,7 +33,7 @@ var bidEntity = new Schema({
     timestamp: Date,
     status: String,
     ttl: Number,
-    options: [optionEntity],
+    bidOptions: [optionEntity],
     totalPoolAmount: Number,
     entryAmount: Number,
     winningOption: Number

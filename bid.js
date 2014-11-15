@@ -28,7 +28,7 @@ var activeBids = {};
 exports.addBid = function (bid) {
 
     // Add auto loser option
-    bid.options.push = {
+    bid.bidOptions.push = {
         optionDescription: "Automatic Losers",
         automaticLoser: true,
         participants: []
@@ -81,7 +81,7 @@ var addParticipant = function (bidRequest, bidId) {
         if (currentBid.status == "Active") {
 
             // Add participant to desired option
-            currentBid.options[bidRequest.option].push({
+            currentBid.bidOptions[bidRequest.option].push({
                 userId: bidRequest.userId,
                 amount: bidRequest.amount
             });
@@ -94,15 +94,15 @@ var addParticipant = function (bidRequest, bidId) {
             var serverMessage = {totalPoolAmount: currentBid.totalPoolAmount, options: []};
 
             // Loop through all the options
-            for (var i in currentBid.options) {
+            for (var i in currentBid.bidOptions) {
 
                 // If this is the last option (auto losers), stop the loop
-                if (i == currentBid.options.length - 1) {
+                if (i == currentBid.bidOptions.length - 1) {
                     break;
                 }
 
                 // Add total participants for option
-                serverMessage.options.push(currentBid.options[i].length);
+                serverMessage.bidOptions.push(currentBid.bidOptions[i].length);
             }
 
             // Send the message on bid_id_msg channel
@@ -115,7 +115,7 @@ var addParticipant = function (bidRequest, bidId) {
             if (bidRequest.option == -1) {
 
                 // Add request to auto losers
-                currentBid.options[currentBid.options.length - 1].push({
+                currentBid.bidOptions[currentBid.bidOptions.length - 1].push({
                     userId: bidRequest.userId,
                     amount: bidRequest.amount
                 });
@@ -205,7 +205,7 @@ var updateUserBalances = function (bid) {
     var winningMoney = 0;
 
     // Get winning option participants (add house as winning participant - this is how we make money :D)
-    var winningUsers = bid.options[bid.winningOption].participants.length + 1;
+    var winningUsers = bid.bidOptions[bid.winningOption].participants.length + 1;
 
     // If there were winning users
     if (winningUsers > 0) {
@@ -214,13 +214,13 @@ var updateUserBalances = function (bid) {
         winningMoney = bid.totalPoolAmount / winningUsers;
     }
     // Loop through the options
-    for (var i in bid.options) {
+    for (var i in bid.bidOptions) {
 
         // If this is the winning option
         if (i == bid.winningOption) {
 
             // Perform task in parallel for each winning participant
-            async.each(bid.options[i].participants, function (participant, callback) {
+            async.each(bid.bidOptions[i].participants, function (participant, callback) {
 
                 // Find user entity
                 dbOperations.UserModel.findOne({_id: participant.userId}, function (err, user) {
@@ -273,7 +273,7 @@ var updateUserBalances = function (bid) {
         } else {
 
             // Perform task in parallel for each winning participant
-            async.each(bid.options[i].participants, function (participant, callback) {
+            async.each(bid.bidOptions[i].participants, function (participant, callback) {
 
                 // Find user entity
                 dbOperations.UserModel.findOne({_id: participant.userId}, function (err, user) {
