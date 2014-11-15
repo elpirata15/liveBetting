@@ -4,14 +4,14 @@ var pubnub = require("pubnub").init({
     subscribe_key: "sub-c-9f28fbce-55f5-11e4-8cbc-02ee2ddab7fe"
 });
 
-var logger = new (winston.Logger)({
-    transports: [
-        new (winston.transports.Console)(),
-        new (winston.transports.File)({filename: 'default.log'})
-    ]
-});
-
 var ServerLogger = function ServerLogger(gameId){
+
+    var logger = new (winston.Logger)({
+        transports: [
+            new (winston.transports.Console)(),
+            new (winston.transports.File)({filename: (gameId)? gameId+".log" : "default.log"})
+        ]
+    });
 
     this.gameId = gameId || "";
 

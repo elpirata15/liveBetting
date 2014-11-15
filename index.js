@@ -88,6 +88,9 @@ app.post('/closeGame/:id', ensureManager, gameController.closeGame);
 // Adds bid entity to game (receives bid entity as parameter)
 app.post('/addBid', ensureManager, bidController.addBid);
 
+// Creates a new ID object to send with bidEntity
+app.get('/newBidId', ensureManager, bidController.newId);
+
 // ###### USER FUNCTIONS ######
 app.get('/getUsers', ensureAdmin, userController.getUsers);
 
@@ -102,7 +105,6 @@ app.post('/logout', userController.logoutUser);
 app.post('/register', userController.registerUser);
 
 app.post('/changeGroup', userController.changeUserGroup);
-
 
 app.get('/defaultLog', ensureAdmin, function (req, res) {
     res.sendFile('default.log');

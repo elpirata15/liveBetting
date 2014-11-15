@@ -158,6 +158,7 @@ exports.assignGame = function (req, res) {
             dbOperations.GameModel
                 .where('timestamp').lte(new Date(gameDate.setHours(gameDate.getHours() + 10))).gte(new Date(gameDate.setHours(gameDate.getHours() - 10)))
                 .where('assignedTo', req.body.managerId)
+                .limit(1)
                 .exec(function (err, docs) {
                     if (docs.length > 0) {
                         res.status(500).send("Manager has a game assigned during this time");
