@@ -32,7 +32,7 @@ angular.module('liveBetManager', [
     $rootScope.$on('$routeChangeStart', function(event, next, current) {
         $rootScope.flash = "";
         if(authService.group() != "Admins"){
-            if(next.restrict && next.restrict.indexOf(authService.group()) < 0  || !authService.isAuthenticated()){
+            if(next.restrict && next.restrict.indexOf(authService.group()) < 0  && !authService.isAuthenticated()){
                 $rootScope.returnUrl = current;
                 $location.path('/login');
             }
