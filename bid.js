@@ -27,6 +27,11 @@ var activeBids = {};
 // Adds bid entity to game (receives bidEntity as parameter)
 exports.addBid = function (bid) {
 
+    // Initialize participants for options
+    for(var i in bid.bidOptions){
+        bid.bidOptions[i].participants = [];
+    }
+
     // Add auto loser option
     bid.bidOptions.push = {
         optionDescription: "Automatic Losers",
