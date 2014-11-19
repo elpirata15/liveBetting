@@ -26,6 +26,7 @@ var optionEntity = new Schema({
 });*/
 
 var bidEntity = new Schema({
+    id: ObjectId,
     gameId: ObjectId,
     gameName: String,
     bidDescription: String,
