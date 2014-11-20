@@ -25,8 +25,9 @@ exports.newId = function (req, res) {
 var activeBids = {};
 
 // Adds bid entity to game (receives bidEntity as parameter)
-exports.addBid = function (bid) {
-
+exports.addBid = function (bidMessage) {
+    // Get the bidEntity from the message (the message from the client contains pn_gcm for android push notifications)
+    var bid = bidMessage.bidEntity;
     // Initialize participants for options
     for(var i in bid.bidOptions){
         bid.bidOptions[i].participants = [];
