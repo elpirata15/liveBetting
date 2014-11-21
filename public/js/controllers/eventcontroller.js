@@ -3,15 +3,19 @@ angular.module('liveBetManager').controller('eventController',['$scope','$rootSc
         $scope.connected = false;
         $scope.log = [];
 		console.log("herh ehrer");
+		$scope.selectedPlayer = {};
     //    $scope.game = localStorageService.get('game');//this contains following array
 		//comes from gave.events
 		$scope.events = [{'eventName':'Foul','eventTemplate':'foul.html'},
-						{'eventName':'Free Kick','eventTemplate':'Free_Kick.html'},
+						{'eventName':'Free Kick','eventTemplate':'Free_Kick.html', toString: function(player){
+							return "Free Kick: " + player.playerName + " is kicking for " + player.teamName;
+						}},
 						{'eventName':'Corner','eventTemplate':'Corner.html'},
-						{'eventName':'Out','eventTemplate':'Out.html'},
+						{'eventName':'Out','eventTemplate':'out.html'},
 						{'eventName':'Offside','eventTemplate':'Offside.html'},
 						{'eventName':'Penalty','eventTemplate':'Penalty.html'},
-						{'eventName':'Substitution','eventTemplate':'Substitution.html'}];
+						{'eventName':'Substitution','eventTemplate':'Substitution.html'},
+                        {'eventName': 'Custom Event', 'eventTemplate': 'custom.html'}];
 		//comes from game.teams
 		$scope.teams = [{'teamName':"macabi tel-aviv", 'players':[
 							{'playerName':"Messi"},
@@ -59,8 +63,10 @@ angular.module('liveBetManager').controller('eventController',['$scope','$rootSc
 		$scope.disableOpen = true;
 		$scope.disableClose = true;
 		$scope.disableOutcomes = true;
-		
-		$scope.betArray = {'betDescription':'','betOptions':[]};
+
+
+		$scope.betArray = {betDescription:'',betOptions:['blah','blooh','bliiigggg']};
+		$scope.selectedOption;
 		$scope.disableTheRest = function(){
 			for (var i=0; i<$scope.teams.length; i++){
 				$scope.teams[i].active = false;

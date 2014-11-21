@@ -21,7 +21,7 @@
     <div class="row">
         <div class="col-xs-2" style="padding-left:0px">
             <div class="btn-group-vertical" style="padding-left: 0px; height: 610px; border: 1px solid black;">
-                <button type="button" class="btn btn-warning" style="margin-top:10px; margin-bottom: 10px;" ng-click="changeEventTemplate(item.eventTemplate);" ng-repeat="item in events">{{item.eventName}}</button>
+                <button type="button" class="btn btn-warning" style="margin-top:10px; margin-bottom: 10px;" ng-click="changeEventTemplate(item.eventTemplate)" ng-repeat="item in events">{{item.eventName}}</button>
             </div>
         </div>
         <div class="col-xs-10" style="min-height: 500px; border: 1px solid black;" ng-include="currentEvent">
@@ -33,7 +33,5 @@
 			</div>
 		</div>
     </div>
-    <div class="navbar navbar-fixed-bottom">
-        <span><b>BET SYNTAX: </b></span>
-    </div>
+
 </div>
