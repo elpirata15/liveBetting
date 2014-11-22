@@ -1,0 +1,12 @@
+<div class="col-xs-6 col-xs-offset-3" style="padding:0px">
+    <div class="panel panel-default">
+        <div class="panel-heading" style="text-align:center;text-transform: capitalize">Will be substituted by</div>
+        <div class="panel-body">
+            <div class="col-xs-4" ng-repeat="player in team.players">
+                <button type="button" ng-click="setOption(player.playerName)"
+                        class="btn btn-block" ng-class="{'btn-default': selectedPlayers.indexOf(player.playerName) == -1, 'btn-info': selectedPlayers.indexOf(player.playerName) > -1}">{{player.playerName}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

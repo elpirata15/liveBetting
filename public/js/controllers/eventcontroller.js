@@ -5,6 +5,13 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         //console.log("herh ehrer");
         //    $scope.game = localStorageService.get('game');//this contains following array
         $scope.eventDescription = {teams: []};
+        $scope.getTeamIndex = function(teamName){
+            for(var i in $scope.teams){
+                if($scope.teams[i].teamName == teamName){
+                    return i;
+                }
+            }
+        };
         $scope.events = {
             corner: {
                 eventName: 'Corner',
@@ -39,9 +46,29 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         (($scope.eventDescription.teams[1]) ? $scope.eventDescription.teams[1].teamName : "undefined");
                 },
                 eventOptions: ['Red Card', 'Yellow Card', 'They Will Fight']
+            },
+            offside: {
+                eventName: 'Offside',
+                viewElements: {
+                    eventTeamSelector: {selectionCount: '1'}
+                },
+                toString: function () {
+                    return "Offside by " + $scope.eventDescription.playerName + " of " + $scope.eventDescription.teamName;
+                },
+                eventOptions: ['Goal', 'Out', 'Potato']
+            },
+            substitution: {
+                eventName: 'Substitution',
+                viewElements: {
+                    eventTeamSelector: {selectionCount: '1'},
+                    substitutionOptions: true
+                },
+                toString: function () {
+                    return "Substitution - "+$scope.eventDescription.teamName+": " + $scope.eventDescription.playerName + " is warming up. Who will he replace?";
+                },
+                eventOptions: []
             }
         };
-
 
 
         //$scope.events = [{'eventName':'Foul','eventTemplate':'foul.html'},
@@ -86,6 +113,12 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 'active': false
             }
         ];
+
+        $scope.teamsToPlayers = {
+            "macabi tel-aviv": $scope.teams[0],
+            "beytar jerusalem": $scope.teams[1]
+        };
+
         /*
          $scope.theteam = '?';
          $scope.setTeam = function(teamName) {

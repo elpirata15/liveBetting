@@ -9,17 +9,17 @@ angular.module('liveBetManager').directive('teamSelector', function () {
         templateUrl: 'js/directives/templates/teamselector.html',
         link: function (scope, element, attrs) {
 
-            scope.$watch('selectedPlayers', function(newVal, oldVal){
-               if(!newVal.playerName || newVal.teams.length == 0){
-                   scope.selectedPlayer = {0: '', 1: ''};
-               }
+            scope.$watch('selectedPlayers', function (newVal, oldVal) {
+                if (!newVal.playerName || newVal.teams.length == 0) {
+                    scope.selectedPlayer = {0: '', 1: ''};
+                }
             });
 
             scope.setSelectedPlayer = function (name, team, teamIndex) {
-                if(scope.selectionCount == 1) {
+                if (scope.selectionCount == 1) {
                     scope.selectedPlayers.playerName = name;
                     scope.selectedPlayers.teamName = team;
-                    if(teamIndex == 0){
+                    if (teamIndex == 0) {
                         scope.selectedPlayer[0] = name;
                         scope.selectedPlayer[1] = "";
                     } else {
@@ -30,7 +30,7 @@ angular.module('liveBetManager').directive('teamSelector', function () {
                 }
                 else
                     scope.selectedPlayers.teams[teamIndex] = {playerName: name, teamName: team};
-                    scope.selectedPlayer[teamIndex] = name;
+                scope.selectedPlayer[teamIndex] = name;
             };
 
             scope.selectedPlayer = {0: '', 1: ''};
@@ -47,6 +47,25 @@ angular.module('liveBetManager').directive('teamSelector', function () {
         link: function (scope, element, attrs) {
             scope.setOption = function (index) {
                 scope.selectedOption = index;
+            }
+        }
+    }
+}).directive('substitutionOptions', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            team: '=',
+            selectedPlayers: '=ngModel'
+        },
+        templateUrl: 'js/directives/templates/substitutionoptions.html',
+        link: function (scope, element, attrs) {
+            scope.setOption = function (playerName) {
+                if (scope.selectedPlayers.length == 3) {
+                    scope.selectedPlayers.push(playerName);
+                    scope.selectedPlayers.splice(0, 1);
+                } else {
+                    scope.selectedPlayers.push(playerName);
+                }
             }
         }
     }
