@@ -28,18 +28,18 @@
             </button>
         </div>
         <div class="col-xs-10">
-            <team-selector ng-show="currentEvent.viewElements.eventTeamSelector"
+            <team-selector ng-if="currentEvent.viewElements.eventTeamSelector"
                            teams="teams"
                            selection-count="currentEvent.viewElements.eventTeamSelector.selectionCount"
                            ng-model="eventDescription"></team-selector>
-            <div class="form-group col-xs-4 col-xs-offset-4" ng-show="currentEvent.viewElements.distanceParamInput">
+            <div class="form-group col-xs-4 col-xs-offset-4" ng-if="currentEvent.viewElements.distanceParamInput">
                 <div class="input-group input-group-lg">
                     <span class="input-group-addon glyphicon glyphicon-resize-horizontal"></span>
                     <input type="number" class="form-control" ng-model="eventDescription.distance">
                     <span class="input-group-addon">m</span>
                 </div>
             </div>
-            <substitution-options ng-show="currentEvent.viewElements.substitutionOptions"
+            <substitution-options ng-if="currentEvent.viewElements.substitutionOptions"
                                   team="teamsToPlayers[eventDescription.teamName]"
                                   warming-player="eventDescription.playerName"
                                   ng-model="currentEvent.eventOptions"></substitution-options>
@@ -49,7 +49,7 @@
 
                 <div style="padding-bottom:10px">
                     <button class="col-xs-4 col-xs-offset-2 btn btn-success btn-lg"
-                            ng-disabled="currentEvent.toString().indexOf('undefined') > -1" ng-click="openBet()">Open
+                            ng-disabled="currentEvent.toString().indexOf('undefined') > -1 || currentEvent.eventOptions.length < 3" ng-click="openBet()">Open
                         Bet
                     </button>
                     <button class="col-xs-4 btn btn-danger btn-lg" style="margin-left:5px" ng-disabled="disableClose"
@@ -59,7 +59,7 @@
                 </div>
             </div>
 
-            <bet-options ng-show="currentEvent.eventOptions" options="currentEvent.eventOptions"
+            <bet-options ng-show="currentEvent.eventOptions.length > 0" options="currentEvent.eventOptions"
                          ng-model="selectedOption"></bet-options>
         </div>
     </div>

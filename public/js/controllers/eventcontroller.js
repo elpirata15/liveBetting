@@ -5,13 +5,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         //console.log("herh ehrer");
         //    $scope.game = localStorageService.get('game');//this contains following array
         $scope.eventDescription = {teams: []};
-        $scope.getTeamIndex = function(teamName){
-            for(var i in $scope.teams){
-                if($scope.teams[i].teamName == teamName){
-                    return i;
-                }
-            }
-        };
+
         $scope.events = {
             corner: {
                 eventName: 'Corner',
