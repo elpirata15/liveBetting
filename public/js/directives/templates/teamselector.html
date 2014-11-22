@@ -4,7 +4,7 @@
             <div class="panel-body">
                 <div class="col-xs-4" ng-repeat="player in teams[0].players">
                     <button type="button" ng-click="setSelectedPlayer(player.playerName, teams[0].teamName, 0)"
-                            class="btn btn-primary btn-block">{{player.playerName}}
+                            class="btn btn-block" ng-class="{'btn-info': selectedPlayer[0] != player.playerName, 'btn-primary': selectedPlayer[0] == player.playerName}">{{player.playerName}}
                     </button>
                 </div>
             </div>
@@ -16,7 +16,7 @@
             <div class="panel-body">
                 <div class="col-xs-4" ng-repeat="player in teams[1].players">
                     <button type="button" ng-click="setSelectedPlayer(player.playerName, teams[1].teamName, 1)"
-                            class="btn btn-warning btn-block">{{player.playerName}}
+                            class="btn btn-block" ng-class="{'btn-info': selectedPlayer[1] != player.playerName, 'btn-warning': selectedPlayer[1] == player.playerName}">{{player.playerName}}
                     </button>
                 </div>
             </div>

@@ -8,7 +8,7 @@
     </div>
     <div class="navbar-collapse collapse navbar-responsive-collapse">
         <div class="navbar-form navbar-left">
-        <button type="button" class="btn btn-danger" ng-click="closeGame()">CLOSE GAME </button>
+            <button type="button" class="btn btn-danger" ng-click="closeGame()">CLOSE GAME</button>
         </div>
         <ul class="nav navbar-nav">
             <li><a>Active Users: </a></li>
@@ -19,19 +19,49 @@
 </div>
 <div class="container-fluid" style="padding-top:100px">
     <div class="row">
-        <div class="col-xs-2" style="padding-left:0px">
-            <div class="btn-group-vertical" style="padding-left: 0px; height: 610px; border: 1px solid black;">
-                <button type="button" class="btn btn-warning" style="margin-top:10px; margin-bottom: 10px;" ng-click="changeEventTemplate(item.eventTemplate)" ng-repeat="item in events">{{item.eventName}}</button>
+        <div class="col-xs-2" style="padding-left:0px;text-align:center">
+            <b><span class="glyphicon glyphicon-arrow-down"></span> Choose an event</b>
+            <button type="button" class="btn btn-block"
+                    ng-class="{'btn-info':currentEvent!=item, 'btn-warning':currentEvent==item} "
+                    style=" margin-bottom: 10px;"
+                    ng-click="changeEventTemplate(item)" ng-repeat="item in events">{{item.eventName}}
+            </button>
+        </div>
+        <div class="col-xs-10">
+            <team-selector ng-show="currentEvent.viewElements.eventTeamSelector"
+                           teams="teams"
+                           selection-count="currentEvent.viewElements.eventTeamSelector.selectionCount"
+                           ng-model="eventDescription"></team-selector>
+            <div class="form-group col-xs-4 col-xs-offset-4" ng-show="currentEvent.viewElements.distanceParamInput">
+                <div class="input-group input-group-lg">
+                    <span class="input-group-addon glyphicon glyphicon-resize-horizontal"></span>
+                    <input type="number" class="form-control" ng-model="eventDescription.distance">
+                    <span class="input-group-addon">m</span>
+                </div>
             </div>
-        </div>
-        <div class="col-xs-10" style="min-height: 500px; border: 1px solid black;" ng-include="currentEvent">
-        </div>
-        <div class="col-xs-10" style="height: 100px; border: 1px solid black; margin-top: 10px;">
-			<div class="btn-group-horizontal">
-				<button type="button" class="btn btn-success" ng-disabled="disableOpen" ng-click="openBet()">Open Bet</button>
-				<button type="button" class="btn btn-danger" ng-disabled="disableClose" ng-click="openSubmitOutcomes()">Close Bet</button>
-			</div>
-		</div>
-    </div>
 
+            <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent">
+                <p align="center" class="text-primary" style="font-size:larger;font-weight:bold"
+                   ng-show="currentEvent.toString().indexOf('undefined') == -1">{{currentEvent.toString()}}</p>
+
+                <div style="padding-bottom:10px">
+                    <button class="col-xs-4 col-xs-offset-2 btn btn-success btn-lg"
+                            ng-disabled="currentEvent.toString().indexOf('undefined') > -1" ng-click="openBet()">Open
+                        Bet
+                    </button>
+                    <button class="col-xs-4 btn btn-danger btn-lg" style="margin-left:5px" ng-disabled="disableClose"
+                            ng-click="openSubmitOutcomes()">Close
+                        Bet
+                    </button>
+                </div>
+            </div>
+
+            <bet-options ng-show="currentEvent.eventOptions" options="currentEvent.eventOptions"
+                         ng-model="selectedOption"></bet-options>
+        </div>
+    </div>
+</div>
+<!--<pre>event description: {{currentEvent.toString()}}</pre>-->
+<!--<pre>selectedPlayer:{{eventDescription|json}}</pre>-->
+<!--<pre>selectedOption:{{selectedOption|json}}</pre>-->
 </div>
