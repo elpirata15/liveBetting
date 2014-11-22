@@ -61,6 +61,17 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     return "Substitution - "+$scope.eventDescription.teamName+": " + $scope.eventDescription.playerName + " is warming up. Who will he replace?";
                 },
                 eventOptions: []
+            },
+            customEvent: {
+                alwaysLast: true,
+                eventName: 'Custom Event',
+                viewElements: {
+                    customBet: true
+                },
+                toString: function () {
+                    return $scope.eventDescription.question;
+                },
+                eventOptions: []
             }
         };
 

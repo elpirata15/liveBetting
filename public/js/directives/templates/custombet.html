@@ -1,0 +1,50 @@
+<div class="panel panel-primary">
+    <div class="panel-heading" style="text-align:center;text-transform: capitalize">custom bet</div>
+    <div class="panel-body">
+        <div class="form-group" style="padding-bottom:10px">
+            <div class="col-xs-2">
+                <label class="control-label text-primary" style="font-size:large;font-weight: bold">Question:</label>
+            </div>
+            <div class="col-xs-10">
+                <input type="text" ng-model="question" class="form-control">
+            </div>
+        </div>
+        <br/><br/>
+
+        <div class="well well-sm col-xs-8 col-xs-offset-2">
+            <h3 style="text-align: center"><b>Bet Options: </b></h3>
+
+            <div class="form-group">
+                <label class="col-xs-2 control-label">Option 1:</label>
+
+                <div class="col-xs-10">
+                    <input type="text" ng-model="betValues[0]" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">Option 2:</label>
+
+                <div class="col-xs-10">
+                    <input type="text" ng-model="betValues[1]" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">Option 3:</label>
+
+                <div class="col-xs-10">
+                    <input type="text" ng-model="betValues[2]" class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="form-group-lg col-xs-6 col-xs-offset-2">
+            <label for="eventType" class="control-label col-xs-6" style="text-align: right;font-size:large;font-weight: bold">Bet Type:</label>
+            <div class="col-xs-6">
+                <select id="eventType" class="form-control" ng-model="eventType">
+                    <option>Long</option>
+                    <option>Short</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+        <!--<pre>{{betValues|json}}</pre>-->

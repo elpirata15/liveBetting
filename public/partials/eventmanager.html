@@ -24,7 +24,12 @@
             <button type="button" class="btn btn-block"
                     ng-class="{'btn-info':currentEvent!=item, 'btn-warning':currentEvent==item} "
                     style=" margin-bottom: 10px;"
-                    ng-click="changeEventTemplate(item)" ng-repeat="item in events">{{item.eventName}}
+                    ng-click="changeEventTemplate(item)" ng-repeat="item in events" ng-if="!item.alwaysLast">{{item.eventName}}
+            </button>
+            <button type="button" class="btn btn-block"
+                    ng-class="{'btn-info':currentEvent!=events.customEvent, 'btn-warning':currentEvent==events.customEvent} "
+                    style=" margin-bottom: 10px;"
+                    ng-click="changeEventTemplate(events.customEvent)">{{events.customEvent.eventName}}
             </button>
         </div>
         <div class="col-xs-10">
@@ -43,6 +48,10 @@
                                   team="teamsToPlayers[eventDescription.teamName]"
                                   warming-player="eventDescription.playerName"
                                   ng-model="currentEvent.eventOptions"></substitution-options>
+            <custom-bet ng-if="currentEvent.viewElements.customBet"
+                        question="eventDescription.question"
+                        event-type="eventDescription.eventType"
+                        ng-model="currentEvent.eventOptions"></custom-bet>
             <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent">
                 <p align="center" class="text-primary" style="font-size:larger;font-weight:bold"
                    ng-show="currentEvent.toString().indexOf('undefined') == -1">{{currentEvent.toString()}}</p>

@@ -75,4 +75,28 @@ angular.module('liveBetManager').directive('teamSelector', function () {
             });
         }
     }
+}).directive('customBet', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            question: '=',
+            betOptions: '=ngModel',
+            eventType: '='
+        },
+        templateUrl: 'js/directives/templates/custombet.html',
+        link: function (scope, element, attrs) {
+            scope.setOption = function (index) {
+                scope.selectedOption = index;
+            };
+            scope.betValues = {};
+            scope.$watch('betValues', function(newVal){
+                if(newVal){
+                    scope.betOptions = [];
+                    for(var i in newVal){
+                        scope.betOptions.push(newVal[i]);
+                    }
+                }
+            },true);
+        }
+    }
 });
