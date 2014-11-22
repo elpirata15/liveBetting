@@ -55,7 +55,8 @@ angular.module('liveBetManager').directive('teamSelector', function () {
         restrict: 'E',
         scope: {
             team: '=',
-            selectedPlayers: '=ngModel'
+            selectedPlayers: '=ngModel',
+            warmingPlayer: '='
         },
         templateUrl: 'js/directives/templates/substitutionoptions.html',
         link: function (scope, element, attrs) {
@@ -66,7 +67,12 @@ angular.module('liveBetManager').directive('teamSelector', function () {
                 } else {
                     scope.selectedPlayers.push(playerName);
                 }
-            }
+            };
+            scope.$watch('warmingPlayer', function(newVal, oldVal){
+                if(newVal != oldVal){
+                    scope.selectedPlayers = [];
+                }
+            });
         }
     }
 });

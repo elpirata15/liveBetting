@@ -41,6 +41,7 @@
             </div>
             <substitution-options ng-show="currentEvent.viewElements.substitutionOptions"
                                   team="teamsToPlayers[eventDescription.teamName]"
+                                  warming-player="eventDescription.playerName"
                                   ng-model="currentEvent.eventOptions"></substitution-options>
             <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent">
                 <p align="center" class="text-primary" style="font-size:larger;font-weight:bold"
