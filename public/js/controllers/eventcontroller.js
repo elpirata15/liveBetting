@@ -75,17 +75,6 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             }
         };
 
-
-        //$scope.events = [{'eventName':'Foul','eventTemplate':'foul.html'},
-        //				{'eventName':'Free Kick','eventTemplate':'Free_Kick.html', toString: function(player){
-        //					return "Free Kick: " + player.playerName + " is kicking for " + player.teamName;
-        //				}},
-        //				{'eventName':'Corner','eventTemplate':'Corner.html'},
-        //				{'eventName':'Out','eventTemplate':'out.html'},
-        //				{'eventName':'Offside','eventTemplate':'Offside.html'},
-        //				{'eventName':'Penalty','eventTemplate':'Penalty.html'},
-        //				{'eventName':'Substitution','eventTemplate':'Substitution.html'},
-        //               {'eventName': 'Custom Event', 'eventTemplate': 'custom.html'}];
         //comes from game.teams
         $scope.teams = [{
             'teamName': "macabi tel-aviv", 'players': [
@@ -119,10 +108,15 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             }
         ];
 
-        $scope.teamsToPlayers = {
-            "macabi tel-aviv": $scope.teams[0],
-            "beytar jerusalem": $scope.teams[1]
-        };
+        for(var i in $scope.teams){
+            teamsService.getPlayers($scope.teams[i].teamId).success(function(data){
+                $scope.teams[i].players = data;
+            });
+        }
+
+        $scope.teamsToPlayers = {};
+        $scope.teamsToPlayers[$scope.teams[0].teamName] = $scope.teams[0];
+        $scope.teamsToPlayers[$scope.teams[1].teamName] = $scope.teams[1];
 
         /*
          $scope.theteam = '?';

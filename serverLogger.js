@@ -51,7 +51,7 @@ var ServerLogger = function ServerLogger(gameId){
 // per game loggers
 var gameLoggers = {};
 
-exports.gameLogger = {
+ServerLogger.prototype.gameLogger = {
     setLogger: function (gameId) {
         gameLoggers[gameId] = new ServerLogger(gameId);
     },
@@ -59,7 +59,7 @@ exports.gameLogger = {
         delete gameLoggers[gameId];
     },
     log: function(gameId){
-        return gameLoggers[gameId].info(arguments.slice(1));
+        //gameLoggers[gameId].info(arguments.slice(1));
     }
 };
 

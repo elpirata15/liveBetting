@@ -5,6 +5,9 @@ var pubnub = require("pubnub").init({
 var dbOperations = require('./dbOperations');
 var serverLogger = require('./serverLogger');
 var bidController = require('./bid');
+var request = require("request");
+
+var apiKey = "tZUXOOZ8Lf7spqPCBkcSjaRqJzeXyvTk";
 
 // default server channel logger
 var logger = new serverLogger();
@@ -112,19 +115,19 @@ exports.createGame = function (req, res) {
     }
 };
 
+
 // Initialize previously created game
 exports.initGame = function (req, res) {
     var minDate = new Date(new Date().getTime() - 15 * 60000);
     var maxDate = new Date(new Date().getTime() + 15 * 60000);
     dbOperations.GameModel.findOne({
-        _id: req.params.id,
-        timestamp: {$gte: minDate, $lte: maxDate},
-        assignedTo: req.body.userId
+        _id: req.params.id
+        //timestamp: {$gte: minDate, $lte: maxDate},
+        //assignedTo: req.body.userId
     }, function (err, game) {
         if (!err && game) {
             game.status = "Active";
             dbOperations.updateDb(game, function (game) {
-
                 // Subscribe to game message socket
                 pubnub.subscribe({
                     channel: game._id,
@@ -139,8 +142,8 @@ exports.initGame = function (req, res) {
                         logger.error(game.gameName + ": " + data);
                     }
                 });
-                serverLogger.gameLogger.setLogger(game._id);
-                serverLogger.gameLogger.log(game._id, "Activated game: ", game.gameName);
+                logger.gameLogger.setLogger(game._id);
+                logger.gameLogger.log(game._id, "Activated game: ", game.gameName);
                 res.status(200).send(game);
             });
         } else {
@@ -148,6 +151,8 @@ exports.initGame = function (req, res) {
         }
     });
 };
+
+
 
 // Assign specified game to specified manager
 exports.assignGame = function (req, res) {
@@ -185,7 +190,7 @@ exports.closeGame = function (req, res) {
             doc.status = "Inactive";
             dbOperations.updateDb(doc, function (game) {
                 dbOperations.uncacheEntity("activeGames", req.params.id);
-                serverLogger.gameLogger.removeLogger(game._id);
+                logger.gameLogger.removeLogger(game._id);
                 logger.info("closed game", game.gameName, "successfully");
                 res.status(200).end();
             }, function (err) {

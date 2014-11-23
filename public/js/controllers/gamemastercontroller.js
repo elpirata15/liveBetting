@@ -1,5 +1,5 @@
 /* jshint ignore:start */
-angular.module('liveBetManager').controller('gameMasterController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', 'ModalService', '$timeout', 'dialogs', function ($scope, $rootScope, PubNub, betManagerService, ModalService, $timeout,dialogs) {
+angular.module('liveBetManager').controller('gameMasterController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', 'teamsService', 'ModalService', '$timeout', 'dialogs', function ($scope, $rootScope, PubNub, betManagerService, teamsService, ModalService, $timeout,dialogs) {
     /* jshint ignore:end */
     $scope.selectedGame = null;
     $scope.games = [];
@@ -9,6 +9,12 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
     $scope.team1 = undefined;
     $scope.team2 = undefined;
     $scope.managers = betManagerService.getManagers();
+
+    $scope.getTeams = function(name) {
+        teamsService.getClubs(name).success(function (data) {
+           return data;
+        });
+    };
 
     $scope.startGame = function () {
         $scope.selectedGame.gameName = $scope.team1 + " vs. " + $scope.team2 + " @ " + $scope.selectedGame.location;

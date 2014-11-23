@@ -40,9 +40,14 @@ var bidEntity = new Schema({
     winningOption: Number
 });
 
+var teamEntity = new Schema({
+    teamName: String,
+    teamId: String
+});
+
 var gameEntity = new Schema({
     gameName: String,
-    teams: [String],
+    teams: [teamEntity],
     assignedTo: String,
     location: String,
     timestamp: Date,
