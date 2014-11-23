@@ -4,7 +4,7 @@
   "description": "Livebetting application",
   "main": "index.js",
   "scripts": {
-    "post-install": "bash ./post_install.sh"
+    "post-install": "./node_modules/bower/bin/bower install"
   },
   "dependencies": {
     "async": "^0.9.0",
