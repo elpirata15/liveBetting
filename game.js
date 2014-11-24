@@ -118,14 +118,15 @@ exports.createGame = function (req, res) {
 
 // Initialize previously created game
 exports.initGame = function (req, res) {
-    var minDate = new Date(new Date().getTime() - 15 * 60000);
-    var maxDate = new Date(new Date().getTime() + 15 * 60000);
-    dbOperations.GameModel.findOne({
-        _id: req.params.id
-        //timestamp: {$gte: minDate, $lte: maxDate},
-        //assignedTo: req.body.userId
-    }, function (err, game) {
-        if (!err && game) {
+    var minDate = new Date(new Date().setMinutes(new Date().getMinutes() - 15));
+    var maxDate = new Date(new Date().setMinutes(new Date().getMinutes() + 15))
+    dbOperations.GameModel.
+        where('timestamp').lte(maxDate).gte(minDate)
+        .where('assignedTo', req.body.userId)
+        .limit(1)
+        .exec(function (err, games) {
+        if (!err && games.length > 0) {
+            var game = games[0];
             game.status = "Active";
             dbOperations.updateDb(game, function (game) {
                 // Subscribe to game message socket

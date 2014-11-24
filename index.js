@@ -76,7 +76,7 @@ app.get('/getWaitingGames/:id', ensureMaster, gameController.getWaitingGames);
 app.post('/createGame', ensureMaster, gameController.createGame);
 
 // Initialize previously created game
-app.post('/initGame/:id', ensureManager, gameController.initGame);
+app.post('/initGame/', ensureManager, gameController.initGame);
 
 // Assign specified game to specified manager
 app.post('/assignGame/', ensureMaster, gameController.assignGame);
