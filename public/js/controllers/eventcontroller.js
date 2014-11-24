@@ -108,11 +108,11 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             }
         ];
 
-        for(var i in $scope.teams){
-            teamsService.getPlayers($scope.teams[i].teamId).success(function(data){
-                $scope.teams[i].players = data;
-            });
-        }
+        //for(var i in $scope.teams){
+        //    teamsService.getPlayers($scope.teams[i].teamId).success(function(data){
+        //        $scope.teams[i].players = data;
+        //    });
+        //}
 
         $scope.teamsToPlayers = {};
         $scope.teamsToPlayers[$scope.teams[0].teamName] = $scope.teams[0];
