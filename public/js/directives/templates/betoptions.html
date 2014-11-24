@@ -5,9 +5,7 @@
         </div>
         <div class="panel-body">
             <div class="btn-group btn-group-justified">
-                <a class="btn btn-primary btn-lg" ng-click="setOption(0)">{{options[0]}}</a>
-                <a class="btn btn-primary btn-lg" ng-click="setOption(1)">{{options[1]}}</a>
-                <a class="btn btn-primary btn-lg" ng-click="setOption(2)">{{options[2]}}</a>
+                <a class="btn btn-primary btn-lg" ng-repeat="option in options" ng-click="setOption($index)">{{option}}</a>
             </div>
         </div>
     </div>

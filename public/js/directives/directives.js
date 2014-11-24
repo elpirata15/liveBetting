@@ -60,10 +60,13 @@ angular.module('liveBetManager').directive('teamSelector', function () {
         },
         templateUrl: 'js/directives/templates/substitutionoptions.html',
         link: function (scope, element, attrs) {
+
+
+
             scope.setOption = function (playerName) {
-                if (scope.selectedPlayers.length == 3) {
-                    scope.selectedPlayers.push(playerName);
-                    scope.selectedPlayers.splice(0, 1);
+                var exists = scope.selectedPlayers.indexOf(playerName);
+                if(exists > -1){
+                    scope.selectedPlayers.splice(exists,1);
                 } else {
                     scope.selectedPlayers.push(playerName);
                 }
@@ -71,6 +74,10 @@ angular.module('liveBetManager').directive('teamSelector', function () {
             scope.$watch('warmingPlayer', function(newVal, oldVal){
                 if(newVal != oldVal){
                     scope.selectedPlayers = [];
+                    for(var i in scope.team.players){
+                        if(scope.team.players[i].playerName != scope.warmingPlayer)
+                            scope.selectedPlayers.push(scope.team.players[i].playerName);
+                    }
                 }
             });
         }

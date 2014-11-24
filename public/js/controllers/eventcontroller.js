@@ -41,16 +41,6 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 },
                 eventOptions: ['Red Card', 'Yellow Card', 'They Will Fight']
             },
-            offside: {
-                eventName: 'Offside',
-                viewElements: {
-                    eventTeamSelector: {selectionCount: '1'}
-                },
-                toString: function () {
-                    return "Offside by " + $scope.eventDescription.playerName + " of " + $scope.eventDescription.teamName;
-                },
-                eventOptions: ['Goal', 'Out', 'Potato']
-            },
             substitution: {
                 eventName: 'Substitution',
                 viewElements: {
@@ -141,28 +131,12 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
 
         $scope.betArray = {betDescription: '', betOptions: ['blah', 'blooh', 'bliiigggg']};
         $scope.selectedOption;
-        $scope.disableTheRest = function () {
-            for (var i = 0; i < $scope.teams.length; i++) {
-                $scope.teams[i].active = false;
-            }
-            $scope.betArray.betDescription = null;
-        }
-        $scope.allowBet = function () {
-            console.log('say is==' + $scope.betArray.betDescription);
-            console.log('say is==' + $scope.betArray.betOptions);
-            $scope.disableOpen = false;
-        }
+
         $scope.openBet = function () {
             //do somthing here to send betarray to the server
             $scope.disableClose = false;
             $scope.disableOpen = true;
         }
-        $scope.openSubmitOutcomes = function () {
-            $scope.disableOpen = true;
-            $scope.disableClose = true;
-            $scope.disableOutcomes = false;
-        }
-
         $scope.templateroot = 'partials/eventstemplates/';
         $scope.currentEvent;
 
