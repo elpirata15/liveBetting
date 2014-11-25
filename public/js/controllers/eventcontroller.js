@@ -1,10 +1,11 @@
-angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', '$timeout', 'localStorageService', 'ModalService',
-    function ($scope, $rootScope, PubNub, betManagerService, $timeout, localStorageService, ModalService) {
+angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', 'teamsService', '$timeout', 'localStorageService', 'ModalService',
+    function ($scope, $rootScope, PubNub, betManagerService, teamsService, $timeout, localStorageService, ModalService) {
         $scope.connected = false;
         $scope.log = [];
-        //console.log("herh ehrer");
-        //    $scope.game = localStorageService.get('game');//this contains following array
+        $scope.game = localStorageService.get('currentGame');
         $scope.eventDescription = {teams: []};
+        $scope.selectedOption;
+        $scope.currentEvent;
 
         $scope.events = {
             corner: {
@@ -48,7 +49,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     substitutionOptions: true
                 },
                 toString: function () {
-                    return "Substitution - "+$scope.eventDescription.teamName+": " + $scope.eventDescription.playerName + " is warming up. Who will he replace?";
+                    return "Substitution - " + $scope.eventDescription.teamName + ": " + $scope.eventDescription.playerName + " is warming up. Who will he replace?";
                 },
                 eventOptions: []
             },
@@ -65,133 +66,46 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             }
         };
 
-        //comes from game.teams
-        $scope.teams = [{
-            'teamName': "macabi tel-aviv", 'players': [
-                {'playerName': "Messi"},
-                {'playerName': "Ronaldo"},
-                {'playerName': "Neymar"},
-                {'playerName': "Haim"},
-                {'playerName': "yafyoofi"},
-                {'playerName': "mooshon"},
-                {'playerName': "eliran"},
-                {'playerName': "adiel"},
-                {'playerName': "uziel"},
-                {'playerName': "yerachmiel"},
-                {'playerName': "tzidki"}],
-            'active': false
-        },
-            {
-                'teamName': "beytar jerusalem", 'players': [
-                {'playerName': "Messi1"},
-                {'playerName': "Ronaldo1"},
-                {'playerName': "Neymar1"},
-                {'playerName': "Haim1"},
-                {'playerName': "yafyoofi1"},
-                {'playerName': "mooshon1"},
-                {'playerName': "eliran1"},
-                {'playerName': "adiel1"},
-                {'playerName': "uziel1"},
-                {'playerName': "yerachmiel1"},
-                {'playerName': "tzidki1"}],
-                'active': false
-            }
-        ];
+        $scope.teams = $scope.game.teams;
 
-        //for(var i in $scope.teams){
-        //    teamsService.getPlayers($scope.teams[i].teamId).success(function(data){
-        //        $scope.teams[i].players = data;
-        //    });
-        //}
+        teamsService.getPlayers($scope.teams[0].teamId).success(function (data) {
+            $scope.teams[0].players = [];
+            for (var j in data) {
+                $scope.teams[0].players.push({playerName: data[j].nickname});
+            }
+        });
+
+        teamsService.getPlayers($scope.teams[1].teamId).success(function (data) {
+            $scope.teams[1].players = [];
+            for (var j in data) {
+                $scope.teams[1].players.push({playerName: data[j].nickname});
+            }
+        });
 
         $scope.teamsToPlayers = {};
         $scope.teamsToPlayers[$scope.teams[0].teamName] = $scope.teams[0];
         $scope.teamsToPlayers[$scope.teams[1].teamName] = $scope.teams[1];
-
-        /*
-         $scope.theteam = '?';
-         $scope.setTeam = function(teamName) {
-         console.log('in teams'+teamName);
-         $scope.theteam = teamName;
-         for (var i=0; i<$scope.teams.length; I++){
-         $scope.theteam[i]
-         }
-         $scope.kicker = '?';
-         };
-
-         $scope.kicker = '?';
-         $scope.setPlayer = function(playerName) {
-         console.log('in players'+playerName);
-         $scope.kicker = playerName;
-         };*/
-        $scope.disableOpen = true;
-        $scope.disableClose = true;
-        $scope.disableOutcomes = true;
-
-
-        $scope.betArray = {betDescription: '', betOptions: ['blah', 'blooh', 'bliiigggg']};
-        $scope.selectedOption;
-
-        $scope.openBet = function () {
-            //do somthing here to send betarray to the server
-            $scope.disableClose = false;
-            $scope.disableOpen = true;
-        }
-        $scope.templateroot = 'partials/eventstemplates/';
-        $scope.currentEvent;
 
         $scope.changeEventTemplate = function (template) {
             $scope.currentEvent = template;
             $scope.eventDescription = {teams: []};
         };
 
+        $scope.closeGame = function () {
+            ModalService.showModal({
+                templateUrl: 'modals/yesno.html',
+                controller: "ModalController"
+            }).then(function (modal) {
+                modal.element.modal();
+                modal.close.then(function (result) {
+                    if (result == "Yes") {
+                        betManagerService.closeGame($scope.game).success(function () {
+                            alert('Game Closed');
+                            window.location = "#/startGame";
+                        });
+                    }
+                });
+            });
 
-        /*    $scope.betSyntax = [];
-         $scope.teamRosters = {};
-         $scope.selectedTeamIndex = 0;*/
-        /*    PubNub.ngSubscribe({
-         channel : $scope.game._id,
-         message : function(message){
-
-         },
-         error: function(data){
-         $scope.log.push($scope.game.gameName+": "+data);
-         },
-         connect: function(data){
-         $scope.$apply(function(){$scope.connected = true;});
-         },
-         disconnect: function(data){
-         $scope.$apply(function(){$scope.connected = false;});
-         }
-         });*/
-
-        /*    $scope.setSyntax = function($event, index){
-         $scope.betSyntax[index] = $event.currentTarget.innerHTML;
-         };
-
-         $scope.selectTeamName = function($event, index){
-         $scope.setSyntax($event, 1);
-         $scope.selectTeamIndex = index;
-         betManagerService.getTeamRoster($scope.game.teams).success(function(data){
-         $scope.teamRosters = data;
-         });
-         };
-
-         $scope.closeGame = function(){
-         ModalService.showModal({
-         templateUrl: 'modals/yesno.html',
-         controller: "ModalController"
-         }).then(function(modal) {
-         modal.element.modal();
-         modal.close.then(function(result) {
-         if(result == "Yes"){
-         betManagerService.closeGame($scope.game).success(function(){
-         alert('Game Closed');
-         window.location = "#/startGame";
-         });
-         }
-         });
-         });
-
-         };*/
+        };
     }]);

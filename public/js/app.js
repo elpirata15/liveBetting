@@ -9,14 +9,14 @@ angular.module('liveBetManager', [
     'dialogs.main',
     'ui.bootstrap'
 ]).config(['$routeProvider', 'localStorageServiceProvider', function($routeProvider, localStorageServiceProvider){
-    $routeProvider.when('/', {templateUrl: 'partials/home.html', controller:'homeController'});
+    //$routeProvider.when('/', {templateUrl: 'partials/home.html', controller:'homeController'});
     $routeProvider.when('/gameMaster', {templateUrl: 'partials/gamemaster.html', controller:'gameMasterController', restrict:['Masters']});
     $routeProvider.when('/gameMaster/newGame', {templateUrl: 'partials/startgame.html', controller:'gameController', restrict:['Masters']});
-    $routeProvider.when('/startGame', {templateUrl: 'partials/startgame.html', controller:'gameController'});
+    $routeProvider.when('/startGame', {templateUrl: 'partials/gamewaitinglist.html', controller:'waitingListController', restrict:['Managers','Masters']});
     $routeProvider.when('/eventManager', {templateUrl: 'partials/eventmanager.html', controller:'eventController', restrict:['Managers','Masters']});
     $routeProvider.when('/login', {templateUrl: 'partials/user/login.html', controller:'userController'});
     $routeProvider.when('/register', {templateUrl: 'partials/user/register.html', controller:'userController'});
-    $routeProvider.otherwise('/');
+    $routeProvider.otherwise('/login');
 
     localStorageServiceProvider.setPrefix('liveBetManager');
 }]).run(function($rootScope,PubNub, authService, $location){
@@ -42,7 +42,9 @@ angular.module('liveBetManager', [
 
     $scope.chosenName = undefined;
 
-    $scope.managers = betManagerService.getManagers();
+    betManagerService.getManagers().success(function(data){
+        $scope.managers = data;
+    });
 
     $scope.close = function(result) {
         result = result || $scope.chosenName;

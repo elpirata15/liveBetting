@@ -70,13 +70,16 @@ app.get('/getGames', ensureUser, gameController.getGames);
 app.get('/getGame/:id', ensureUser, gameController.getGames);
 
 // For event managers - get waiting events
-app.get('/getWaitingGames/:id', ensureMaster, gameController.getWaitingGames);
+app.get('/getWaitingGames/:id', ensureManager, gameController.getWaitingGames);
 
 // ## Create game entity in DB and start game
 app.post('/createGame', ensureMaster, gameController.createGame);
 
 // Initialize previously created game
-app.post('/initGame/', ensureManager, gameController.initGame);
+//app.post('/initGame/', ensureManager, gameController.initGame);
+
+// Initialize previously created game: FOR DEV
+app.post('/initGame/:id', ensureManager, gameController.initGame);
 
 // Assign specified game to specified manager
 app.post('/assignGame/', ensureMaster, gameController.assignGame);
@@ -96,7 +99,7 @@ app.get('/getUsers', ensureAdmin, userController.getUsers);
 
 app.get('/getUser/:id', ensureAdmin, userController.getUserById);
 
-app.get('/getUsersByGroup', ensureManager, userController.getUsersByGroup);
+app.get('/getUsersByGroup/:group', ensureManager, userController.getUsersByGroup);
 
 app.post('/login', userController.loginUser);
 

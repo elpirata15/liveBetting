@@ -2,22 +2,20 @@ angular.module('liveBetManager').factory('betManagerService', ['$http', function
     var betManagerService = {};
     var url = 'http://localhost:5000';
 
-    betManagerService.gameInit = function(game){
+    betManagerService.createGame = function(game){
         return $http.post('/createGame', game);
+    };
+
+    betManagerService.initGame = function(id){
+        return $http.post('/initGame/'+id, null);
     };
 
     betManagerService.closeGame = function(game){
         return $http.post('/closeGame/'+game._id, null);
     };
 
-    betManagerService.getTeamRoster = function(teams){
-      // TODO: Add call to service to get teams rosters, for now we use a local json
-        return $http.get('/sampleTeams.json');
-    };
-
     betManagerService.getManagers = function(){
-      // TODO: Add call to service to get real managing users
-        return ["elirankon","fishondor","adi.millis","pilpel"];
+        return $http.get('/getUsersByGroup/Managers');
     };
 
     betManagerService.assignGame = function(gameId, managerId){
@@ -26,6 +24,10 @@ angular.module('liveBetManager').factory('betManagerService', ['$http', function
 
     betManagerService.getGames = function(){
         return $http.get('/getGames');
+    };
+
+    betManagerService.getGamesForManager = function(manager){
+        return $http.get('/getWaitingGames/'+manager);
     };
     return betManagerService;
 }]);

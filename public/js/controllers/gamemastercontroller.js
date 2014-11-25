@@ -8,7 +8,9 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
     $scope.gameTime = undefined;
     $scope.team1 = undefined;
     $scope.team2 = undefined;
-    $scope.managers = betManagerService.getManagers();
+    $scope.managers = [];
+
+
 
     $scope.getTeams = function(name) {
         teamsService.getClubs(name).success(function (data) {
@@ -20,7 +22,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
         $scope.selectedGame.gameName = $scope.team1 + " vs. " + $scope.team2 + " @ " + $scope.selectedGame.location;
         $scope.selectedGame.teams = [$scope.team1, $scope.team2];
         $scope.selectedGame.timestamp = new Date($scope.gameDate.getFullYear(), $scope.gameDate.getMonth(), $scope.gameDate.getDate(), $scope.gameTime.getHours(), $scope.gameTime.getMinutes());
-        betManagerService.gameInit($scope.selectedGame).success(function () {
+        betManagerService.createGame($scope.selectedGame).success(function () {
             dialogs.notify("Game Saved", "Game Saved.");
             getData();
         });
@@ -86,8 +88,8 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
         }).then(function (modal) {
             modal.element.modal();
             modal.close.then(function (result) {
-                if (result.toLowerCase() != 'cancel') {
-                    betManagerService.assignGame($scope.selectedGame._id, result).success(function () {
+                if (result.email) {
+                    betManagerService.assignGame($scope.selectedGame._id, result.email).success(function () {
                         dialogs.notify("Manager Assigned", "Manager was assigned");
                         getData();
                     }).error(function(data){

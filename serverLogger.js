@@ -59,7 +59,7 @@ ServerLogger.prototype.gameLogger = {
         delete gameLoggers[gameId];
     },
     log: function(gameId){
-        //gameLoggers[gameId].info(arguments.slice(1));
+        gameLoggers[gameId].info(arguments);
     }
 };
 

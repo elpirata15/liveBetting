@@ -121,8 +121,9 @@ exports.initGame = function (req, res) {
     var minDate = new Date(new Date().setMinutes(new Date().getMinutes() - 15));
     var maxDate = new Date(new Date().setMinutes(new Date().getMinutes() + 15))
     dbOperations.GameModel.
-        where('timestamp').lte(maxDate).gte(minDate)
-        .where('assignedTo', req.body.userId)
+        //where('timestamp').lte(maxDate).gte(minDate)
+        where('_id', req.params.id)
+        //.where('assignedTo', req.body.userId)
         .limit(1)
         .exec(function (err, games) {
         if (!err && games.length > 0) {
