@@ -5,17 +5,12 @@ angular.module('liveBetManager').controller('gameController', ['$scope', '$rootS
         $scope.team2 = "";
         $scope.availableTeams = [];
 
-        $scope.games = [];
-
-        betManagerService.getGamesForManager(authService.currentUser()).success(function(data){
-            $scope.games = data;
-        });
-
         teamsService.getClubs().success(function (data) {
             $scope.availableTeams = data;
         });
 
         $scope.startGame = function () {
+            $scope.game.assignedTo = $scope.game.assignedTo.email;
             $scope.game.gameName = $scope.team1.name + " vs. " + $scope.team2.name + " @ " + $scope.game.location;
             $scope.game.teams = [];
             $scope.game.teams.push({teamName: $scope.team1.name, teamId: $scope.team1.id}, {teamName: $scope.team2.name, teamId: $scope.team2.id});
@@ -28,5 +23,7 @@ angular.module('liveBetManager').controller('gameController', ['$scope', '$rootS
 
 
 
-        $scope.managers = betManagerService.getManagers();
+        betManagerService.getManagers().success(function(data){
+            $scope.managers = data;
+        });
     }]);

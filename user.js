@@ -66,11 +66,6 @@ exports.registerUser = function (req, res) {
                         logger.info("Registered user ", user.email, " with ID", user._id);
                         req.session.uid = user._id;
                         req.session.group = user.group;
-                        req.session.save(function (err) {
-                            if (err) {
-                                return res.status(500).send(err);
-                            }
-                        });
                         res.status(200).send(user);
                     }
                 });
@@ -117,15 +112,8 @@ exports.loginUser = function (req, res) {
                         if (result) {
                             req.session.uid = user._id;
                             req.session.group = user.group;
-                            req.session.save(function (err) {
-                                if (err) {
-                                    logger.error(err);
-                                    res.status(500).send(err);
-                                } else {
-                                    logger.info("request approved");
-                                    res.status(200).send(user);
-                                }
-                            });
+                            logger.info("request approved");
+                            res.status(200).send(user);
                         } else {
                             logger.error("request denied: Passwords don't match");
                             res.status(401).send("Passwords don't match");
@@ -146,13 +134,8 @@ exports.loginUser = function (req, res) {
 };
 
 exports.logoutUser = function (req, res) {
-    req.session.destroy(function (err) {
-        if (!err) {
-            res.status(200).end();
-        } else {
-            res.status(500).send(err);
-        }
-    });
+    req.session = null;
+    res.status(200).end();
 };
 
 exports.deleteUser = function (req, res) {

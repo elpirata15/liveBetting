@@ -41,7 +41,7 @@
         <div class="form-group">
             <label for="assigned" class="col-lg-2 control-label">Assigned To:</label>
             <div class="col-lg-10">
-                <select class="form-control" ng-options="manager for manager in managers" ng-model="game.assignedTo"></select>
+                <select class="form-control" ng-options="manager as manager.fullName for manager in managers" ng-model="game.assignedTo"></select>
             </div>
         </div>
         <div class="form-group">

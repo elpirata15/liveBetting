@@ -58,8 +58,13 @@ ServerLogger.prototype.gameLogger = {
     removeLogger: function (gameId) {
         delete gameLoggers[gameId];
     },
-    log: function(gameId){
-        gameLoggers[gameId].info(arguments);
+    log: function(){
+        var logString = "";
+        for(var i = 1; i<arguments.length; i++)
+        {
+            logString += arguments[i];
+        }
+        gameLoggers[arguments[0]].info(logString);
     }
 };
 

@@ -13,6 +13,10 @@
         <ul class="nav navbar-nav">
             <li><a>Active Users: </a></li>
             <li><a>Last Pool Users: </a></li>
+
+            <li><a>Last Server Message: <b>{{log[log.length - 1]}}</b></a></li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
             <li><a><span ng-class="{'red':!connected, 'green':connected}">&bull;</span> Broadcast Connection</a></li>
         </ul>
     </div>
@@ -55,7 +59,12 @@
             <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent">
                 <p align="center" class="text-primary" style="font-size:larger;font-weight:bold"
                    ng-show="currentEvent.toString().indexOf('undefined') == -1">{{currentEvent.toString()}}</p>
-
+                <br/>
+                <div class="input-group input-group-lg col-xs-4 col-xs-offset-3">
+                    <span class="input-group-addon"><b class="glyphicon glyphicon-usd"></b></span>
+                    <input type="number" class="input-lg" ng-model="bidEntity.entryAmount" placeholder="Entry Amount">
+                    </div>
+                <br/><br/>
                 <div style="padding-bottom:10px">
                     <button class="col-xs-4 col-xs-offset-2 btn btn-success btn-lg"
                             ng-disabled="currentEvent.toString().indexOf('undefined') > -1 || currentEvent.eventOptions.length < 3" ng-click="openBet()">Open

@@ -1,8 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
-var session = require('express-session');
-var RedisStore = require('connect-redis')(session);
+var session = require('cookie-session');
 var serverLogger = require('./serverLogger');
 var gameController = require('./game');
 var bidController = require('./bid');
@@ -12,13 +11,14 @@ var secretKey = "ELFcjUgNvdKyiiaXDg2mnjPUgVAx6uaVlbdcqANvqgoyZeZVIxmqlOVykkmr2hc
 
 var logger = new serverLogger();
 var app = express();
-var day = 1000*60*60*24
+var day = 1000*60*60*24;
+
 app.set('port', (process.env.PORT || 5000));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 app.use(session({
     secret: secretKey,
-    cookie: {secure:true, maxAge:day}
+    cookie: {secure:true, maxAge:day, signed:true, overwrite:true},
     saveUninitialized: true,
     resave: true
 }));

@@ -82,6 +82,14 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             }
         });
 
+        $scope.bidEntity = {
+            gameId: $scope.game._id,
+            gameName: $scope.game.gameName,
+            bidDescription: ($scope.currentEvent) ? $scope.currentEvent.toString() : "",
+            bidType: ($scope.currentEvent) ? $scope.currentEvent.title : "",
+            entryAmount: 0
+        };
+
         $scope.teamsToPlayers = {};
         $scope.teamsToPlayers[$scope.teams[0].teamName] = $scope.teams[0];
         $scope.teamsToPlayers[$scope.teams[1].teamName] = $scope.teams[1];
@@ -106,6 +114,22 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     }
                 });
             });
-
         };
+
+        PubNub.ngSubscribe({
+            channel : $scope.game._id+'adminSocket',
+            message : function(message, env, channel){
+                $scope.log.push(message[0]);
+                $scope.$apply();
+            },
+            error: function(data){
+                $scope.log.push(data);
+            },
+            connect: function(data){
+                $scope.$apply(function(){$scope.connected = true;});
+            },
+            disconnect: function(data){
+                $scope.$apply(function(){$scope.connected = false;});
+            }
+        });
     }]);
