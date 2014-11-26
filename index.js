@@ -12,17 +12,13 @@ var secretKey = "ELFcjUgNvdKyiiaXDg2mnjPUgVAx6uaVlbdcqANvqgoyZeZVIxmqlOVykkmr2hc
 
 var logger = new serverLogger();
 var app = express();
-
+var day = 1000*60*60*24
 app.set('port', (process.env.PORT || 5000));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 app.use(session({
-    store: new RedisStore({
-        host: 'pub-redis-18324.us-east-1-3.3.ec2.garantiadata.com',
-        pass: 'XrFsdyWE8JBsTKrM',
-        port: 18324,
-        prefix: 'sess'
-    }), secret: secretKey,
+    secret: secretKey,
+    cookie: {secure:true, maxAge:day}
     saveUninitialized: true,
     resave: true
 }));
