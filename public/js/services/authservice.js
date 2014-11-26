@@ -1,9 +1,12 @@
 angular.module('liveBetManager').factory('authService', ['$http', '$rootScope', '$cookieStore', function ($http, $rootScope, $cookieStore) {
     var authService = {};
 
+    var user = null;
+
     authService.login = function (creds, callback) {
         $http.post('/login', creds).success(function (data) {
-            $cookieStore.put("liveBetUser", data.email);
+            user = data;
+            $cookieStore.put("liveBetUser", data._id);
             $cookieStore.put("liveBetGroup", data.group);
             callback(true);
         }).error(function (data) {
@@ -14,6 +17,7 @@ angular.module('liveBetManager').factory('authService', ['$http', '$rootScope', 
 
     authService.logout = function (callback) {
         $http.post('/logout', null).success(function () {
+            user = null;
             $cookieStore.remove("liveBetUser");
             $cookieStore.remove("liveBetGroup");
             callback(true);
@@ -25,7 +29,8 @@ angular.module('liveBetManager').factory('authService', ['$http', '$rootScope', 
 
     authService.register = function (user, callback) {
         $http.post('/register', user).success(function (data) {
-            $cookieStore.put("liveBetUser", data.email);
+            user = data;
+            $cookieStore.put("liveBetUser", data._id);
             $cookieStore.put("liveBetGroup", data.group);
             callback(true);
         }).error(function (data) {
@@ -35,15 +40,15 @@ angular.module('liveBetManager').factory('authService', ['$http', '$rootScope', 
     };
 
     authService.currentUser = function(){
-        return $cookieStore.get("liveBetUser");
+        return user;
     };
 
     authService.group = function () {
-        return $cookieStore.get("liveBetGroup");
+        return user.group;
     };
 
     authService.isAuthenticated = function () {
-        return $cookieStore.get("liveBetUser") != null;
+        return user != null;
     };
 
     return authService;

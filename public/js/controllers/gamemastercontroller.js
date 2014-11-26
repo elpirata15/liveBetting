@@ -8,9 +8,12 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
     $scope.gameTime = undefined;
     $scope.team1 = undefined;
     $scope.team2 = undefined;
-    $scope.managers = [];
-
-
+    $scope.managers = {};
+    betManagerService.getManagers().success(function(data){
+        for(var i in data){
+            $scope.managers[data[i]._id] = data[i].fullName;
+        }
+    });
 
     $scope.getTeams = function(name) {
         teamsService.getClubs(name).success(function (data) {
@@ -35,6 +38,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
             for (var i in data) {
                 if (data[i].status == "Waiting") {
                     $scope.games.push(data[i]);
+                    $scope.games[i].assignedTo = $scope.managers[data[i].assignedTo];
                 }
             }
 
@@ -89,7 +93,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
             modal.element.modal();
             modal.close.then(function (result) {
                 if (result.email) {
-                    betManagerService.assignGame($scope.selectedGame._id, result.email).success(function () {
+                    betManagerService.assignGame($scope.selectedGame._id, result._id).success(function () {
                         dialogs.notify("Manager Assigned", "Manager was assigned");
                         getData();
                     }).error(function(data){
