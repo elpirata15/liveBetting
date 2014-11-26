@@ -90,6 +90,10 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             entryAmount: 0
         };
 
+        $scope.$watch('eventDescription', function () {
+            $scope.bidEntity.bidDescription = $scope.currentEvent.toString();
+        }, true);
+
         $scope.teamsToPlayers = {};
         $scope.teamsToPlayers[$scope.teams[0].teamName] = $scope.teams[0];
         $scope.teamsToPlayers[$scope.teams[1].teamName] = $scope.teams[1];
@@ -97,6 +101,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.changeEventTemplate = function (template) {
             $scope.currentEvent = template;
             $scope.eventDescription = {teams: []};
+            $scope.bidEntity.bidType = template.eventName;
         };
 
         $scope.closeGame = function () {
@@ -115,21 +120,59 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 });
             });
         };
+        $scope.betOpen = false;
+        $scope.openBet = function () {
+            betManagerService.getNewBidId().success(function (data) {
+                $scope.bidEntity.id = data;
+                $scope.bidEntity.bidOptions = [];
+                for (var i in $scope.currentEvent.eventOptions) {
+                    $scope.bidEntity.bidOptions.push({optionDescription: $scope.currentEvent.eventOptions[i]});
+                }
+                PubNub.ngPublish({
+                    channel: $scope.game._id,
+                    message: {
+                        pn_gcm: $scope.bidEntity,
+                        bidEntity: $scope.bidEntity
+                    }
+                });
+                $scope.betOpen = true;
+            });
+        };
+        $scope.showResults = false;
 
-        PubNub.ngSubscribe({
-            channel : $scope.game._id+'adminSocket',
-            message : function(message, env, channel){
-                $scope.log.push(message[0]);
-                $scope.$apply();
-            },
-            error: function(data){
-                $scope.log.push(data);
-            },
-            connect: function(data){
-                $scope.$apply(function(){$scope.connected = true;});
-            },
-            disconnect: function(data){
-                $scope.$apply(function(){$scope.connected = false;});
-            }
-        });
+        $scope.closeBet = function () {
+            PubNub.ngPublish({
+                channel: [$scope.bidEntity.id, $scope.bidEntity.id + 'msg'],
+                message: {bidId: $scope.bidEntity.id, close: true}
+            });
+            $scope.betOpen = false;
+            $scope.showResults = true;
+        };
+
+        $scope.publishWinningResult = function (optionIndex) {
+            PubNub.ngPublish({
+                channel: [$scope.bidEntity.id, $scope.bidEntity.id + 'msg'],
+                message: {bidId: $scope.bidEntity.id, winningOption: optionIndex}
+            });
+            $scope.betOpen = false;
+            $scope.showResults = true;
+        };
+        /* CONNECT TO GAME LOGGER
+
+         PubNub.ngSubscribe({
+         channel : $scope.game._id+'adminSocket',
+         message : function(message, env, channel){
+         $scope.log.push(message[0]);
+         $scope.$apply();
+         },
+         error: function(data){
+         $scope.log.push(data);
+         },
+         connect: function(data){
+         $scope.$apply(function(){$scope.connected = true;});
+         },
+         disconnect: function(data){
+         $scope.$apply(function(){$scope.connected = false;});
+         }
+         });*/
     }]);

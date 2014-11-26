@@ -41,12 +41,14 @@ angular.module('liveBetManager').directive('teamSelector', function () {
         restrict: 'E',
         scope: {
             options: '=',
-            selectedOption: '=ngModel'
+            selectedOption: '=ngModel',
+            publishAction: '&'
         },
         templateUrl: 'js/directives/templates/betoptions.html',
         link: function (scope, element, attrs) {
             scope.setOption = function (index) {
                 scope.selectedOption = index;
+                scope.publishAction(index);
             }
         }
     }
@@ -61,21 +63,19 @@ angular.module('liveBetManager').directive('teamSelector', function () {
         templateUrl: 'js/directives/templates/substitutionoptions.html',
         link: function (scope, element, attrs) {
 
-
-
             scope.setOption = function (playerName) {
                 var exists = scope.selectedPlayers.indexOf(playerName);
-                if(exists > -1){
-                    scope.selectedPlayers.splice(exists,1);
+                if (exists > -1) {
+                    scope.selectedPlayers.splice(exists, 1);
                 } else {
                     scope.selectedPlayers.push(playerName);
                 }
             };
-            scope.$watch('warmingPlayer', function(newVal, oldVal){
-                if(newVal != oldVal){
+            scope.$watch('warmingPlayer', function (newVal, oldVal) {
+                if (newVal != oldVal) {
                     scope.selectedPlayers = [];
-                    for(var i in scope.team.players){
-                        if(scope.team.players[i].playerName != scope.warmingPlayer)
+                    for (var i in scope.team.players) {
+                        if (scope.team.players[i].playerName != scope.warmingPlayer)
                             scope.selectedPlayers.push(scope.team.players[i].playerName);
                     }
                 }
@@ -96,14 +96,14 @@ angular.module('liveBetManager').directive('teamSelector', function () {
                 scope.selectedOption = index;
             };
             scope.betValues = {};
-            scope.$watch('betValues', function(newVal){
-                if(newVal){
+            scope.$watch('betValues', function (newVal) {
+                if (newVal) {
                     scope.betOptions = [];
-                    for(var i in newVal){
+                    for (var i in newVal) {
                         scope.betOptions.push(newVal[i]);
                     }
                 }
-            },true);
+            }, true);
         }
     }
 });

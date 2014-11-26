@@ -2,7 +2,11 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 var NodeCache = require("node-cache");
 
-var ObjectId = exports.ObjectId = Schema.ObjectId;
+var ObjectId = Schema.ObjectId;
+
+exports.ObjectId = function () {
+    return mongoose.Types.ObjectId();
+};
 
 var participantEntity = new Schema({
     userId: ObjectId,
@@ -16,14 +20,14 @@ var optionEntity = new Schema({
 });
 
 /*var bidRequestEntity = new Schema({
-    userId: ObjectId,
-    bidId: ObjectId,
-    gameId: ObjectId,
-    bidOption: Number,
-    status: String,
-    winAmount: Number,
-    betAmount: Number
-});*/
+ userId: ObjectId,
+ bidId: ObjectId,
+ gameId: ObjectId,
+ bidOption: Number,
+ status: String,
+ winAmount: Number,
+ betAmount: Number
+ });*/
 
 var bidEntity = new Schema({
     id: ObjectId,

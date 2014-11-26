@@ -18,7 +18,7 @@ var publishMessage = function (channel, message) {
 
 // new Id generator
 exports.newId = function (req, res) {
-    res.send(new dbOperations.ObjectId());
+    res.send(dbOperations.ObjectId());
 };
 
 // Active bids cache
@@ -29,21 +29,14 @@ exports.addBid = function (bidMessage) {
     // Get the bidEntity from the message (the message from the client contains pn_gcm for android push notifications)
     var bid = bidMessage.bidEntity;
     // Initialize participants for options
-    for(var i in bid.bidOptions){
+    for (var i in bid.bidOptions) {
         bid.bidOptions[i].participants = [];
     }
-
-    // Add auto loser option
-    bid.bidOptions.push = {
-        optionDescription: "Automatic Losers",
-        automaticLoser: true,
-        participants: []
-    };
 
     // Add bid to active bids cache
     activeBids[bid.id] = bid;
 
-    serverLogger.gameLogger.log(bid.gameId, "bid added successfully");
+    logger.gameLogger.log(bid.gameId, "bid added successfully");
 
     // Subscribe to bid_id channel
     pubnub.subscribe({
@@ -79,7 +72,7 @@ var addParticipant = function (bidRequest, bidId) {
 
     // If we got a bid
     if (currentBid && ensureUserBalance(bidRequest, currentBid.gameId)) {
-        serverLogger.gameLogger.log(currentBid.gameId, "received bid request for game: " + bidId);
+        logger.gameLogger.log(currentBid.gameId, "received bid request for game: " + bidId);
 
         currentBid.totalPoolAmount += bidRequest.amount;
 
@@ -91,7 +84,7 @@ var addParticipant = function (bidRequest, bidId) {
                 userId: bidRequest.userId,
                 amount: bidRequest.amount
             });
-            serverLogger.gameLogger.log(currentBid.gameId, "bid request added successfully");
+            logger.gameLogger.log(currentBid.gameId, "bid request added successfully");
 
             // Send OK to user
             publishMessage(bidRequest.userId, {info: "OK"});
@@ -114,26 +107,12 @@ var addParticipant = function (bidRequest, bidId) {
             // Send the message on bid_id_msg channel
             publishMessage(bidId + "_msg", serverMessage);
 
-        // If the bid is inactive
+            // If the bid is inactive
         } else {
+            logger.gameLogger.log(currentBid.gameId, "Rejected Bid Request: Bid is Inactive");
 
-            // If the option was -1 (auto losers)
-            if (bidRequest.option == -1) {
-
-                // Add request to auto losers
-                currentBid.bidOptions[currentBid.bidOptions.length - 1].push({
-                    userId: bidRequest.userId,
-                    amount: bidRequest.amount
-                });
-                serverLogger.gameLogger.log(currentBid.gameId, "Automatic loser bid request added successfully");
-
-                // If this is not auto losers option
-            } else {
-                serverLogger.gameLogger.log(currentBid.gameId, "Rejected Bid Request: Bid is Inactive");
-
-                // Publish to user that the bid is rejected
-                publishMessage(bidRequest.userId, {error: "Rejected Bid Request: Bid is Inactive"});
-            }
+            // Publish to user that the bid is rejected
+            publishMessage(bidRequest.userId, {error: "Rejected Bid Request: Bid is Inactive"});
         }
     }
 };
@@ -151,7 +130,7 @@ var closeBid = function (closeMessage, bidId) {
         currentBid.status = "Inactive";
 
         // Alert the manager
-        serverLogger.gameLogger.log(currentBid.gameId, "Bid " + bidId + " is now Inactive");
+        logger.gameLogger.log(currentBid.gameId, "Bid " + bidId + " is now Inactive");
     }
 };
 
@@ -167,7 +146,7 @@ var winningOptionMessage = function (winningOptionObject, bidId) {
         currentBid.winningOption = winningOptionObject.winningOption;
 
         // Alert the manager
-        serverLogger.gameLogger.log(currentBid.gameId, "Winning option " + currentBid.winningOption + " set for bid " + bidId + ". Now adding all to DB");
+        logger.gameLogger.log(currentBid.gameId, "Winning option " + currentBid.winningOption + " set for bid " + bidId + ". Now adding all to DB");
 
         sendToDbAndUpdateUsers(currentBid);
     }
@@ -176,7 +155,7 @@ var winningOptionMessage = function (winningOptionObject, bidId) {
 var sendToDbAndUpdateUsers = function (bid) {
 
     // Alert the manager
-    serverLogger.gameLogger.log(bid.gameId, "Saving bid " + bid.id + " to DB and updating users balances");
+    logger.gameLogger.log(bid.gameId, "Saving bid " + bid.id + " to DB and updating users balances");
 
     // Get the game entity
     dbOperations.getEntity(bid.gameId, null, function (game) {
@@ -191,7 +170,7 @@ var sendToDbAndUpdateUsers = function (bid) {
             dbOperations.updateDb(game, function (savedGame) {
 
                 // Alert manager
-                serverLogger.gameLogger.log(bid.gameId, "Saved bid. Removing from active bids");
+                logger.gameLogger.log(bid.gameId, "Saved bid. Removing from active bids");
 
                 // Update users balances
                 updateUserBalances(savedGame.bids.id(bid.id));
@@ -201,7 +180,7 @@ var sendToDbAndUpdateUsers = function (bid) {
         } else {
 
             // Alert manager
-            serverLogger.gameLogger.log(bid.gameId, "could not find game ", bid.gameId);
+            logger.gameLogger.log(bid.gameId, "could not find game ", bid.gameId);
         }
     });
 };
@@ -263,7 +242,7 @@ var updateUserBalances = function (bid) {
             }, function (err) {
 
                 // If we have an error
-                if(err){
+                if (err) {
 
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
                     logger.error(err);
@@ -275,7 +254,7 @@ var updateUserBalances = function (bid) {
                 }
             });
 
-        // This is not a winning option
+            // This is not a winning option
         } else {
 
             // Perform task in parallel for each winning participant
@@ -316,7 +295,7 @@ var updateUserBalances = function (bid) {
             }, function (err) {
 
                 // If we have an error
-                if(err){
+                if (err) {
 
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
                     logger.error(err);
@@ -347,7 +326,7 @@ var ensureUserBalance = function (bidRequest, gameId) {
             if (user && user.balance >= bidRequest.amount) {
 
                 // Alert manager
-                serverLogger.gameLogger.log(gameId, "User " + user.fullName + "has sufficient funds to make this bet");
+                logger.gameLogger.log(gameId, "User " + user.fullName + "has sufficient funds to make this bet");
 
                 return true;
 
@@ -355,7 +334,7 @@ var ensureUserBalance = function (bidRequest, gameId) {
             } else {
 
                 // Alert manager
-                serverLogger.gameLogger.log(gameId, "User " + user.fullName + "doesn't have sufficient funds to make this bet");
+                logger.gameLogger.log(gameId, "User " + user.fullName + "doesn't have sufficient funds to make this bet");
                 return false;
             }
         } else {

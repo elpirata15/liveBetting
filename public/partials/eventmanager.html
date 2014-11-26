@@ -14,7 +14,7 @@
             <li><a>Active Users: </a></li>
             <li><a>Last Pool Users: </a></li>
 
-            <li><a>Last Server Message: <b>{{log[log.length - 1]}}</b></a></li>
+            <!--<li><a>Last Server Message: <b>{{log[log.length - 1]}}</b></a></li>-->
         </ul>
         <ul class="nav navbar-nav pull-right">
             <li><a><span ng-class="{'red':!connected, 'green':connected}">&bull;</span> Broadcast Connection</a></li>
@@ -28,7 +28,8 @@
             <button type="button" class="btn btn-block"
                     ng-class="{'btn-info':currentEvent!=item, 'btn-warning':currentEvent==item} "
                     style=" margin-bottom: 10px;"
-                    ng-click="changeEventTemplate(item)" ng-repeat="item in events" ng-if="!item.alwaysLast">{{item.eventName}}
+                    ng-click="changeEventTemplate(item)" ng-repeat="item in events" ng-if="!item.alwaysLast">
+                {{item.eventName}}
             </button>
             <button type="button" class="btn btn-block"
                     ng-class="{'btn-info':currentEvent!=events.customEvent, 'btn-warning':currentEvent==events.customEvent} "
@@ -41,12 +42,23 @@
                            teams="teams"
                            selection-count="currentEvent.viewElements.eventTeamSelector.selectionCount"
                            ng-model="eventDescription"></team-selector>
-            <div class="btn-group btn-group-justified col-xs-4" style="padding-bottom: 10px" ng-if="currentEvent.viewElements.distanceParamInput">
-                <a class="btn btn-lg" ng-class="{'btn-default': eventDescription.distance != 20, 'btn-info': eventDescription.distance == 20}" ng-click="eventDescription.distance = 20">20m</a>
-                <a class="btn btn-lg" ng-class="{'btn-default': eventDescription.distance != 30, 'btn-info': eventDescription.distance == 30}" ng-click="eventDescription.distance = 30">30m</a>
-                <a class="btn btn-lg" ng-class="{'btn-default': eventDescription.distance != 40, 'btn-info': eventDescription.distance == 40}" ng-click="eventDescription.distance = 40">40m</a>
-                <a class="btn btn-lg" ng-class="{'btn-default': eventDescription.distance != 50, 'btn-info': eventDescription.distance == 50}" ng-click="eventDescription.distance = 50">50m</a>
-                <a class="btn btn-lg" ng-class="{'btn-default': eventDescription.distance != 70, 'btn-info': eventDescription.distance == 70}" ng-click="eventDescription.distance = 70">70m</a>
+            <div class="btn-group btn-group-justified col-xs-4" style="padding-bottom: 10px"
+                 ng-if="currentEvent.viewElements.distanceParamInput">
+                <a class="btn btn-lg"
+                   ng-class="{'btn-default': eventDescription.distance != 20, 'btn-info': eventDescription.distance == 20}"
+                   ng-click="eventDescription.distance = 20">20m</a>
+                <a class="btn btn-lg"
+                   ng-class="{'btn-default': eventDescription.distance != 30, 'btn-info': eventDescription.distance == 30}"
+                   ng-click="eventDescription.distance = 30">30m</a>
+                <a class="btn btn-lg"
+                   ng-class="{'btn-default': eventDescription.distance != 40, 'btn-info': eventDescription.distance == 40}"
+                   ng-click="eventDescription.distance = 40">40m</a>
+                <a class="btn btn-lg"
+                   ng-class="{'btn-default': eventDescription.distance != 50, 'btn-info': eventDescription.distance == 50}"
+                   ng-click="eventDescription.distance = 50">50m</a>
+                <a class="btn btn-lg"
+                   ng-class="{'btn-default': eventDescription.distance != 70, 'btn-info': eventDescription.distance == 70}"
+                   ng-click="eventDescription.distance = 70">70m</a>
             </div>
             <substitution-options ng-if="currentEvent.viewElements.substitutionOptions"
                                   team="teamsToPlayers[eventDescription.teamName]"
@@ -60,24 +72,28 @@
                 <p align="center" class="text-primary" style="font-size:larger;font-weight:bold"
                    ng-show="currentEvent.toString().indexOf('undefined') == -1">{{currentEvent.toString()}}</p>
                 <br/>
+
                 <div class="input-group input-group-lg col-xs-4 col-xs-offset-3">
                     <span class="input-group-addon"><b class="glyphicon glyphicon-usd"></b></span>
                     <input type="number" class="input-lg" ng-model="bidEntity.entryAmount" placeholder="Entry Amount">
-                    </div>
+                </div>
                 <br/><br/>
+
                 <div style="padding-bottom:10px">
                     <button class="col-xs-4 col-xs-offset-2 btn btn-success btn-lg"
-                            ng-disabled="currentEvent.toString().indexOf('undefined') > -1 || currentEvent.eventOptions.length < 3" ng-click="openBet()">Open
+                            ng-disabled="currentEvent.toString().indexOf('undefined') > -1 || currentEvent.eventOptions.length < 3 || bidEntity.entryAmount == 0 || betOpen"
+                            ng-click="openBet()">Open
                         Bet
                     </button>
-                    <button class="col-xs-4 btn btn-danger btn-lg" style="margin-left:5px" ng-disabled="disableClose"
-                            ng-click="openSubmitOutcomes()">Close
+                    <button class="col-xs-4 btn btn-danger btn-lg" style="margin-left:5px" ng-disabled="!betOpen"
+                            ng-click="closeBet()">Close
                         Bet
                     </button>
                 </div>
             </div>
 
-            <bet-options ng-show="currentEvent.eventOptions.length > 0" options="currentEvent.eventOptions"
+            <bet-options ng-show="currentEvent.eventOptions.length > 0 && showResults"
+                         publish-action="publishWinningResult" options="currentEvent.eventOptions"
                          ng-model="selectedOption"></bet-options>
         </div>
     </div>
@@ -85,4 +101,5 @@
 <!--<pre>event description: {{currentEvent.toString()}}</pre>-->
 <!--<pre>selectedPlayer:{{eventDescription|json}}</pre>-->
 <!--<pre>selectedOption:{{selectedOption|json}}</pre>-->
+<!--<pre>{{bidEntity|json}}</pre>-->
 </div>

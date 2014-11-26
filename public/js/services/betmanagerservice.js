@@ -10,6 +10,11 @@ angular.module('liveBetManager').factory('betManagerService', ['$http', function
         return $http.post('/initGame/'+id, null);
     };
 
+    betManagerService.getNewBidId = function(){
+      return $http.get('/newBidId');
+    };
+
+
     betManagerService.closeGame = function(game){
         return $http.post('/closeGame/'+game._id, null);
     };
