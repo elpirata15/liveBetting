@@ -1,7 +1,7 @@
 var winston = require("winston");
 var pubnub = require("pubnub").init({
-    publish_key: "pub-c-0dd5cf68-51d4-46f1-afeb-e8eeb4780703",
-    subscribe_key: "sub-c-8bec0072-7663-11e4-af64-02ee2ddab7fe"
+    publish_key: process.env.PUBNUB_PUBLISH_KEY,
+    subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY
 });
 
 var ServerLogger = function ServerLogger(gameId){

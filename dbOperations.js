@@ -79,7 +79,7 @@ var options = {
     replset: {socketOptions: {keepAlive: 1}}
 };
 
-mongoose.connect("mongodb://ds055980.mongolab.com:55980/heroku_app32018241", options);
+mongoose.connect(process.env.MONGOLAB_URI, options);
 
 // ************** ENTITY CACHING *********************
 // Active games cache
