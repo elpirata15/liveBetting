@@ -74,12 +74,12 @@ var userEntity = new Schema({
 exports.UserModel = mongoose.model('users', userEntity);
 
 var options = {
-    user: 'root',
+    user: 'elirankon',
     pass: 'elirankon86',
     replset: {socketOptions: {keepAlive: 1}}
 };
 
-mongoose.connect("mongodb://ds047050.mongolab.com:47050/heroku_app30774540", options);
+mongoose.connect("mongodb://ds055980.mongolab.com:55980/heroku_app32018241", options);
 
 // ************** ENTITY CACHING *********************
 // Active games cache

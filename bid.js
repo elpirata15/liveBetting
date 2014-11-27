@@ -1,6 +1,6 @@
 var pubnub = require("pubnub").init({
-    publish_key: "pub-c-d9e96f7d-2b88-4081-b25e-8f74aa7e9151",
-    subscribe_key: "sub-c-9f28fbce-55f5-11e4-8cbc-02ee2ddab7fe"
+    publish_key: "pub-c-0dd5cf68-51d4-46f1-afeb-e8eeb4780703",
+    subscribe_key: "sub-c-8bec0072-7663-11e4-af64-02ee2ddab7fe"
 });
 var async = require('async');
 var dbOperations = require('./dbOperations');
