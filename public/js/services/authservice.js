@@ -2,7 +2,7 @@ angular.module('liveBetManager').factory('authService', ['$http', '$rootScope', 
     var authService = {};
 
     var user = function(){
-        return $cookieStore.get("liveBetUSer");
+        return $cookieStore.get("liveBetUser");
     };
 
     authService.login = function (creds, callback) {
@@ -11,7 +11,7 @@ angular.module('liveBetManager').factory('authService', ['$http', '$rootScope', 
             $cookieStore.put("liveBetGroup", data.group);
             callback(true);
         }).error(function (data) {
-            $rootScope.flash = data;
+            $rootScope.flash = data.error;
             callback(false);
         });
     };

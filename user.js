@@ -116,7 +116,7 @@ exports.loginUser = function (req, res) {
                             res.status(200).send(user);
                         } else {
                             logger.error("request denied: Passwords don't match");
-                            res.status(401).send("Passwords don't match");
+                            res.status(401).send({error:"Passwords don't match"});
                         }
                     } else {
                         logger.error(err);
@@ -125,7 +125,8 @@ exports.loginUser = function (req, res) {
 
                 });
             } else {
-                res.status(401).send("No user by this name");
+                logger.error("request denied: No user by this name");
+                res.status(401).send({error:"No user by this name"});
             }
         } else {
             res.status(500).send(err);
