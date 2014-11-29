@@ -5,7 +5,6 @@ var pubnub = require("pubnub").init({
 var dbOperations = require('./dbOperations');
 var serverLogger = require('./serverLogger');
 var bidController = require('./bid');
-var request = require("request");
 
 var apiKey = "tZUXOOZ8Lf7spqPCBkcSjaRqJzeXyvTk";
 
