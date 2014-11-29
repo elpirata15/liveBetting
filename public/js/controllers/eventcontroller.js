@@ -8,7 +8,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.currentEvent;
         $scope.longBets = {};
         $scope.longBetsLength = 0;
-        $scope.amounts = [10,20,30,50,100];
+        $scope.amounts = [10, 20, 30, 50, 100];
 
         $scope.events = {
             corner: {
@@ -66,7 +66,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     return $scope.eventDescription.question;
                 },
                 eventOptions: [],
-                time:0
+                time: 0
             }
         };
         $scope.teams = $scope.game.teams;
@@ -96,7 +96,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.bidEntity = angular.copy($scope.bidEntityTemplate);
 
         $scope.$watch('eventDescription', function () {
-            $scope.bidEntity.bidDescription = ($scope.currentEvent)? $scope.currentEvent.toString() : "";
+            $scope.bidEntity.bidDescription = ($scope.currentEvent) ? $scope.currentEvent.toString() : "";
 
         }, true);
 
@@ -112,25 +112,19 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             $scope.showResults = false;
         };
 
-        //$scope.closeGame = function () {
-        //    ModalService.showModal({
-        //        templateUrl: 'modals/yesno.html',
-        //        controller: "ModalController"
-        //    }).then(function (modal) {
-        //        modal.element.modal();
-        //        modal.close.then(function (result) {
-        //            if (result == "Yes") {
-        //                betManagerService.closeGame($scope.game).success(function () {
-        //                    alert('Game Closed');
-        //                    window.location = "#/startGame";
-        //                });
-        //            }
-        //        });
-        //    });
-        //};
+        $scope.closeGame = function () {
+            var dlg = dialogs.confirm("Close Game?", "This action will close the game and sign you off!<br/>Are you sure?");
+            dlg.result.then(function () {
+                //$scope.confirmed = 'You confirmed "Yes."';
+                betManagerService.closeGame($scope.game).success(function () {
+                    alert('Game Closed');
+                    window.location = "#/startGame";
+                });
+            });
+        };
 
-        $scope.setEntryAmount = function(amount){
-          $scope.bidEntity.entryAmount = amount;
+        $scope.setEntryAmount = function (amount) {
+            $scope.bidEntity.entryAmount = amount;
         };
 
         $scope.betOpen = false;
@@ -193,32 +187,32 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             $scope.longBets[$scope.bidEntity.id] = (angular.copy(longBet));
 
             // Set modal window to pop up 30 sec before time is up
-            $timeout(function(){
-               $scope.showLongBetModal(longBet.bidEntity);
-            }, (time-0.5)*60000);
+            $timeout(function () {
+                $scope.showLongBetModal(longBet.bidEntity);
+            }, (time - 0.5) * 60000);
 
             // Subtract time every 30 seconds.
-            $interval(function(){
-                if(longBet.ttl)
+            $interval(function () {
+                if (longBet.ttl)
                     longBet.ttl -= 0.5;
                 else {
                     delete $scope.longBets[longBet.id];
                     $scope.longBetsLength--;
                 }
-            }, 30000,longBet.ttl / 0.5 + 1,true);
+            }, 30000, longBet.ttl / 0.5 + 1, true);
 
             dialogs.notify("Long bet added", "Long bet " + longBet.bidEntity.bidDescription + " was added");
             $scope.changeEventTemplate($scope.events.corner);
             $scope.longBetsLength++;
-            $timeout(function(){
+            $timeout(function () {
                 $scope.$apply();
             });
         };
 
-        $scope.showLongBetModal = function(bid){
-            var dlg = dialogs.create('/modals/longbetresolution.html','bidModalCtrl',bid,'lg');
-            dlg.result.then(function(complete){
-                if(complete){
+        $scope.showLongBetModal = function (bid) {
+            var dlg = dialogs.create('/modals/longbetresolution.html', 'bidModalCtrl', bid, 'lg');
+            dlg.result.then(function (complete) {
+                if (complete) {
                     delete $scope.longBets[bid.id];
                     $scope.longBetsLength--;
                 }
@@ -242,25 +236,25 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
          $scope.$apply(function(){$scope.connected = false;});
          }
          });*/
-    }]).controller('bidModalCtrl',function($scope,$modalInstance,data,PubNub){
+    }]).controller('bidModalCtrl', function ($scope, $modalInstance, data, PubNub) {
     //-- Variables --//
 
     $scope.bidEntity = data;
-    $scope.bidOptions = $scope.bidEntity.bidOptions.map(function(el){
-       return el.optionDescription;
+    $scope.bidOptions = $scope.bidEntity.bidOptions.map(function (el) {
+        return el.optionDescription;
     });
     //-- Methods --//
 
     $scope.completed = false;
 
-    $scope.cancel = function(){
+    $scope.cancel = function () {
         $modalInstance.dismiss(false);
     }; // end cancel
 
     $scope.betOpen = true;
 
-    $scope.hitEnter = function(evt){
-        if(angular.equals(evt.keyCode,13) && !(angular.equals($scope.user.name,null) || angular.equals($scope.user.name,'')))
+    $scope.hitEnter = function (evt) {
+        if (angular.equals(evt.keyCode, 13) && !(angular.equals($scope.user.name, null) || angular.equals($scope.user.name, '')))
             $scope.save();
     };
 
