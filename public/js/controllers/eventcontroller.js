@@ -209,9 +209,12 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
 
         $scope.showLongBetModal = function(bid){
             var dlg = dialogs.create('/modals/longbetresolution.html','bidModalCtrl',bid,'lg');
-            if(dlg){
-                delete $scope.longBets[bid.id];
-            }
+            dlg.result.then(function(complete){
+                if(complete){
+                    delete $scope.longBets[bid.id];
+                    $scope.longBetsLength--;
+                }
+            });
         };
         /* CONNECT TO GAME LOGGER
 
@@ -243,8 +246,10 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
     $scope.completed = false;
 
     $scope.cancel = function(){
-        $modalInstance.dismiss($scope.completed);
+        $modalInstance.dismiss(false);
     }; // end cancel
+
+    $scope.betOpen = true;
 
     $scope.hitEnter = function(evt){
         if(angular.equals(evt.keyCode,13) && !(angular.equals($scope.user.name,null) || angular.equals($scope.user.name,'')))
@@ -264,6 +269,8 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             channel: $scope.bidEntity.id + 'msg',
             message: {bidId: $scope.bidEntity.id, close: true}
         });
+
+        $scope.betOpen = false;
     };
 
     $scope.publishWinningResult = function (optionIndex) {
@@ -278,7 +285,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         });
 
         $scope.completed = true;
-        $scope.cancel();
+        $modalInstance.close(true);
     };
 
 });
