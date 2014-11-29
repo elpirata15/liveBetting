@@ -200,7 +200,11 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             $interval(function(){
                 if(longBet.ttl)
                     longBet.ttl -= 0.5;
-            }, 30000,0,true);
+                else {
+                    delete $scope.longBets[longBet.id];
+                    $scope.longBetsLength--;
+                }
+            }, 30000,longBet.ttl / 0.5 + 1,true);
 
             dialogs.notify("Long bet added", "Long bet " + longBet.bidEntity.bidDescription + " was added");
             $scope.changeEventTemplate($scope.events.corner);
