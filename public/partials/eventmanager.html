@@ -17,13 +17,13 @@
         </ul>
         <ul class="nav navbar-nav" style="margin-left:50px">
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle">Ongoing Long Bets <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle">Ongoing Long Bets <b class="caret"></b>  <span class="badge" ng-show="longBets.length">{{longBets.length}}</span></a>
                 <ul class="dropdown-menu" style="width:250px">
                     <li><span class="col-xs-10" style="text-align: center; border-right:1px inset;padding-bottom: 10px"><b>Bet
                         Description</b></span><span style="top:4px;padding-bottom: 10px"
                                                     class="col-xs-2 glyphicon glyphicon-time"></span></li>
-                    <li><span class="col-xs-10" style="border-right:1px inset"><a style="cursor:pointer">Moshe bet 1</a></span><span
-                            class="col-xs-2">5m</span></li>
+                    <li ng-repeat="bet in longBets"><span class="col-xs-10" style="border-right:1px inset"><a ng-click="showLongBetModal(bet.bidEntity)" style="cursor:pointer">{{bet.bidEntity.bidDescription}}</a></span><span
+                            class="col-xs-2">{{bet.ttl}}</span></li>
                 </ul>
             </li>
         </ul>
@@ -55,6 +55,7 @@
                            teams="teams"
                            selection-count="currentEvent.viewElements.eventTeamSelector.selectionCount"
                            ng-model="eventDescription"></team-selector>
+            <p align="center" ng-show="currentEvent.viewElements.distanceParamInput"><b>Distance</b></p>
             <div class="btn-group btn-group-justified col-xs-4" style="padding-bottom: 10px"
                  ng-if="currentEvent.viewElements.distanceParamInput">
                 <a class="btn btn-lg"
@@ -79,7 +80,7 @@
                                   ng-model="currentEvent.eventOptions"></substitution-options>
             <custom-bet ng-if="currentEvent.viewElements.customBet"
                         question="eventDescription.question"
-                        event-type="eventDescription.eventType"
+                        time="currentEvent.time"
                         ng-model="currentEvent.eventOptions"></custom-bet>
             <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent">
                 <p align="center" class="text-primary" style="font-size:larger;font-weight:bold"
@@ -97,7 +98,7 @@
 
                 <div style="padding-bottom:10px">
                     <button class="col-xs-4 col-xs-offset-2 btn btn-success btn-lg"
-                            ng-disabled="currentEvent.toString().indexOf('undefined') > -1 || currentEvent.eventOptions.length < 3 || bidEntity.entryAmount == 0 || betOpen"
+                            ng-disabled="currentEvent.toString().indexOf('undefined') > -1 || currentEvent.eventOptions.length < 2 || bidEntity.entryAmount == 0 || betOpen"
                             ng-click="openBet()">Open
                         Bet
                     </button>
@@ -107,16 +108,18 @@
                     </button>
                 </div>
             </div>
-            <div class="well well-lg col-xs-8 col-xs-offset-2">
-                <bet-options ng-show="currentEvent.eventOptions.length > 0"
-                             publish-action="publishWinningResult" options="currentEvent.eventOptions"
-                             ng-disabled="!showResults"></bet-options>
+            <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent.eventOptions.length > 0 && (!currentEvent.time || currentEvent.time == 0)">
+                <bet-options
+                        publish-action="publishWinningResult" options="currentEvent.eventOptions"
+                        ng-disabled="!showResults"></bet-options>
             </div>
         </div>
     </div>
 </div>
-<!--<pre>event description: {{currentEvent.toString()}}</pre>-->
+<!--<pre>event description: {{currentEvent|json}}</pre>-->
 <!--<pre>selectedPlayer:{{eventDescription|json}}</pre>-->
 <!--<pre>selectedOption:{{selectedOption|json}}</pre>-->
 <!--<pre>{{bidEntity|json}}</pre>-->
+        <!--<pre>{{eventDescription.eventLength|json}}</pre>-->
+        <!--<pre>{{longBets|json}}</pre>-->
 </div>

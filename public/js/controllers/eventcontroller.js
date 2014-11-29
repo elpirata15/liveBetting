@@ -1,5 +1,5 @@
-angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', 'teamsService', '$timeout', 'localStorageService', 'ModalService',
-    function ($scope, $rootScope, PubNub, betManagerService, teamsService, $timeout, localStorageService, ModalService) {
+angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', 'teamsService', '$timeout', '$interval', 'localStorageService', 'dialogs',
+    function ($scope, $rootScope, PubNub, betManagerService, teamsService, $timeout, $interval, localStorageService, dialogs) {
         $scope.connected = false;
         $scope.log = [];
         $scope.game = localStorageService.get('currentGame');
@@ -64,10 +64,10 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 toString: function () {
                     return $scope.eventDescription.question;
                 },
-                eventOptions: []
+                eventOptions: [],
+                time:0
             }
         };
-
         $scope.teams = $scope.game.teams;
 
         teamsService.getPlayers($scope.teams[0].teamId).success(function (data) {
@@ -96,6 +96,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
 
         $scope.$watch('eventDescription', function () {
             $scope.bidEntity.bidDescription = ($scope.currentEvent)? $scope.currentEvent.toString() : "";
+
         }, true);
 
         $scope.teamsToPlayers = {};
@@ -103,28 +104,28 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.teamsToPlayers[$scope.teams[1].teamName] = $scope.teams[1];
 
         $scope.changeEventTemplate = function (template) {
-            $scope.currentEvent = template;
+            $scope.currentEvent = angular.copy(template);
             $scope.eventDescription = {teams: []};
             $scope.bidEntity = angular.copy($scope.bidEntityTemplate);
             $scope.bidEntity.bidType = template.eventName;
         };
 
-        $scope.closeGame = function () {
-            ModalService.showModal({
-                templateUrl: 'modals/yesno.html',
-                controller: "ModalController"
-            }).then(function (modal) {
-                modal.element.modal();
-                modal.close.then(function (result) {
-                    if (result == "Yes") {
-                        betManagerService.closeGame($scope.game).success(function () {
-                            alert('Game Closed');
-                            window.location = "#/startGame";
-                        });
-                    }
-                });
-            });
-        };
+        //$scope.closeGame = function () {
+        //    ModalService.showModal({
+        //        templateUrl: 'modals/yesno.html',
+        //        controller: "ModalController"
+        //    }).then(function (modal) {
+        //        modal.element.modal();
+        //        modal.close.then(function (result) {
+        //            if (result == "Yes") {
+        //                betManagerService.closeGame($scope.game).success(function () {
+        //                    alert('Game Closed');
+        //                    window.location = "#/startGame";
+        //                });
+        //            }
+        //        });
+        //    });
+        //};
 
         $scope.setEntryAmount = function(amount){
           $scope.bidEntity.entryAmount = amount;
@@ -145,8 +146,10 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         bidEntity: $scope.bidEntity
                     }
                 });
-                if (!$scope.bidEntity.ttl)
+                if ($scope.currentEvent.time == 0)
                     $scope.betOpen = true;
+                else
+                    $scope.openLongBet($scope.currentEvent.time);
             });
         };
         $scope.showResults = false;
@@ -184,10 +187,26 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         };
 
         $scope.openLongBet = function (time) {
-            $scope.bidEntity.ttl = time;
-            $scope.openBet();
-            $scope.longBets.push($scope.bidEntity);
+            var longBet = {bidEntity: $scope.bidEntity, ttl: time};
+            $scope.longBets.push(angular.copy(longBet));
 
+            // Set modal window to pop up 30 sec before time is up
+            $timeout(function(){
+                $scope.showLongBetModal(longBet.bidEntity);
+            }, (time-0.5)*60000);
+
+            // Subtract time every 30 seconds.
+            $interval(function(){
+                if(longBet.ttl)
+                    longBet.ttl -= 0.5;
+            }, 30000,0,true);
+
+            dialogs.notify("Long bet added", "Long bet " + longBet.bidEntity.bidDescription + " was added");
+            $scope.changeEventTemplate($scope.events.customEvent);
+        };
+
+        $scope.showLongBetModal = function(bid){
+            var dlg = dialogs.create('/modals/longbetresolution.html','bidModalCtrl',bid,'lg');
         };
         /* CONNECT TO GAME LOGGER
 
@@ -207,4 +226,54 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
          $scope.$apply(function(){$scope.connected = false;});
          }
          });*/
-    }]);
+    }]).controller('bidModalCtrl',function($scope,$modalInstance,data,PubNub){
+    //-- Variables --//
+
+    $scope.bidEntity = data;
+    $scope.bidOptions = $scope.bidEntity.bidOptions.map(function(el){
+       return el.optionDescription;
+    });
+    //-- Methods --//
+
+    $scope.completed = false;
+
+    $scope.cancel = function(){
+        $modalInstance.dismiss($scope.completed);
+    }; // end cancel
+
+    $scope.hitEnter = function(evt){
+        if(angular.equals(evt.keyCode,13) && !(angular.equals($scope.user.name,null) || angular.equals($scope.user.name,'')))
+            $scope.save();
+    };
+
+    $scope.closeBet = function () {
+
+        // Publish to server
+        PubNub.ngPublish({
+            channel: $scope.bidEntity.id,
+            message: {bidId: $scope.bidEntity.id, close: true}
+        });
+
+        // Notify all clients
+        PubNub.ngPublish({
+            channel: $scope.bidEntity.id + 'msg',
+            message: {bidId: $scope.bidEntity.id, close: true}
+        });
+    };
+
+    $scope.publishWinningResult = function (optionIndex) {
+        PubNub.ngPublish({
+            channel: $scope.bidEntity.id,
+            message: {bidId: $scope.bidEntity.id, winningOption: optionIndex}
+        });
+
+        PubNub.ngPublish({
+            channel: $scope.bidEntity.id + 'msg',
+            message: {bidId: $scope.bidEntity.id, winningOption: optionIndex}
+        });
+
+        $scope.completed = true;
+        $scope.cancel();
+    };
+
+});

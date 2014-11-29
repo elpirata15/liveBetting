@@ -1,0 +1,26 @@
+<!--<div class="modal">-->
+    <!--<div class="modal-dialog">-->
+        <!--<div class="modal-content">-->
+            <!--<div class="modal-header">-->
+                <!--<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>-->
+                <!--<h4 class="modal-title">{{bid.bidDescription}}</h4>-->
+            <!--</div>-->
+            <!--<div class="modal-body">-->
+                <!--<button class="btn btn-large btn-danger col-xs-6 col-xs-offset-3" ng-click="closeBet()">Close Bet</button>-->
+                    <!--<bet-options-->
+                            <!--publish-action="publishWinningResult" options="currentEvent.eventOptions"-->
+                            <!--ng-disabled="!showResults"></bet-options>-->
+            <!--</div>-->
+            <!--<div class="modal-footer">-->
+                <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+<div class="well well-lg col-xs-8 col-xs-offset-2">
+<h3 style="text-align:center"><b>{{bidEntity.bidDescription}}</b></h3>
+    <br/>
+    <button class="btn btn-large btn-danger col-xs-6 col-xs-offset-3" ng-click="closeBet()">Close Bet</button><br/><br/><br/>
+    <bet-options  publish-action="publishWinningResult" options="bidOptions"></bet-options><br/><br/>
+    <button class="btn btn-large btn-default col-xs-6 col-xs-offset-3" ng-click="cancel()">Cancel</button>
+</div>

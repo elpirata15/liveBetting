@@ -87,28 +87,35 @@ angular.module('liveBetManager').directive('teamSelector', function () {
         restrict: 'E',
         scope: {
             question: '=',
-            betOptions: '=ngModel',
-            eventType: '='
+            time: '=',
+            betOptions: '=ngModel'
         },
         templateUrl: 'js/directives/templates/custombet.html',
         link: function (scope, element, attrs) {
             scope.setOption = function (index) {
                 scope.selectedOption = index;
             };
+            scope.eventType = null;
+            scope.betTypes = ['Long','Short'];
+            scope.setType = function(type){
+                scope.eventType = type;
+            };
 
             scope.betValuesCounter = 0;
 
             scope.addBetValue = function () {
-                scope.betValues[scope.betValuesCounter] = "";
+                scope.betValues[scope.betValuesCounter] = {id: scope.betValuesCounter, text:""};
                 scope.betValuesCounter++;
             };
-
+            scope.removeBetValue = function(index){
+                delete scope.betValues[index];
+            };
             scope.betValues = {};
             scope.$watch('betValues', function (newVal) {
                 if (newVal) {
                     scope.betOptions = [];
                     for (var i in newVal) {
-                        scope.betOptions.push(newVal[i]);
+                        scope.betOptions.push(newVal[i].text);
                     }
                 }
             }, true);

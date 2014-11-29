@@ -10,27 +10,45 @@
             </div>
         </div>
         <br/><br/>
-
-        <div class="well well-sm col-xs-8 col-xs-offset-2">
-            <h3 style="text-align: center"><b>Bet Options: </b></h3>
-
-            <div class="form-group" ng-repeat="value in betValues">
-                <label class="col-xs-2 control-label">Option 1:</label>
-
-                <div class="col-xs-10">
-                    <input type="text" ng-model="value" class="form-control">
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="well well-sm">
+                    <div class="form-group" ng-repeat="value in betValues track by value.id">
+                        <div class="input-group">
+                            <input type="text" ng-model="value.text" class="form-control" placeholder="Option {{$index +1}}">
+                        <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="removeBetValue(value.id)"><span
+                                class="glyphicon glyphicon-remove"></span></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <br/><br/>
+                <button class="btn btn-link col-xs-4 col-xs-offset-4" ng-click="addBetValue()">Add Bet Option</button>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group-lg" style="padding-bottom: 2px">
+                    <label class="control-label col-xs-6"
+                           style="text-align: right;font-weight: bold;top:6px">Bet Type:</label>
+                    <div class="col-xs-6">
+                        <div class="btn-group btn-group-justified">
+                            <a class="btn" ng-repeat="betType in betTypes" ng-click="setType(betType)"
+                               ng-class="{'btn-default':eventType!=betType,'btn-info':eventType==betType}">{{betType}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-xs-offset-6" ng-show="eventType=='Long'">
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
+                        <input type="text" ng-model="time" class="form-control">
+                        <span class="input-group-addon">m</span>
+                    </div>
+                    <!-- /input-group -->
                 </div>
             </div>
         </div>
-        <div class="form-group-lg col-xs-6 col-xs-offset-2">
-            <label for="eventType" class="control-label col-xs-6" style="text-align: right;font-size:large;font-weight: bold">Bet Type:</label>
-            <div class="col-xs-6">
-                <select id="eventType" class="form-control" ng-model="eventType">
-                    <option>Long</option>
-                    <option>Short</option>
-                </select>
-            </div>
-        </div>
+
+
+        <!-- /.col-lg-6 -->
     </div>
 </div>
-        <!--<pre>{{betValues|json}}</pre>-->
