@@ -203,8 +203,11 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             }, 30000,0,true);
 
             dialogs.notify("Long bet added", "Long bet " + longBet.bidEntity.bidDescription + " was added");
-            $scope.changeEventTemplate($scope.events.customEvent);
+            $scope.changeEventTemplate($scope.events.corner);
             $scope.longBetsLength++;
+            $timeout(function(){
+                $scope.$apply();
+            });
         };
 
         $scope.showLongBetModal = function(bid){
