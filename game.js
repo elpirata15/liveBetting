@@ -96,7 +96,6 @@ exports.createGame = function (req, res) {
             gameName: req.body.gameName,
             teams: req.body.teams,
             timestamp: new Date(req.body.timestamp),
-            assignedTo: req.body.assignedTo,
             location: req.body.location,
             type: req.body.type,
             status: "Waiting"
@@ -138,10 +137,10 @@ exports.initGame = function (req, res) {
                         logger.error(data);
                     },
                     connect: function (data) {
-                        logger.info(data);
+                        logger.info("Connected To Channel: "+ data);
                     },
                     disconnect: function (data) {
-                        logger.error(data);
+                        logger.error("Disconnected From Channel: "+ data);
                     }
                 });
                 logger.gameLogger.setLogger(game._id);

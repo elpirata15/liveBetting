@@ -13,8 +13,19 @@
         <ul class="nav navbar-nav">
             <li><a>Active Users: </a></li>
             <li><a>Last Pool Users: </a></li>
-
             <!--<li><a>Last Server Message: <b>{{log[log.length - 1]}}</b></a></li>-->
+        </ul>
+        <ul class="nav navbar-nav" style="margin-left:50px">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">Ongoing Long Bets <b class="caret"></b></a>
+                <ul class="dropdown-menu" style="width:250px">
+                    <li><span class="col-xs-10" style="text-align: center; border-right:1px inset;padding-bottom: 10px"><b>Bet
+                        Description</b></span><span style="top:4px;padding-bottom: 10px"
+                                                    class="col-xs-2 glyphicon glyphicon-time"></span></li>
+                    <li><span class="col-xs-10" style="border-right:1px inset"><a style="cursor:pointer">Moshe bet 1</a></span><span
+                            class="col-xs-2">5m</span></li>
+                </ul>
+            </li>
         </ul>
         <ul class="nav navbar-nav pull-right">
             <li><a><span ng-class="{'red':!connected, 'green':connected}">&bull;</span> Broadcast Connection</a></li>
@@ -26,14 +37,16 @@
         <div class="col-xs-2" style="padding-left:0px;text-align:center">
             <b><span class="glyphicon glyphicon-arrow-down"></span> Choose an event</b>
             <button type="button" class="btn btn-block"
-                    ng-class="{'btn-info':currentEvent!=item, 'btn-warning':currentEvent==item} "
+                    ng-class="{'btn-default':currentEvent!=item, 'btn-info':currentEvent==item}"
+                    ng-disabled="betOpen"
                     style=" margin-bottom: 10px;"
                     ng-click="changeEventTemplate(item)" ng-repeat="item in events" ng-if="!item.alwaysLast">
                 {{item.eventName}}
             </button>
             <button type="button" class="btn btn-block"
-                    ng-class="{'btn-info':currentEvent!=events.customEvent, 'btn-warning':currentEvent==events.customEvent} "
+                    ng-class="{'btn-default':currentEvent!=events.customEvent, 'btn-info':currentEvent==events.customEvent} "
                     style=" margin-bottom: 10px;"
+                    ng-disabled="betOpen"
                     ng-click="changeEventTemplate(events.customEvent)">{{events.customEvent.eventName}}
             </button>
         </div>
@@ -73,9 +86,12 @@
                    ng-show="currentEvent.toString().indexOf('undefined') == -1">{{currentEvent.toString()}}</p>
                 <br/>
 
-                <div class="input-group input-group-lg col-xs-4 col-xs-offset-3">
-                    <span class="input-group-addon"><b class="glyphicon glyphicon-usd"></b></span>
-                    <input type="number" class="input-lg" ng-model="bidEntity.entryAmount" placeholder="Entry Amount">
+                <p align="center"><b>Entry Amount</b></p>
+
+                <div class="btn-group btn-group-justified">
+                    <a class="btn" ng-repeat="amount in amounts"
+                       ng-class="{'btn-default':bidEntity.entryAmount != amount, 'btn-info':bidEntity.entryAmount == amount}"
+                       ng-click="setEntryAmount(amount)">${{amount}}</a>
                 </div>
                 <br/><br/>
 
@@ -91,10 +107,11 @@
                     </button>
                 </div>
             </div>
-
-            <bet-options ng-show="currentEvent.eventOptions.length > 0 && showResults"
-                         publish-action="publishWinningResult" options="currentEvent.eventOptions"
-                         ng-model="selectedOption"></bet-options>
+            <div class="well well-lg col-xs-8 col-xs-offset-2">
+                <bet-options ng-show="currentEvent.eventOptions.length > 0"
+                             publish-action="publishWinningResult" options="currentEvent.eventOptions"
+                             ng-disabled="!showResults"></bet-options>
+            </div>
         </div>
     </div>
 </div>

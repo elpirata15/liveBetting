@@ -1,4 +1,4 @@
-var winston = require("winston");
+var chalk = require("chalk");
 var pubnub = require("pubnub").init({
     publish_key: process.env.PUBNUB_PUBLISH_KEY,
     subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY
@@ -6,44 +6,23 @@ var pubnub = require("pubnub").init({
 
 var ServerLogger = function ServerLogger(gameId){
 
-    var logger = new (winston.Logger)({
-        transports: [
-            new (winston.transports.Console)(),
-            new (winston.transports.File)({filename: (gameId)? gameId+".log" : "default.log"})
-        ]
-    });
-
     this.gameId = gameId || "";
 
     this.info = function(){
         var pubnubMessages = [];
-        pubnubMessages.push("Info: ");
         for(var i in arguments){
             pubnubMessages.push(arguments[i]);
         }
-        pubnub.publish({
-            channel: this.gameId + 'adminSocket',
-            message: pubnubMessages.join(''),
-            error: function(e){
-                logger.error("publishing info message to PubNub failed: ", e);
-            }
-        });
-        logger.info(pubnubMessages.join(''));
+        var prefix = (this.gameId) ? "[GAME INFO] ("+this.gameId+") " : "[INFO]";
+        console.log(prefix + pubnubMessages.join(''));
     };
     this.error = function(){
         var pubnubMessages = [];
-        pubnubMessages.push("Error: ");
         for(var i in arguments){
             pubnubMessages.push(arguments[i]);
         }
-        pubnub.publish({
-            channel: this.gameId + 'adminSocket',
-            message: pubnubMessages.join(''),
-            error: function(e){
-                logger.error("publishing info message to PubNub failed: ", e);
-            }
-        });
-        logger.error(pubnubMessages.join(''));
+        var prefix = (this.gameId) ? "[GAME ERROR] ("+this.gameId+") " : "[ERROR]";
+        console.log(chalk.red(prefix + pubnubMessages.join('')));
     };
 
 };
@@ -65,6 +44,14 @@ ServerLogger.prototype.gameLogger = {
             logString += arguments[i];
         }
         gameLoggers[arguments[0]].info(logString);
+    },
+    error: function(){
+        var logString = "";
+        for(var i = 1; i<arguments.length; i++)
+        {
+            logString += arguments[i];
+        }
+        gameLoggers[arguments[0]].error(logString);
     }
 };
 

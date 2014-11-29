@@ -8,6 +8,11 @@ exports.ObjectId = function () {
     return mongoose.Types.ObjectId();
 };
 
+exports.getObjectIdFromString = function(idString){
+    var typedObjectId = mongoose.Types.ObjectId;
+    return typedObjectId(idString);
+};
+
 var participantEntity = new Schema({
     userId: ObjectId,
     amount: Number
@@ -42,7 +47,7 @@ var bidEntity = new Schema({
     totalPoolAmount: Number,
     entryAmount: Number,
     winningOption: Number
-});
+},{_id:false});
 
 var teamEntity = new Schema({
     teamName: String,

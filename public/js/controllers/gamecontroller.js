@@ -10,7 +10,7 @@ angular.module('liveBetManager').controller('gameController', ['$scope', '$rootS
         });
 
         $scope.startGame = function () {
-            $scope.game.assignedTo = $scope.game.assignedTo._id;
+            //$scope.game.assignedTo = $scope.game.assignedTo._id;
             $scope.game.gameName = $scope.team1.name + " vs. " + $scope.team2.name + " @ " + $scope.game.location;
             $scope.game.teams = [];
             $scope.game.teams.push({teamName: $scope.team1.name, teamId: $scope.team1.id}, {teamName: $scope.team2.name, teamId: $scope.team2.id});

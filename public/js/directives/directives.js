@@ -41,13 +41,13 @@ angular.module('liveBetManager').directive('teamSelector', function () {
         restrict: 'E',
         scope: {
             options: '=',
-            selectedOption: '=ngModel',
-            publishAction: '&'
+//            selectedOption: '=ngModel',
+            publishAction: '=',
+            disabled: '=ngDisabled'
         },
         templateUrl: 'js/directives/templates/betoptions.html',
         link: function (scope, element, attrs) {
             scope.setOption = function (index) {
-                scope.selectedOption = index;
                 scope.publishAction(index);
             }
         }
@@ -95,6 +95,14 @@ angular.module('liveBetManager').directive('teamSelector', function () {
             scope.setOption = function (index) {
                 scope.selectedOption = index;
             };
+
+            scope.betValuesCounter = 0;
+
+            scope.addBetValue = function () {
+                scope.betValues[scope.betValuesCounter] = "";
+                scope.betValuesCounter++;
+            };
+
             scope.betValues = {};
             scope.$watch('betValues', function (newVal) {
                 if (newVal) {

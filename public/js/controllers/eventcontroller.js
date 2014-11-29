@@ -6,6 +6,8 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.eventDescription = {teams: []};
         $scope.selectedOption;
         $scope.currentEvent;
+        $scope.longBets = [];
+        $scope.amounts = [10,20,30,50,100];
 
         $scope.events = {
             corner: {
@@ -82,7 +84,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             }
         });
 
-        $scope.bidEntity = {
+        $scope.bidEntityTemplate = {
             gameId: $scope.game._id,
             gameName: $scope.game.gameName,
             bidDescription: ($scope.currentEvent) ? $scope.currentEvent.toString() : "",
@@ -90,8 +92,10 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             entryAmount: 0
         };
 
+        $scope.bidEntity = angular.copy($scope.bidEntityTemplate);
+
         $scope.$watch('eventDescription', function () {
-            $scope.bidEntity.bidDescription = $scope.currentEvent.toString();
+            $scope.bidEntity.bidDescription = ($scope.currentEvent)? $scope.currentEvent.toString() : "";
         }, true);
 
         $scope.teamsToPlayers = {};
@@ -101,6 +105,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.changeEventTemplate = function (template) {
             $scope.currentEvent = template;
             $scope.eventDescription = {teams: []};
+            $scope.bidEntity = angular.copy($scope.bidEntityTemplate);
             $scope.bidEntity.bidType = template.eventName;
         };
 
@@ -120,6 +125,11 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 });
             });
         };
+
+        $scope.setEntryAmount = function(amount){
+          $scope.bidEntity.entryAmount = amount;
+        };
+
         $scope.betOpen = false;
         $scope.openBet = function () {
             betManagerService.getNewBidId().success(function (data) {
@@ -135,27 +145,49 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         bidEntity: $scope.bidEntity
                     }
                 });
-                $scope.betOpen = true;
+                if (!$scope.bidEntity.ttl)
+                    $scope.betOpen = true;
             });
         };
         $scope.showResults = false;
 
         $scope.closeBet = function () {
+
+            // Publish to server
             PubNub.ngPublish({
-                channel: [$scope.bidEntity.id, $scope.bidEntity.id + 'msg'],
+                channel: $scope.bidEntity.id,
                 message: {bidId: $scope.bidEntity.id, close: true}
             });
+
+            // Notify all clients
+            PubNub.ngPublish({
+                channel: $scope.bidEntity.id + 'msg',
+                message: {bidId: $scope.bidEntity.id, close: true}
+            });
+
             $scope.betOpen = false;
             $scope.showResults = true;
         };
 
         $scope.publishWinningResult = function (optionIndex) {
             PubNub.ngPublish({
-                channel: [$scope.bidEntity.id, $scope.bidEntity.id + 'msg'],
+                channel: $scope.bidEntity.id,
+                message: {bidId: $scope.bidEntity.id, winningOption: optionIndex}
+            });
+
+            PubNub.ngPublish({
+                channel: $scope.bidEntity.id + 'msg',
                 message: {bidId: $scope.bidEntity.id, winningOption: optionIndex}
             });
             $scope.betOpen = false;
-            $scope.showResults = true;
+            $scope.showResults = false;
+        };
+
+        $scope.openLongBet = function (time) {
+            $scope.bidEntity.ttl = time;
+            $scope.openBet();
+            $scope.longBets.push($scope.bidEntity);
+
         };
         /* CONNECT TO GAME LOGGER
 

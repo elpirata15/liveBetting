@@ -47,7 +47,7 @@ exports.addBid = function (bidMessage) {
                 // Close bid
                 closeBid(message, channel);
                 // If this a winning option message
-            } else if (message.winningOption) {
+            } else if (message.hasOwnProperty("winningOption")) {
                 winningOptionMessage(message, channel);
                 // This is a bid request from user
             } else {
@@ -109,7 +109,7 @@ var addParticipant = function (bidRequest, bidId) {
 
             // If the bid is inactive
         } else {
-            logger.gameLogger.log(currentBid.gameId, "Rejected Bid Request: Bid is Inactive");
+            logger.gameLogger.error(currentBid.gameId, "Rejected Bid Request: Bid is Inactive");
 
             // Publish to user that the bid is rejected
             publishMessage(bidRequest.userId, {error: "Rejected Bid Request: Bid is Inactive"});
@@ -166,21 +166,23 @@ var sendToDbAndUpdateUsers = function (bid) {
             // Add bid to game bids
             game.bids.push(bid);
 
+            //bid._id = bid.id = dbOperations.getObjectIdFromString(bid.id);
+
             // Save the game
-            dbOperations.updateDb(game, function (savedGame) {
+            dbOperations.updateDb(game, function () {
 
                 // Alert manager
                 logger.gameLogger.log(bid.gameId, "Saved bid. Removing from active bids");
 
                 // Update users balances
-                updateUserBalances(savedGame.bids.id(bid.id));
+                updateUserBalances(bid);
             }, function (err) {
                 logger.error(err);
             });
         } else {
 
             // Alert manager
-            logger.gameLogger.log(bid.gameId, "could not find game ", bid.gameId);
+            logger.gameLogger.error(bid.gameId, "could not find game ", bid.gameId);
         }
     });
 };
@@ -334,7 +336,7 @@ var ensureUserBalance = function (bidRequest, gameId) {
             } else {
 
                 // Alert manager
-                logger.gameLogger.log(gameId, "User " + user.fullName + "doesn't have sufficient funds to make this bet");
+                logger.gameLogger.error(gameId, "User " + user.fullName + "doesn't have sufficient funds to make this bet");
                 return false;
             }
         } else {
