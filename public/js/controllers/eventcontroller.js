@@ -109,6 +109,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             $scope.eventDescription = {teams: []};
             $scope.bidEntity = angular.copy($scope.bidEntityTemplate);
             $scope.bidEntity.bidType = template.eventName;
+            $scope.showResults = false;
         };
 
         //$scope.closeGame = function () {
@@ -147,7 +148,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         bidEntity: $scope.bidEntity
                     }
                 });
-                if ($scope.currentEvent.time == 0)
+                if (!$scope.currentEvent.time || $scope.currentEvent.time == 0)
                     $scope.betOpen = true;
                 else
                     $scope.openLongBet($scope.currentEvent.time);

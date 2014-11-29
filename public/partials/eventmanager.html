@@ -37,14 +37,14 @@
         <div class="col-xs-2" style="padding-left:0px;text-align:center">
             <b><span class="glyphicon glyphicon-arrow-down"></span> Choose an event</b>
             <button type="button" class="btn btn-block"
-                    ng-class="{'btn-default':currentEvent!=item, 'btn-info':currentEvent==item}"
+                    ng-class="{'btn-default':currentEvent.eventName!=item.eventName, 'btn-info':currentEvent.eventName==item.eventName}"
                     ng-disabled="betOpen"
                     style=" margin-bottom: 10px;"
                     ng-click="changeEventTemplate(item)" ng-repeat="item in events" ng-if="!item.alwaysLast">
                 {{item.eventName}}
             </button>
             <button type="button" class="btn btn-block"
-                    ng-class="{'btn-default':currentEvent!=events.customEvent, 'btn-info':currentEvent==events.customEvent} "
+                    ng-class="{'btn-default':currentEvent.eventName!=events.customEvent.eventName, 'btn-info':currentEvent.eventName==events.customEvent.eventName} "
                     style=" margin-bottom: 10px;"
                     ng-disabled="betOpen"
                     ng-click="changeEventTemplate(events.customEvent)">{{events.customEvent.eventName}}
@@ -82,7 +82,7 @@
                         question="eventDescription.question"
                         time="currentEvent.time"
                         ng-model="currentEvent.eventOptions"></custom-bet>
-            <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent">
+            <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent && !showResults">
                 <p align="center" class="text-primary" style="font-size:larger;font-weight:bold"
                    ng-show="currentEvent.toString().indexOf('undefined') == -1">{{currentEvent.toString()}}</p>
                 <br/>
@@ -108,7 +108,7 @@
                     </button>
                 </div>
             </div>
-            <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent.eventOptions.length > 0 && currentEvent.time == 0">
+            <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent.eventOptions.length > 0 && (!currentEvent.time || currentEvent.time == 0)">
                 <bet-options
                         publish-action="publishWinningResult" options="currentEvent.eventOptions"
                         ng-disabled="!showResults"></bet-options>
