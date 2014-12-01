@@ -188,8 +188,8 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         };
 
         $scope.openLongBet = function (time) {
-            var longBet = {bidEntity: $scope.bidEntity, ttl: time};
-            $scope.longBets[$scope.bidEntity.id] = (angular.copy(longBet));
+            var longBet = {bidEntity: angular.copy($scope.bidEntity), ttl: time};
+            $scope.longBets[$scope.bidEntity.id] = longBet;
 
             // Set modal window to pop up 30 sec before time is up
             $timeout(function () {
@@ -198,13 +198,13 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
 
             // Subtract time every 30 seconds.
             $interval(function () {
-                if ($scope.longBets[longBet.id].ttl)
-                    $scope.longBets[longBet.id].ttl -= 0.5;
+                if ($scope.longBets[longBet.bidEntity.id].ttl)
+                    $scope.longBets[longBet.bidEntity.id].ttl -= 0.5;
                 else {
-                    delete $scope.longBets[longBet.id];
+                    delete $scope.longBets[longBet.bidEntity.id];
                     $scope.longBetsLength--;
                 }
-            }, 30000, $scope.longBets[longBet.id].ttl / 0.5 + 1, true);
+            }, 30000, $scope.longBets[longBet.bidEntity.id].ttl / 0.5 + 1, true);
 
             dialogs.notify("Long bet added", "Long bet " + longBet.bidEntity.bidDescription + " was added");
             $scope.changeEventTemplate($scope.events.corner);
