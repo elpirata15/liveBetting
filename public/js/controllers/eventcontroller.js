@@ -1,5 +1,5 @@
-angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', 'PubNub', 'betManagerService', 'teamsService', '$timeout', '$interval', 'localStorageService', 'dialogs',
-    function ($scope, $rootScope, PubNub, betManagerService, teamsService, $timeout, $interval, localStorageService, dialogs) {
+angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', '$location', 'PubNub', 'betManagerService', 'teamsService', 'authService', '$timeout', '$interval', 'localStorageService', 'dialogs',
+    function ($scope, $rootScope, $location, PubNub, betManagerService, teamsService, authService, $timeout, $interval, localStorageService, dialogs) {
         $scope.connected = false;
         $scope.log = [];
         $scope.game = localStorageService.get('currentGame');
@@ -9,6 +9,14 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.longBets = {};
         $scope.longBetsLength = 0;
         $scope.amounts = [10, 20, 30, 50, 100];
+
+        $scope.doLogout = function(){
+            authService.logout(function (result) {
+                if (result) {
+                    $location.path('/login');
+                }
+            });
+        };
 
         $scope.events = {
             corner: {
@@ -123,7 +131,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         channel: $scope.game._id,
                         message: {gameId: $scope.game._id, close: true}
                     });
-                    window.location = "#/startGame";
+                    $scope.doLogout();
                 });
             });
         };
