@@ -198,13 +198,13 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
 
             // Subtract time every 30 seconds.
             $interval(function () {
-                if (longBet.ttl)
-                    longBet.ttl -= 0.5;
+                if ($scope.longBets[longBet.id].ttl)
+                    $scope.longBets[longBet.id].ttl -= 0.5;
                 else {
                     delete $scope.longBets[longBet.id];
                     $scope.longBetsLength--;
                 }
-            }, 30000, longBet.ttl / 0.5 + 1, true);
+            }, 30000, $scope.longBets[longBet.id].ttl / 0.5 + 1, true);
 
             dialogs.notify("Long bet added", "Long bet " + longBet.bidEntity.bidDescription + " was added");
             $scope.changeEventTemplate($scope.events.corner);
