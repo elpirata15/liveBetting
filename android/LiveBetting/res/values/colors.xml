@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="themeMainColor">#2d8553</color>
+    <color name="buttonsBackground">#c26978</color>
+    <color name="inputBackground">#faf5f6</color>
+    <color name="intrestingBlue">#3650d6</color>
+    <color name="lightblue">#b88b02</color>
+    <color name="strangeGreen">#b8d1c3</color>
+    <color name="brown">#4d452c</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+</resources>
