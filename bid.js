@@ -79,7 +79,7 @@ var addParticipant = function (bidRequest, bidId) {
         ensureUserBalance(bidRequest, currentBid.gameId, function () {
             logger.info("received bid request for game: " + bidId);
 
-            currentBid.totalPoolAmount += bidRequest.amount;
+            currentBid.totalPoolAmount = parseInt(currentBid.totalPoolAmount, 10) + parseInt(bidRequest.amount, 10);
 
             // If the bid is active
             if (currentBid.status == "Active") {
@@ -106,7 +106,7 @@ var addParticipant = function (bidRequest, bidId) {
                     }
 
                     // Add total participants for option
-                    serverMessage.options.push(currentBid.bidOptions[i].length);
+                    serverMessage.options.push(currentBid.bidOptions[i].participants.length);
                 }
 
                 logger.gameLogger.log(currentBid.gameId, "total pool amount: "+currentBid.totalPoolAmount);
