@@ -84,7 +84,7 @@ var addParticipant = function (bidRequest, bidId) {
             if (currentBid.status == "Active") {
 
                 // Add participant to desired option
-                currentBid.bidOptions[bidRequest.option].push({
+                currentBid.bidOptions[bidRequest.option].participants.push({
                     userId: bidRequest.userId,
                     amount: bidRequest.amount
                 });
@@ -107,6 +107,8 @@ var addParticipant = function (bidRequest, bidId) {
                     // Add total participants for option
                     serverMessage.bidOptions.push(currentBid.bidOptions[i].length);
                 }
+
+                logger.gameLogger.log(currentBid.gameId, "total pool amount: $"+currentBid.totalPoolAmount);
 
                 // Send the message on bid_id_msg channel
                 publishMessage(bidId + "_msg", serverMessage);
