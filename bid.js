@@ -324,6 +324,7 @@ var ensureUserBalance = function (bidRequest, gameId) {
         // If we don't have an error
         if (!err) {
                 logger.gameLogger.log(gameId, "User Balance: " + user.balance);
+                 logger.gameLogger.log(gameId, "Bid Request: " + bidRequest.amount);
             // If we found a user and the balance is sufficient
             if (user && user.balance >= bidRequest.amount) {
 
