@@ -127,10 +127,6 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 betManagerService.closeGame($scope.game).success(function () {
                     alert('Game Closed');
                     // Publish to server
-                    PubNub.ngPublish({
-                        channel: $scope.game._id,
-                        message: {gameId: $scope.game._id, close: true}
-                    });
                     $scope.doLogout();
                 });
             });

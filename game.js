@@ -192,6 +192,10 @@ exports.closeGame = function (req, res) {
                 dbOperations.uncacheEntity("activeGames", req.params.id);
                 logger.gameLogger.removeLogger(game._id);
                 logger.info("closed game", game.gameName, "successfully");
+                pubnub.publish({
+                    channel: game._id,
+                    message: {gameId: game._id, close:true}
+                });
                 res.status(200).end();
             }, function (err) {
                 res.status(500).send(err);
