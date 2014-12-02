@@ -74,7 +74,7 @@ var addParticipant = function (bidRequest, bidId) {
 
     // If we got a bid
     if (currentBid.gameId != "" && ensureUserBalance(bidRequest, currentBid.gameId)) {
-        logger.info(currentBid.gameId, "received bid request for game: " + bidId);
+        logger.info("received bid request for game: " + bidId);
 
         currentBid.totalPoolAmount += bidRequest.amount;
 
