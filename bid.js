@@ -105,7 +105,7 @@ var addParticipant = function (bidRequest, bidId) {
                     }
 
                     // Add total participants for option
-                    serverMessage.bidOptions.push(currentBid.bidOptions[i].length);
+                    serverMessage.options.push(currentBid.bidOptions[i].length);
                 }
 
                 logger.gameLogger.log(currentBid.gameId, "total pool amount: $"+currentBid.totalPoolAmount);
