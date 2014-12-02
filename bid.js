@@ -33,6 +33,8 @@ exports.addBid = function (bidMessage) {
         bid.bidOptions[i].participants = [];
     }
 
+    bid.status = "Active";
+
     // Add bid to active bids cache
     activeBids[bid.id] = bid;
 
@@ -336,7 +338,7 @@ var ensureUserBalance = function (bidRequest, gameId, callback) {
             if (user && user.balance >= bidRequest.amount) {
 
                 // Alert manager
-                logger.gameLogger.log(gameId, "User " + user.fullName + "has sufficient funds to make this bet");
+                logger.gameLogger.log(gameId, "User " + user._id + " has sufficient funds to make this bet");
 
                 callback();
 
@@ -344,7 +346,7 @@ var ensureUserBalance = function (bidRequest, gameId, callback) {
             } else {
 
                 // Alert manager
-                logger.gameLogger.error(gameId, "User " + user.fullName + "doesn't have sufficient funds to make this bet");
+                logger.gameLogger.error(gameId, "User " + user._id + " doesn't have sufficient funds to make this bet");
                 return false;
             }
         } else {
