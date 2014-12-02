@@ -70,6 +70,8 @@ var addParticipant = function (bidRequest, bidId) {
     // Get the current bid
     var currentBid = activeBids[bidId];
 
+    logger.info(currentBid.gameId);
+
     // If we got a bid
     if (currentBid && ensureUserBalance(bidRequest, currentBid.gameId)) {
         logger.gameLogger.log(currentBid.gameId, "received bid request for game: " + bidId);
