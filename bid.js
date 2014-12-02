@@ -34,6 +34,7 @@ exports.addBid = function (bidMessage) {
     }
 
     bid.status = "Active";
+    bid.totalPoolAmount = 0;
 
     // Add bid to active bids cache
     activeBids[bid.id] = bid;
@@ -108,7 +109,7 @@ var addParticipant = function (bidRequest, bidId) {
                     serverMessage.options.push(currentBid.bidOptions[i].length);
                 }
 
-                logger.gameLogger.log(currentBid.gameId, "total pool amount: $"+currentBid.totalPoolAmount);
+                logger.gameLogger.log(currentBid.gameId, "total pool amount: "+currentBid.totalPoolAmount);
 
                 // Send the message on bid_id_msg channel
                 publishMessage(bidId + "_msg", serverMessage);
