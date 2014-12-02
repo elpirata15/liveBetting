@@ -70,52 +70,53 @@ var addParticipant = function (bidRequest, bidId) {
     // Get the current bid
     var currentBid = activeBids[bidId];
 
-    logger.info(currentBid.gameId);
-
     // If we got a bid
-    if (currentBid.gameId != "" && ensureUserBalance(bidRequest, currentBid.gameId)) {
-        logger.info("received bid request for game: " + bidId);
+    if (currentBid) {
 
-        currentBid.totalPoolAmount += bidRequest.amount;
+        ensureUserBalance(bidRequest, currentBid.gameId, function () {
+            logger.info("received bid request for game: " + bidId);
 
-        // If the bid is active
-        if (currentBid.status == "Active") {
+            currentBid.totalPoolAmount += bidRequest.amount;
 
-            // Add participant to desired option
-            currentBid.bidOptions[bidRequest.option].push({
-                userId: bidRequest.userId,
-                amount: bidRequest.amount
-            });
-            logger.gameLogger.log(currentBid.gameId, "bid request added successfully");
+            // If the bid is active
+            if (currentBid.status == "Active") {
 
-            // Send OK to user
-            publishMessage(bidRequest.userId, {info: "OK"});
+                // Add participant to desired option
+                currentBid.bidOptions[bidRequest.option].push({
+                    userId: bidRequest.userId,
+                    amount: bidRequest.amount
+                });
+                logger.gameLogger.log(currentBid.gameId, "bid request added successfully");
 
-            // Make server message feedback
-            var serverMessage = {totalPoolAmount: currentBid.totalPoolAmount, options: []};
+                // Send OK to user
+                publishMessage(bidRequest.userId, {info: "OK"});
 
-            // Loop through all the options
-            for (var i in currentBid.bidOptions) {
+                // Make server message feedback
+                var serverMessage = {totalPoolAmount: currentBid.totalPoolAmount, options: []};
 
-                // If this is the last option (auto losers), stop the loop
-                if (i == currentBid.bidOptions.length - 1) {
-                    break;
+                // Loop through all the options
+                for (var i in currentBid.bidOptions) {
+
+                    // If this is the last option (auto losers), stop the loop
+                    if (i == currentBid.bidOptions.length - 1) {
+                        break;
+                    }
+
+                    // Add total participants for option
+                    serverMessage.bidOptions.push(currentBid.bidOptions[i].length);
                 }
 
-                // Add total participants for option
-                serverMessage.bidOptions.push(currentBid.bidOptions[i].length);
+                // Send the message on bid_id_msg channel
+                publishMessage(bidId + "_msg", serverMessage);
+
+                // If the bid is inactive
+            } else {
+                logger.gameLogger.error(currentBid.gameId, "Rejected Bid Request: Bid is Inactive");
+
+                // Publish to user that the bid is rejected
+                publishMessage(bidRequest.userId, {error: "Rejected Bid Request: Bid is Inactive"});
             }
-
-            // Send the message on bid_id_msg channel
-            publishMessage(bidId + "_msg", serverMessage);
-
-            // If the bid is inactive
-        } else {
-            logger.gameLogger.error(currentBid.gameId, "Rejected Bid Request: Bid is Inactive");
-
-            // Publish to user that the bid is rejected
-            publishMessage(bidRequest.userId, {error: "Rejected Bid Request: Bid is Inactive"});
-        }
+        });
     }
 };
 
@@ -229,6 +230,9 @@ var updateUserBalances = function (bid) {
                                 // Log success
                                 logger.info("Added " + winningMoney + " to user " + savedUser._id + " balance");
 
+                                // Send OK to user
+                                publishMessage(savedUser._id, {newBalance: savedUser.balance});
+
                                 // Return with no error
                                 callback();
                             } else {
@@ -282,6 +286,9 @@ var updateUserBalances = function (bid) {
                                 // Log success
                                 logger.info("Subtracted " + participant.amount + " to user " + savedUser._id + " balance");
 
+                                // Send OK to user
+                                publishMessage(savedUser._id, {newBalance: savedUser.balance});
+
                                 // Return with no error
                                 callback();
                             } else {
@@ -318,22 +325,20 @@ var updateUserBalances = function (bid) {
 };
 
 // Ensures a users balance to make a bet
-var ensureUserBalance = function (bidRequest, gameId) {
+var ensureUserBalance = function (bidRequest, gameId, callback) {
 
     // Find the user
     dbOperations.UserModel.findOne({_id: bidRequest.userId}, function (err, user) {
 
         // If we don't have an error
         if (!err) {
-                logger.gameLogger.log(gameId, "User Balance: " + user.balance);
-                 logger.gameLogger.log(gameId, "Bid Request: " + bidRequest.amount);
             // If we found a user and the balance is sufficient
             if (user && user.balance >= bidRequest.amount) {
 
                 // Alert manager
                 logger.gameLogger.log(gameId, "User " + user.fullName + "has sufficient funds to make this bet");
 
-                return true;
+                callback();
 
                 // If no sufficient funds
             } else {
