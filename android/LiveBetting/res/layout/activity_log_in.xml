@@ -1,0 +1,85 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/themeMainColor"
+    tools:context=".LogIn" >
+	<LinearLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:id="@+id/logInMainBox"
+	    android:orientation="vertical"
+	    android:layout_centerInParent="true"
+	    android:layout_alignParentStart="true">
+<!--      <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/tagInputUsername"
+	        android:text="UserName" />-->	
+	    <EditText
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:padding="15dp"
+	        android:layout_margin="5dp"
+	        android:id="@+id/inputUsername"
+	        android:inputType="textEmailAddress"
+	        android:background="@drawable/input_background"
+	        android:hint="Email"
+	        android:text="manager.test1@livebetting.com"></EditText>
+<!--      <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/tagInputPassword"
+	        android:text="Password" />-->	
+	     <EditText
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:padding="15dp"
+	        android:layout_margin="5dp"
+	        android:background="@drawable/input_background"
+	        android:inputType="textPassword"
+	        android:hint="Password"
+	        android:id="@+id/inputPassword"
+	        android:text="123456"></EditText>
+	    
+	</LinearLayout>
+	<LinearLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="15dp"
+	    android:orientation="vertical"
+	    android:gravity="center"
+	    android:layout_below="@id/logInMainBox">
+	    <Button 
+	        android:layout_width="150dp"
+	        android:layout_height="wrap_content"
+	        android:layout_margin="5dp"
+	        android:id="@+id/buttonLogin"
+	        android:background="@drawable/wood_background"
+	        android:textColor="@color/white"
+	        android:text="LogIn"/>	
+	    <TextView
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_margin="5dp"
+	        android:layout_marginTop="15dp"
+	        android:gravity="center"
+	        android:textColor="@color/black"
+	        android:id="@+id/textRegister"
+	        android:text="Don't Have an acout?\n Register" />
+	</LinearLayout>
+
+</RelativeLayout>
+
+
+<!--     <Button 
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:background="@drawable/button_background"
+	        android:textColor="@color/white"
+	        android:id="@+id/buttonRegister"
+	        android:text="Register"/> -->
