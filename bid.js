@@ -100,11 +100,6 @@ var addParticipant = function (bidRequest, bidId) {
                 // Loop through all the options
                 for (var i in currentBid.bidOptions) {
 
-                    // If this is the last option (auto losers), stop the loop
-                    if (i == currentBid.bidOptions.length - 1) {
-                        break;
-                    }
-
                     // Add total participants for option
                     serverMessage.options.push(currentBid.bidOptions[i].participants.length);
                 }
