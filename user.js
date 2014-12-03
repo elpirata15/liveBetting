@@ -47,59 +47,67 @@ exports.registerUser = function (req, res) {
     } else {
         logger.info("Updating user ", req.body.email);
     }
-
-    bcrypt.hash(req.body.pass, null, null, function (err, hash) {
+    dbOperations.UserModel.findOne({email: req.body.email}, function (err, existingUser) {
         if (!err) {
-            var newUser;
-            if (!req.body._id) {
-                newUser = new dbOperations.UserModel({
-                    email: req.body.email,
-                    pass: hash,
-                    fullName: req.body.fullName,
-                    balance: (req.body.group == "Admins" || req.body.group == "Managers") ? -1 : 0,
-                    group: req.body.group,
-                    status: "Active"
-                });
-
-                newUser.save(function (err, user) {
-                    if (!err) {
-                        logger.info("Registered user ", user.email, " with ID", user._id);
-                        req.session.uid = user._id;
-                        req.session.group = user.group;
-                        res.status(200).send(user);
-                    }
-                });
+            if (existingUser) {
+                res.status(500).send("A user with this E-mail address is already registered.");
             } else {
-                dbOperations.UserModel.findOne({_id: req.body._id}, function (err, user) {
+                bcrypt.hash(req.body.pass, null, null, function (err, hash) {
                     if (!err) {
-                        user.email = req.body.email;
-                        user.pass = hash;
-                        user.fullName = req.body.fullName;
-                        user.group = req.body.group || "User";
+                        var newUser;
+                        if (!req.body._id) {
+                            newUser = new dbOperations.UserModel({
+                                email: req.body.email,
+                                pass: hash,
+                                fullName: req.body.fullName,
+                                balance: 0,
+                                group: req.body.group,
+                                status: "Active"
+                            });
 
-                        user.save(function (err, user) {
-                            if (!err) {
-                                logger.info("Updated user ", user.email);
-                                req.session.uid = user._id;
-                                req.session.group = user.group;
-                                req.session.save(function (err) {
-                                    if (err) {
-                                        return res.status(500).send(err);
-                                    }
-                                });
-                                res.status(200).send(user);
-                            }
-                        });
+                            newUser.save(function (err, user) {
+                                if (!err) {
+                                    logger.info("Registered user ", user.email, " with ID", user._id);
+                                    req.session.uid = user._id;
+                                    req.session.group = user.group;
+                                    res.status(200).send(user);
+                                }
+                            });
+                        } else {
+                            dbOperations.UserModel.findOne({_id: req.body._id}, function (err, user) {
+                                if (!err) {
+                                    user.email = req.body.email;
+                                    user.pass = hash;
+                                    user.fullName = req.body.fullName;
+                                    user.group = req.body.group || "User";
+
+                                    user.save(function (err, user) {
+                                        if (!err) {
+                                            logger.info("Updated user ", user.email);
+                                            req.session.uid = user._id;
+                                            req.session.group = user.group;
+                                            res.status(200).send(user);
+                                        }
+                                    });
+                                } else {
+                                    logger.error(err);
+                                    res.status(500).send(err);
+                                }
+                            });
+                        }
+
                     } else {
-                        return res.status(500).send(err);
+                        logger.error(err);
+                        res.status(500).send(err);
                     }
                 });
             }
-
         } else {
+            logger.error(err);
             res.status(500).send(err);
         }
     });
+
 };
 
 exports.loginUser = function (req, res) {
@@ -116,7 +124,7 @@ exports.loginUser = function (req, res) {
                             res.status(200).send(user);
                         } else {
                             logger.error("request denied: Passwords don't match");
-                            res.status(401).send({error:"Passwords don't match"});
+                            res.status(401).send({error: "Passwords don't match"});
                         }
                     } else {
                         logger.error(err);
@@ -126,7 +134,7 @@ exports.loginUser = function (req, res) {
                 });
             } else {
                 logger.error("request denied: No user by this name");
-                res.status(401).send({error:"No user by this name"});
+                res.status(401).send({error: "No user by this name"});
             }
         } else {
             res.status(500).send(err);
