@@ -50,6 +50,7 @@ exports.registerUser = function (req, res) {
     dbOperations.UserModel.findOne({email: req.body.email}, function (err, existingUser) {
         if (!err) {
             if (existingUser) {
+                logger.error("A user with this E-mail address is already registered.");
                 res.status(500).send("A user with this E-mail address is already registered.");
             } else {
                 bcrypt.hash(req.body.pass, null, null, function (err, hash) {

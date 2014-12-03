@@ -33,9 +33,10 @@ angular.module('liveBetManager').controller('userController', ['$scope', '$rootS
 
     $scope.doRegister = function () {
         authService.register($scope.user, function (result) {
-            if (result)
+            if (result == true) {
                 $scope.loggedIn = true;
                 $location.path('/');
+            }
         });
     };
 }]);
