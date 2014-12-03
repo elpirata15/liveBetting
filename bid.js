@@ -37,9 +37,26 @@ exports.addBid = function (bidMessage) {
     bid.totalPoolAmount = 0;
 
     // Add bid to active bids cache
-    activeBids[bid.id] = bid;
+    activeBids[bid.id] = {entity: bid};
 
     logger.gameLogger.log(bid.gameId, "bid added successfully");
+
+    activeBids[bid.id].timer = setInterval(function(){
+        // If bid is active
+        if(bid.status == "Active") {
+            // Make server message feedback
+            var serverMessage = {totalPoolAmount: bid.totalPoolAmount, options: []};
+
+            // Loop through all the options
+            for (var i in bid.bidOptions) {
+
+                // Add total participants for option
+                serverMessage.options.push(bid.bidOptions[i].participants.length);
+            }
+            // Send the message on bid_id_msg channel
+            publishMessage(bid.id + "_msg", serverMessage);
+        }
+    }, 1000);
 
     // Subscribe to bid_id channel
     pubnub.subscribe({
@@ -71,7 +88,7 @@ exports.addBid = function (bidMessage) {
 var addParticipant = function (bidRequest, bidId) {
 
     // Get the current bid
-    var currentBid = activeBids[bidId];
+    var currentBid = activeBids[bidId].entity;
 
     // If we got a bid
     if (currentBid) {
@@ -94,20 +111,9 @@ var addParticipant = function (bidRequest, bidId) {
                 // Send OK to user
                 publishMessage(bidRequest.userId, {info: "OK"});
 
-                // Make server message feedback
-                var serverMessage = {totalPoolAmount: currentBid.totalPoolAmount, options: []};
 
-                // Loop through all the options
-                for (var i in currentBid.bidOptions) {
-
-                    // Add total participants for option
-                    serverMessage.options.push(currentBid.bidOptions[i].participants.length);
-                }
 
                 logger.gameLogger.log(currentBid.gameId, "total pool amount: "+currentBid.totalPoolAmount);
-
-                // Send the message on bid_id_msg channel
-                publishMessage(bidId + "_msg", serverMessage);
 
                 // If the bid is inactive
             } else {
@@ -124,7 +130,7 @@ var addParticipant = function (bidRequest, bidId) {
 var closeBid = function (closeMessage, bidId) {
 
     // Get the bid object
-    var currentBid = activeBids[bidId];
+    var currentBid = activeBids[bidId].entity;
 
     // If you found the bid
     if (currentBid) {
@@ -134,13 +140,15 @@ var closeBid = function (closeMessage, bidId) {
 
         // Alert the manager
         logger.gameLogger.log(currentBid.gameId, "Bid " + bidId + " is now Inactive");
+
+        clearInterval(activeBids[bidId].timer);
     }
 };
 
 var winningOptionMessage = function (winningOptionObject, bidId) {
 
     // Get the bid object
-    var currentBid = activeBids[bidId];
+    var currentBid = activeBids[bidId].entity;
 
     // If you found the bid
     if (currentBid) {
@@ -194,14 +202,14 @@ var updateUserBalances = function (bid) {
 
     var winningMoney = 0;
 
-    // Get winning option participants (add house as winning participant - this is how we make money :D)
-    var winningUsers = bid.bidOptions[bid.winningOption].participants.length + 1;
+    // Get winning option participants
+    var winningUsers = bid.bidOptions[bid.winningOption].participants.length;
 
     // If there were winning users
     if (winningUsers > 0) {
 
-        // Calculate winning money
-        winningMoney = bid.totalPoolAmount / winningUsers;
+        // Calculate winning money  (take 20% off - this is how we make money :D). If there is only one user (entry amount equals the total pool) give user back his money (no winnings)
+        winningMoney = (bid.totalPoolAmount != bid.entryAmount) ? bid.totalPoolAmount * 0.8 / winningUsers : 0;
     }
     // Loop through the options
     for (var i in bid.bidOptions) {
@@ -254,7 +262,7 @@ var updateUserBalances = function (bid) {
 
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
                     logger.error(err);
-                    logger.error(activeBids[bid.id]);
+                    logger.error(activeBids[bid.id].entity);
                 } else {
 
                     // Log success
@@ -310,7 +318,7 @@ var updateUserBalances = function (bid) {
 
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
                     logger.error(err);
-                    logger.error(activeBids[bid.id]);
+                    logger.error(activeBids[bid.id].entity);
                 } else {
 
                     // Log success
