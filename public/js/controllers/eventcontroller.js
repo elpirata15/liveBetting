@@ -169,7 +169,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
 
             // Notify all clients
             PubNub.ngPublish({
-                channel: $scope.bidEntity.id + 'msg',
+                channel: $scope.bidEntity.id + '_msg',
                 message: {bidId: $scope.bidEntity.id, close: true}
             });
 
@@ -184,7 +184,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             });
 
             PubNub.ngPublish({
-                channel: $scope.bidEntity.id + 'msg',
+                channel: $scope.bidEntity.id + '_msg',
                 message: {bidId: $scope.bidEntity.id, winningOption: optionIndex}
             });
             $scope.betOpen = false;
@@ -277,7 +277,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
 
         // Notify all clients
         PubNub.ngPublish({
-            channel: $scope.bidEntity.id + 'msg',
+            channel: $scope.bidEntity.id + '_msg',
             message: {bidId: $scope.bidEntity.id, close: true}
         });
 
@@ -291,7 +291,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         });
 
         PubNub.ngPublish({
-            channel: $scope.bidEntity.id + 'msg',
+            channel: $scope.bidEntity.id + '_msg',
             message: {bidId: $scope.bidEntity.id, winningOption: optionIndex}
         });
 
