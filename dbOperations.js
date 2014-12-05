@@ -20,7 +20,6 @@ var participantEntity = new Schema({
 
 var optionEntity = new Schema({
     optionDescription: String,
-    automaticLoser: Boolean, // True/False if it's an automaticLoser option (each bidEntity will have 1 of these)
     participants: [participantEntity]
 });
 

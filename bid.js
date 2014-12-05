@@ -28,11 +28,13 @@ var activeBids = {};
 exports.addBid = function (bidMessage) {
     // Get the bidEntity from the message (the message from the client contains pn_gcm for android push notifications)
     var bid = bidMessage.bidEntity;
+    var bidOptionsArray = [];
     // Initialize participants for options
     for (var i in bid.bidOptions) {
-        bid.bidOptions[i].participants = [];
+        bidOptionsArray.push(bid.bidOptions[i]);
+        bidOptionsArray[i].participants = [];
     }
-
+    bid.bidOptions = bidOptionsArray;
     bid.status = "Active";
     bid.totalPoolAmount = 0;
 
@@ -51,7 +53,7 @@ exports.addBid = function (bidMessage) {
             for (var i in bid.bidOptions) {
 
                 // Add total participants for option
-                serverMessage.options.push(bid.bidOptions[i].participants.length);
+                serverMessage.options.push({id: i, participants: bid.bidOptions[i].participants.length});
             }
             // Send the message on bid_id_msg channel
             publishMessage(bid.id + "_msg", serverMessage);

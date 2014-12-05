@@ -140,9 +140,9 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.openBet = function () {
             betManagerService.getNewBidId().success(function (data) {
                 $scope.bidEntity.id = data;
-                $scope.bidEntity.bidOptions = [];
+                $scope.bidEntity.bidOptions = {};
                 for (var i in $scope.currentEvent.eventOptions) {
-                    $scope.bidEntity.bidOptions.push({optionDescription: $scope.currentEvent.eventOptions[i]});
+                    $scope.bidEntity.bidOptions[i] = {optionDescription: $scope.currentEvent.eventOptions[i]};
                 }
                 PubNub.ngPublish({
                     channel: $scope.game._id,
@@ -227,24 +227,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 }
             });
         };
-        /* CONNECT TO GAME LOGGER
 
-         PubNub.ngSubscribe({
-         channel : $scope.game._id+'adminSocket',
-         message : function(message, env, channel){
-         $scope.log.push(message[0]);
-         $scope.$apply();
-         },
-         error: function(data){
-         $scope.log.push(data);
-         },
-         connect: function(data){
-         $scope.$apply(function(){$scope.connected = true;});
-         },
-         disconnect: function(data){
-         $scope.$apply(function(){$scope.connected = false;});
-         }
-         });*/
     }]).controller('bidModalCtrl', function ($scope, $modalInstance, data, PubNub) {
     //-- Variables --//
 
