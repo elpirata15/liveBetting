@@ -110,6 +110,7 @@ var addParticipant = function (bidRequest, bidId) {
                 });
                 logger.gameLogger.log(currentBid.gameId, "bid request added successfully");
 
+                logger.gameLogger.log(currentBid.gameId, "Sending OK to user "+bidRequest.userId);
                 // Send OK to user
                 publishMessage(bidRequest.userId, {info: "OK"});
 
@@ -120,6 +121,8 @@ var addParticipant = function (bidRequest, bidId) {
                 // If the bid is inactive
             } else {
                 logger.gameLogger.error(currentBid.gameId, "Rejected Bid Request: Bid is Inactive");
+
+                logger.gameLogger.log(currentBid.gameId, "Sending error to user "+bidRequest.userId);
 
                 // Publish to user that the bid is rejected
                 publishMessage(bidRequest.userId, {error: "Rejected Bid Request: Bid is Inactive"});

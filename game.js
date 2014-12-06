@@ -131,7 +131,11 @@ exports.initGame = function (req, res) {
                 // Subscribe to game message socket
                 pubnub.subscribe({
                     channel: game._id,
-                    message: bidController.addBid,
+                    message: function(message){
+                        if(!message.bidId && !message.close) {
+                            bidController.addBid(message);
+                        }
+                    },
                     error: function (data) {
                         logger.error(data);
                     },
