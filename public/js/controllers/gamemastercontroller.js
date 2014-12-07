@@ -22,7 +22,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
     };
 
     $scope.startGame = function () {
-        $scope.selectedGame.gameName = $scope.team1 + " vs. " + $scope.team2 + " @ " + $scope.selectedGame.location;
+        $scope.selectedGame.gameName = $scope.team1 + " vs. " + $scope.team2;
         $scope.selectedGame.teams = [$scope.team1, $scope.team2];
         $scope.selectedGame.timestamp = new Date($scope.gameDate.getFullYear(), $scope.gameDate.getMonth(), $scope.gameDate.getDate(), $scope.gameTime.getHours(), $scope.gameTime.getMinutes());
         betManagerService.createGame($scope.selectedGame).success(function () {
