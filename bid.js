@@ -9,6 +9,8 @@ var serverLogger = require("./serverLogger");
 // default server channel logger
 var logger = new serverLogger();
 
+var activeTimers = {};
+
 var publishMessage = function (channel, message) {
     pubnub.publish({
         channel: channel,
@@ -20,9 +22,6 @@ var publishMessage = function (channel, message) {
 exports.newId = function (req, res) {
     res.send(dbOperations.ObjectId());
 };
-
-// Active bids cache
-var activeBids = {};
 
 // Adds bid entity to game (receives bidEntity as parameter)
 exports.addBid = function (bidMessage) {
@@ -38,14 +37,13 @@ exports.addBid = function (bidMessage) {
     bid.status = "Active";
     bid.totalPoolAmount = 0;
 
+
     // Add bid to active bids cache
-    activeBids[bid.id] = {entity: bid};
+    dbOperations.cacheEntity(dbOperations.caches.bidCache, {entity: bid});
 
-    logger.gameLogger.log(bid.gameId, "bid added successfully");
-
-    activeBids[bid.id].timer = setInterval(function(){
+    activeTimers[bid.id] = setInterval(function () {
         // If bid is active
-        if(bid.status == "Active") {
+        if (bid.status == "Active") {
             // Make server message feedback
             var serverMessage = {totalPoolAmount: bid.totalPoolAmount, options: []};
 
@@ -60,7 +58,9 @@ exports.addBid = function (bidMessage) {
         }
     }, 1000);
 
-    // Subscribe to bid_id channel
+    logger.gameLogger.log(bid.gameId, "bid added successfully");
+
+// Subscribe to bid_id channel
     pubnub.subscribe({
         channel: bid.id,
         callback: function (message, env, channel) {
@@ -84,88 +84,99 @@ exports.addBid = function (bidMessage) {
         }
     });
 
-};
+}
+;
 
 // Adds participant to bid option
 var addParticipant = function (bidRequest, bidId) {
 
-    // Get the current bid
-    var currentBid = activeBids[bidId].entity;
+    dbOperations.getBidEntity(bidId, function (bidEntity) {
 
-    // If we got a bid
-    if (currentBid) {
+        var currentBid = bidEntity.entity;
 
-        ensureUserBalance(bidRequest, currentBid.gameId, function () {
-            logger.info("received bid request for game: " + bidId);
+        // If we got a bid
+        if (currentBid) {
 
-            currentBid.totalPoolAmount = parseInt(currentBid.totalPoolAmount, 10) + parseInt(bidRequest.amount, 10);
+            ensureUserBalance(bidRequest, currentBid.gameId, function () {
+                logger.info("received bid request for game: " + bidId);
 
-            // If the bid is active
-            if (currentBid.status == "Active") {
+                currentBid.totalPoolAmount = parseInt(currentBid.totalPoolAmount, 10) + parseInt(bidRequest.amount, 10);
 
-                // Add participant to desired option
-                currentBid.bidOptions[bidRequest.option].participants.push({
-                    userId: bidRequest.userId,
-                    amount: bidRequest.amount
-                });
-                logger.gameLogger.log(currentBid.gameId, "bid request added successfully");
+                // If the bid is active
+                if (currentBid.status == "Active") {
 
-                logger.gameLogger.log(currentBid.gameId, "Sending OK to user "+bidRequest.userId);
-                // Send OK to user
-                publishMessage(bidRequest.userId, {info: "OK"});
+                    // Add participant to desired option
+                    currentBid.bidOptions[bidRequest.option].participants.push({
+                        userId: bidRequest.userId,
+                        amount: bidRequest.amount
+                    });
+                    logger.gameLogger.log(currentBid.gameId, "bid request added successfully");
 
+                    logger.gameLogger.log(currentBid.gameId, "Sending OK to user " + bidRequest.userId);
+                    // Send OK to user
+                    publishMessage(bidRequest.userId, {info: "OK"});
 
+                    dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
 
-                logger.gameLogger.log(currentBid.gameId, "total pool amount: "+currentBid.totalPoolAmount);
+                    logger.gameLogger.log(currentBid.gameId, "total pool amount: " + currentBid.totalPoolAmount);
 
-                // If the bid is inactive
-            } else {
-                logger.gameLogger.error(currentBid.gameId, "Rejected Bid Request: Bid is Inactive");
+                    // If the bid is inactive
+                } else {
+                    logger.gameLogger.error(currentBid.gameId, "Rejected Bid Request: Bid is Inactive");
 
-                logger.gameLogger.log(currentBid.gameId, "Sending error to user "+bidRequest.userId);
+                    logger.gameLogger.log(currentBid.gameId, "Sending error to user " + bidRequest.userId);
 
-                // Publish to user that the bid is rejected
-                publishMessage(bidRequest.userId, {error: "Rejected Bid Request: Bid is Inactive"});
-            }
-        });
-    }
+                    // Publish to user that the bid is rejected
+                    publishMessage(bidRequest.userId, {error: "Rejected Bid Request: Bid is Inactive"});
+                }
+            });
+        }
+    });
 };
 
 // Closes bid after manager sends close message
 var closeBid = function (closeMessage, bidId) {
 
-    // Get the bid object
-    var currentBid = activeBids[bidId].entity;
+    dbOperations.getBidEntity(bidId, function (bidEntity) {
 
-    // If you found the bid
-    if (currentBid) {
+        var currentBid = bidEntity.entity;
 
-        // Change bid status to inactive
-        currentBid.status = "Inactive";
+        // If you found the bid
+        if (currentBid) {
 
-        // Alert the manager
-        logger.gameLogger.log(currentBid.gameId, "Bid " + bidId + " is now Inactive");
+            // Change bid status to inactive
+            currentBid.status = "Inactive";
 
-        clearInterval(activeBids[bidId].timer);
-    }
+            dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
+
+            // Alert the manager
+            logger.gameLogger.log(currentBid.gameId, "Bid " + bidId + " is now Inactive");
+
+            clearInterval(activeTimers[bidId]);
+        }
+    });
 };
 
 var winningOptionMessage = function (winningOptionObject, bidId) {
 
-    // Get the bid object
-    var currentBid = activeBids[bidId].entity;
+    dbOperations.getBidEntity(bidId, function (bidEntity) {
 
-    // If you found the bid
-    if (currentBid) {
+        var currentBid = bidEntity.entity;
 
-        // Change bid status to inactive
-        currentBid.winningOption = winningOptionObject.winningOption;
+        // If you found the bid
+        if (currentBid) {
 
-        // Alert the manager
-        logger.gameLogger.log(currentBid.gameId, "Winning option " + currentBid.winningOption + " set for bid " + bidId + ". Now adding all to DB");
+            // Change bid status to inactive
+            currentBid.winningOption = winningOptionObject.winningOption;
 
-        sendToDbAndUpdateUsers(currentBid);
-    }
+            dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
+
+            // Alert the manager
+            logger.gameLogger.log(currentBid.gameId, "Winning option " + currentBid.winningOption + " set for bid " + bidId + ". Now adding all to DB");
+
+            sendToDbAndUpdateUsers(currentBid);
+        }
+    });
 };
 
 var sendToDbAndUpdateUsers = function (bid) {
@@ -174,31 +185,35 @@ var sendToDbAndUpdateUsers = function (bid) {
     logger.gameLogger.log(bid.gameId, "Saving bid " + bid.id + " to DB and updating users balances");
 
     // Get the game entity
-    dbOperations.getEntity(bid.gameId, null, function (game) {
+    dbOperations.GameModel.findOne({_id: bid.gameId}, function (err, game) {
+        if (!err) {
+            // If we found the game
+            if (game) {
 
-        // If we found the game
-        if (game) {
+                // Add bid to game bids
+                game.bids.push(bid);
 
-            // Add bid to game bids
-            game.bids.push(bid);
+                //bid._id = bid.id = dbOperations.getObjectIdFromString(bid.id);
 
-            //bid._id = bid.id = dbOperations.getObjectIdFromString(bid.id);
+                // Save the game
+                game.save(function (err, savedGame) {
+                    if (!err) {
+                        // Alert manager
+                        logger.gameLogger.log(bid.gameId, "Saved bid. Removing from active bids");
 
-            // Save the game
-            dbOperations.updateDb(game, function () {
+                        // Update users balances
+                        updateUserBalances(bid);
+                    } else {
+                        logger.error(err);
+                    }
+                });
+            } else {
 
                 // Alert manager
-                logger.gameLogger.log(bid.gameId, "Saved bid. Removing from active bids");
-
-                // Update users balances
-                updateUserBalances(bid);
-            }, function (err) {
-                logger.error(err);
-            });
+                logger.gameLogger.error(bid.gameId, "could not find game ", bid.gameId);
+            }
         } else {
-
-            // Alert manager
-            logger.gameLogger.error(bid.gameId, "could not find game ", bid.gameId);
+            logger.error(err.toString());
         }
     });
 };
@@ -267,7 +282,7 @@ var updateUserBalances = function (bid) {
 
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
                     logger.error(err);
-                    logger.error(activeBids[bid.id].entity);
+                    logger.error(bid.toString());
                 } else {
 
                     // Log success
@@ -323,7 +338,7 @@ var updateUserBalances = function (bid) {
 
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
                     logger.error(err);
-                    logger.error(activeBids[bid.id].entity);
+                    logger.error(bid.toString());
                 } else {
 
                     // Log success
@@ -334,7 +349,7 @@ var updateUserBalances = function (bid) {
     }
 
     // Remove bid from active bids cache
-    delete activeBids[bid.id];
+    dbOperations.uncacheEntity(dbOperations.caches.bidCache, bid.id);
 };
 
 // Ensures a users balance to make a bet

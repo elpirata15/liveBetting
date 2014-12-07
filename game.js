@@ -11,15 +11,6 @@ var apiKey = "tZUXOOZ8Lf7spqPCBkcSjaRqJzeXyvTk";
 // default server channel logger
 var logger = new serverLogger();
 
-// Find active games on server load - in case server fails
-dbOperations.GameModel.find({status: 'Active'}, function (err, docs) {
-    for (var ind in docs) {
-        //noinspection JSUnfilteredForInLoop
-        dbOperations.cacheEntity("activeGames", docs[ind]);
-    }
-    logger.info('currently active games: ' + docs.length);
-});
-
 // For client - get games you can subscribe to
 exports.getGames = function (req, res) {
     dbOperations.GameModel.where('status').in(['Active', 'Waiting']).exec(function (err, docs) {
@@ -38,17 +29,17 @@ exports.getGames = function (req, res) {
     });
 };
 
-// Get single game info
-exports.getGame = function (req, res) {
-    logger.info('getting game info for game ', req.res.id);
-    dbOperations.getEntity(req.params.id, null, function (game) {
-        if (game) {
-            return game;
-        } else {
-            res.status(404).end();
-        }
-    });
-};
+//// Get single game info
+//exports.getGame = function (req, res) {
+//    logger.info('getting game info for game ', req.res.id);
+//    dbOperations.getEntity(req.params.id, dbOperations.caches.gameCache, function (game) {
+//        if (game) {
+//            return game;
+//        } else {
+//            res.status(404).end();
+//        }
+//    });
+//};
 
 // For event managers - get waiting events
 exports.getWaitingGames = function (req, res) {
@@ -73,21 +64,27 @@ exports.createGame = function (req, res) {
     var newGame;
     if (req.body._id) {
         logger.info("Updating game: ", req.body.gameName);
-        dbOperations.getEntity(req.body._id, null, function (game) {
-            game.gameName = req.body.gameName;
-            game.teams = req.body.teams;
-            game.timestamp = new Date(req.body.timestamp);
-            game.assignedTo = req.body.assignedTo;
-            game.location = req.body.location;
-            game.type = req.body.type;
-            game.status = "Waiting";
-            dbOperations.updateDb(game, function (game) {
-                logger.info("Updated game ", game.gameName);
-                res.status(200).send(game);
-            }, function (err) {
-                logger.error(err);
-                res.status(500).send(err);
-            });
+        dbOperations.GameModel.findOne({_id: req.body._id}, function (err, game) {
+            if(!err){
+                game.gameName = req.body.gameName;
+                game.teams = req.body.teams;
+                game.timestamp = new Date(req.body.timestamp);
+                game.assignedTo = req.body.assignedTo;
+                game.location = req.body.location;
+                game.type = req.body.type;
+                game.status = "Waiting";
+                game.save(function (err, game) {
+                    if(!err){
+                        logger.info("Updated game ", game.gameName);
+                        res.status(200).send(game);
+                    } else {
+                        logger.error(err.toString());
+                        res.status(500).send(err.toString());
+                    }
+                });
+            } else {
+                logger.error(err.toString());
+            }
         });
     } else {
         logger.info("Creating game: ", req.body.gameName);
@@ -124,88 +121,99 @@ exports.initGame = function (req, res) {
         //.where('assignedTo', req.body.userId)
         .limit(1)
         .exec(function (err, games) {
-        if (!err && games.length > 0) {
-            var game = games[0];
-            game.status = "Active";
-            dbOperations.updateDb(game, function (game) {
-                // Subscribe to game message socket
-                pubnub.subscribe({
-                    channel: game._id,
-                    message: function(message){
-                        if(!message.bidId && !message.close) {
-                            bidController.addBid(message);
+            if (!err && games.length > 0) {
+                var game = games[0];
+                game.status = "Active";
+                dbOperations.updateDb(game, dbOperations.caches.gameCache, function (game) {
+                    // Subscribe to game message socket
+                    pubnub.subscribe({
+                        channel: game._id,
+                        message: function (message) {
+                            if (!message.bidId && !message.close) {
+                                bidController.addBid(message);
+                            }
+                        },
+                        error: function (data) {
+                            logger.error(data);
+                        },
+                        connect: function (data) {
+                            logger.info("Connected To Channel: " + data);
+                        },
+                        disconnect: function (data) {
+                            logger.error("Disconnected From Channel: " + data);
                         }
-                    },
-                    error: function (data) {
-                        logger.error(data);
-                    },
-                    connect: function (data) {
-                        logger.info("Connected To Channel: "+ data);
-                    },
-                    disconnect: function (data) {
-                        logger.error("Disconnected From Channel: "+ data);
-                    }
+                    });
+                    logger.gameLogger.setLogger(game._id);
+                    logger.gameLogger.log(game._id, "Activated game: ", game.gameName);
+                    res.status(200).send(game);
                 });
-                logger.gameLogger.setLogger(game._id);
-                logger.gameLogger.log(game._id, "Activated game: ", game.gameName);
-                res.status(200).send(game);
-            });
-        } else {
-            res.status(500).send(err);
-        }
-    });
+            } else {
+                res.status(500).send(err);
+            }
+        });
 };
-
 
 
 // Assign specified game to specified manager
 exports.assignGame = function (req, res) {
-    dbOperations.getEntity(req.body.gameId, null, function (game) {
-        if (game) {
-            // Check for games assigned to user +/- 10 hours before and after the newly assigned game
-            var gameDate = new Date(game.timestamp);
-            dbOperations.GameModel
-                .where('timestamp').lte(new Date(gameDate.setHours(gameDate.getHours() + 10))).gte(new Date(gameDate.setHours(gameDate.getHours() - 10)))
-                .where('assignedTo', req.body.managerId)
-                .limit(1)
-                .exec(function (err, docs) {
-                    if (docs.length > 0) {
-                        res.status(500).send("Manager has a game assigned during this time");
-                    } else {
-                        game.assignedTo = req.body.managerId;
-                        dbOperations.updateDb(game, function (game) {
-                            logger.info("assigned game: ", game.gameName, " to manager ", game.assignedTo);
-                            res.status(200).end();
-                        }, function (err) {
-                            res.status(500).send(err);
-                        });
-                    }
-                });
+    dbOperations.GameModel.findOne({_id: req.body.gameId}, function (err, game) {
+        if (!err) {
+            if (game) {
+                // Check for games assigned to user +/- 10 hours before and after the newly assigned game
+                var gameDate = new Date(game.timestamp);
+                dbOperations.GameModel
+                    .where('timestamp').lte(new Date(gameDate.setHours(gameDate.getHours() + 10))).gte(new Date(gameDate.setHours(gameDate.getHours() - 10)))
+                    .where('assignedTo', req.body.managerId)
+                    .limit(1)
+                    .exec(function (err, docs) {
+                        if (docs.length > 0) {
+                            res.status(500).send("Manager has a game assigned during this time");
+                        } else {
+                            game.assignedTo = req.body.managerId;
+                            game.save(function (err, savedGame) {
+                                if (!err) {
+                                    logger.info("assigned game: ", savedGame.gameName, " to manager ", savedGame.assignedTo);
+                                    res.status(200).end();
+                                } else {
+                                    res.status(500).send(err);
+                                }
+                            });
+                        }
+                    });
+            } else {
+                res.status(404).end();
+            }
         } else {
-            res.status(404).end();
+            logger.error(err.toString());
         }
     });
 };
 
 exports.closeGame = function (req, res) {
     logger.info("Closing game:", req.params.id);
-    dbOperations.getEntity(req.params.id, null, function (doc) {
-        if (doc) {
-            doc.status = "Inactive";
-            dbOperations.updateDb(doc, function (game) {
-                dbOperations.uncacheEntity("activeGames", req.params.id);
-                logger.gameLogger.removeLogger(game._id);
-                logger.info("closed game", game.gameName, "successfully");
-                pubnub.publish({
-                    channel: game._id,
-                    message: {gameId: game._id, close:true}
+    dbOperations.GameModel.findOne({_id: req.params.id}, function (err, game) {
+        if(!err) {
+            if (game) {
+                game.status = "Inactive";
+                game.save(function (err, game) {
+                    if(!err){
+                        dbOperations.uncacheEntity(dbOperations.caches.gameCache, req.params.id);
+                        logger.gameLogger.removeLogger(game._id);
+                        logger.info("closed game", game.gameName, "successfully");
+                        pubnub.publish({
+                            channel: game._id,
+                            message: {gameId: game._id, close: true}
+                        });
+                        res.status(200).end();
+                    } else {
+                        res.status(500).send(err);
+                    }
                 });
-                res.status(200).end();
-            }, function (err) {
-                res.status(500).send(err);
-            });
+            } else {
+                res.status(404).end();
+            }
         } else {
-            res.status(404).end();
+            logger.error(err.toString());
         }
     });
 };

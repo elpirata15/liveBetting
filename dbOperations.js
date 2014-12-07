@@ -1,6 +1,13 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
-var NodeCache = require("node-cache");
+//var NodeCache = require("node-cache");
+var redis = require("redis");
+
+var redisClient = redis.createClient(process.env.REDISCLOUD_PORT, process.env.REDISCLOUD_HOST);
+
+redisClient.auth(process.env.REDISCLOUD_PASS, function () {
+    console.log("[INFO]Redis Connected");
+});
 
 var ObjectId = Schema.ObjectId;
 
@@ -8,7 +15,7 @@ exports.ObjectId = function () {
     return mongoose.Types.ObjectId();
 };
 
-exports.getObjectIdFromString = function(idString){
+exports.getObjectIdFromString = function (idString) {
     var typedObjectId = mongoose.Types.ObjectId;
     return typedObjectId(idString);
 };
@@ -46,7 +53,7 @@ var bidEntity = new Schema({
     totalPoolAmount: Number,
     entryAmount: Number,
     winningOption: Number
-},{_id:false});
+}, {_id: false});
 
 var teamEntity = new Schema({
     teamName: String,
@@ -86,16 +93,13 @@ var options = {
 mongoose.connect(process.env.MONGOLAB_URI, options);
 
 // ************** ENTITY CACHING *********************
-// Active games cache
-var cache = {
-    activeGames: new NodeCache({stdTTL: 300, checkPeriod: 60})
-};
+exports.caches = {gameCache: "activeGames", bidCache: "activeBids"};
 
 // ** DB FUNCTION WITH CACHING **
-exports.updateDb = function (entity, callback, errCallback) {
+exports.updateDb = function (entity, cacheType, callback, errCallback) {
     return entity.save(function (err, savedEntity) {
         if (!err) {
-            cacheEntity("activeGames", savedEntity);
+            cacheEntity(cacheType, savedEntity);
             callback(savedEntity);
         } else {
             errCallback(err);
@@ -104,28 +108,43 @@ exports.updateDb = function (entity, callback, errCallback) {
 };
 
 exports.getEntity = function (entityId, cacheType, callback) {
-    var cacheString = cacheType ? cacheType : "activeGames";
-    var cachedEntity = cache[cacheString].get(entityId);
-    if (Object.keys(cachedEntity).length) {
-        callback(cachedEntity[entityId]);
-    } else {
-        gameModel.findOne({_id: entityId}, function (err, doc) {
-            if (!err || !doc || doc !== undefined) {
-                cacheEntity(cacheType ? cacheType : "activeGames", doc);
-                callback(doc);
-            }
-            else {
-                callback(false);
-            }
-        });
-    }
-
+    redisClient.get(cacheType + "_" + entityId, function (err, cachedEntity) {
+        if (cachedEntity) {
+            callback(JSON.parse(cachedEntity));
+        } else {
+            gameModel.findOne({_id: entityId}, function (err, doc) {
+                if (!err || !doc || doc !== undefined) {
+                    cacheEntity(cacheType, doc);
+                    callback(doc);
+                }
+                else {
+                    callback(false);
+                }
+            });
+        }
+    });
 };
 
 exports.uncacheEntity = function (cacheType, entity) {
-    cache[cacheType].del([entity._id]);
+    var key = entity._id || entity;
+    redisClient.del(cacheType + "_" + key);
+    console.log("[INFO]Deleted "+ cacheType + "_" + key + " from cache");
 };
 
 var cacheEntity = exports.cacheEntity = function (cacheType, entity) {
-    cache[cacheType].set([entity._id], entity);
+    // Set expiration for 2 hours
+    var key = entity._id || entity.entity.id;
+    redisClient.setex(cacheType + "_" + key, 7200, JSON.stringify(entity));
+};
+
+exports.getBidEntity = function (entityId, callback) {
+    redisClient.get(this.caches.bidCache + "_" + entityId, function (err, bid) {
+        if (!err) {
+            if (bid != null) {
+                callback(JSON.parse(bid));
+            }
+        } else {
+            console.error(err);
+        }
+    })
 };

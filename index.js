@@ -65,7 +65,7 @@ function ensureManager(req, res, next){
 app.get('/getGames', ensureUser, gameController.getGames);
 
 // Get single game info
-app.get('/getGame/:id', ensureUser, gameController.getGames);
+//app.get('/getGame/:id', ensureUser, gameController.getGames);
 
 // For event managers - get waiting events
 app.get('/getWaitingGames/:id', ensureManager, gameController.getWaitingGames);
