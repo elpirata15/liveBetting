@@ -8,7 +8,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.currentEvent;
         $scope.longBets = {};
         $scope.longBetsLength = 0;
-        $scope.amounts = [10, 20, 30, 50, 100];
+        $scope.amounts = [10, 25, 50, 100];
 
         $scope.doLogout = function(){
             authService.logout(function (result) {
@@ -27,7 +27,17 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 toString: function () {
                     return "Corner: " + $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName;
                 },
-                eventOptions: ['Goal', 'Out', 'Corner Again']
+                eventOptions: ['Goal', 'Out', 'Corner Again','Foul','Block']
+            },
+            penalty: {
+                eventName: 'Penalty',
+                viewElements: {
+                    eventTeamSelector: {selectionCount: '1'}
+                },
+                toString: function () {
+                    return "Penalty: " + $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName;
+                },
+                eventOptions: ['Goal', 'Out', 'Goalkeeper saves']
             },
             freeKick: {
                 eventName: 'Free Kick',
@@ -38,9 +48,9 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 toString: function () {
                     return "Free Kick: " + $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName + " from " + $scope.eventDescription.distance + "m";
                 },
-                eventOptions: ['Goal', 'Out', 'Hit the wall']
+                eventOptions: ['Goal', 'Out', 'Block']
             },
-            foul: {
+            /*foul: {
                 eventName: 'Foul',
                 viewElements: {
                     eventTeamSelector: {selectionCount: '2'}
@@ -52,7 +62,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         (($scope.eventDescription.teams[1]) ? $scope.eventDescription.teams[1].teamName : "undefined");
                 },
                 eventOptions: ['Red Card', 'Yellow Card', 'They Will Fight']
-            },
+            },*/
             substitution: {
                 eventName: 'Substitution',
                 viewElements: {
