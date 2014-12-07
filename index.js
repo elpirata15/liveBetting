@@ -1,3 +1,4 @@
+require('newrelic');
 var express = require('express');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -6,6 +7,7 @@ var serverLogger = require('./serverLogger');
 var gameController = require('./game');
 var bidController = require('./bid');
 var userController = require('./user');
+
 
 var secretKey = "ELFcjUgNvdKyiiaXDg2mnjPUgVAx6uaVlbdcqANvqgoyZeZVIxmqlOVykkmr2hcs";
 
