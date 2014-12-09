@@ -23,44 +23,28 @@ exports.newId = function (req, res) {
     res.send(dbOperations.ObjectId());
 };
 
-// Adds bid entity to game (receives bidEntity as parameter)
-exports.addBid = function (bidMessage) {
-    // Get the bidEntity from the message (the message from the client contains pn_gcm for android push notifications)
-    var bid = bidMessage.bidEntity;
-    var bidOptionsArray = [];
-    // Initialize participants for options
-    for (var i in bid.bidOptions) {
-        bidOptionsArray.push(bid.bidOptions[i]);
-        bidOptionsArray[i].participants = [];
-    }
-    bid.bidOptions = bidOptionsArray;
-    bid.status = "Active";
-    bid.totalPoolAmount = 0;
+var uiUpdater = function (bid) {
+// If bid is active
+    if (bid.status == "Active") {
+        // Make server message feedback
+        var serverMessage = {totalPoolAmount: bid.totalPoolAmount, options: []};
+        // Loop through all the options
+        for (var i in bid.bidOptions) {
 
-
-    // Add bid to active bids cache
-    dbOperations.cacheEntity(dbOperations.caches.bidCache, {entity: bid});
-
-    activeTimers[bid.id] = setInterval(function () {
-        // If bid is active
-        if (bid.status == "Active") {
-            // Make server message feedback
-            var serverMessage = {totalPoolAmount: bid.totalPoolAmount, options: []};
-
-            // Loop through all the options
-            for (var i in bid.bidOptions) {
-
-                // Add total participants for option
-                serverMessage.options.push({id: i, participants: bid.bidOptions[i].participants.length});
-            }
-            // Send the message on bid_id_msg channel
-            publishMessage(bid.id + "_msg", serverMessage);
+            // Add total participants for option
+            serverMessage.options.push({id: i, participants: bid.bidOptions[i].participants.length});
         }
-    }, 1000);
+        // Send the message on bid_id_msg channel
+        publishMessage(bid.id + "_msg", serverMessage);
+    }
+};
 
-    logger.gameLogger.log(bid.gameId, "bid added successfully");
+exports.setUiUpdaterInterval = function (bid) {
+    activeTimers[bid.id] = setInterval(uiUpdater, 1000, bid);
+};
 
-// Subscribe to bid_id channel
+// Adds bid entity to game (receives bidEntity as parameter)
+exports.subscribeBidToPubnub = function (bid) {
     pubnub.subscribe({
         channel: bid.id,
         callback: function (message, env, channel) {
@@ -83,9 +67,32 @@ exports.addBid = function (bidMessage) {
             logger.error("Disconnected from bid channel: ", bid.id);
         }
     });
+};
+exports.addBid = function (bidMessage) {
+    // Get the bidEntity from the message (the message from the client contains pn_gcm for android push notifications)
+    var bid = bidMessage.bidEntity;
+    var bidOptionsArray = [];
+    // Initialize participants for options
+    for (var i in bid.bidOptions) {
+        bidOptionsArray.push(bid.bidOptions[i]);
+        bidOptionsArray[i].participants = [];
+    }
+    bid.bidOptions = bidOptionsArray;
+    bid.status = "Active";
+    bid.totalPoolAmount = 0;
 
-}
-;
+
+    // Add bid to active bids cache
+    dbOperations.cacheEntity(dbOperations.caches.bidCache, {entity: bid});
+
+    this.setUiUpdaterInterval(bid);
+
+    logger.gameLogger.log(bid.gameId, "bid added successfully");
+
+    // Subscribe to bid_id channel
+    this.subscribeBidToPubnub(bid);
+
+};
 
 // Adds participant to bid option
 var addParticipant = function (bidRequest, bidId) {

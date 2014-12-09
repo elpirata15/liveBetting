@@ -112,6 +112,26 @@ exports.createGame = function (req, res) {
 
 
 // Initialize previously created game
+exports.subscribeToPubnub = function (game) {
+    pubnub.subscribe({
+        channel: game._id,
+        message: function (message) {
+            if (!message.bidId && !message.close) {
+                bidController.addBid(message);
+            }
+        },
+        error: function (data) {
+            logger.error(data);
+        },
+        connect: function (data) {
+            logger.info("Connected To Channel: " + data);
+        },
+        disconnect: function (data) {
+            logger.error("Disconnected From Channel: " + data);
+        }
+    });
+};
+
 exports.initGame = function (req, res) {
     var minDate = new Date(new Date().setMinutes(new Date().getMinutes() - 15));
     var maxDate = new Date(new Date().setMinutes(new Date().getMinutes() + 15));
@@ -127,23 +147,7 @@ exports.initGame = function (req, res) {
                 game.save(function (err, game) {
                     if (!err) {
                         // Subscribe to game message socket
-                        pubnub.subscribe({
-                            channel: game._id,
-                            message: function (message) {
-                                if (!message.bidId && !message.close) {
-                                    bidController.addBid(message);
-                                }
-                            },
-                            error: function (data) {
-                                logger.error(data);
-                            },
-                            connect: function (data) {
-                                logger.info("Connected To Channel: " + data);
-                            },
-                            disconnect: function (data) {
-                                logger.error("Disconnected From Channel: " + data);
-                            }
-                        });
+                        this.subscribeToPubnub(game);
                         logger.gameLogger.setLogger(game._id);
                         logger.gameLogger.log(game._id, "Activated game: ", game.gameName);
                         res.status(200).send(game);
