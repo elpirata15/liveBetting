@@ -21,7 +21,8 @@
     "newrelic": "^1.14.1",
     "node-cache": "^1.0.2",
     "pubnub": "^3.6.7",
-    "redis": "^0.12.1"
+    "redis": "^0.12.1",
+    "iron_mq": "^0.2.3"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
