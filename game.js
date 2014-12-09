@@ -124,31 +124,33 @@ exports.initGame = function (req, res) {
             if (!err && games.length > 0) {
                 var game = games[0];
                 game.status = "Active";
-                dbOperations.updateDb(game, dbOperations.caches.gameCache, function (game) {
-                    // Subscribe to game message socket
-                    pubnub.subscribe({
-                        channel: game._id,
-                        message: function (message) {
-                            if (!message.bidId && !message.close) {
-                                bidController.addBid(message);
+                game.save(function (err, game) {
+                    if (!err) {
+                        // Subscribe to game message socket
+                        pubnub.subscribe({
+                            channel: game._id,
+                            message: function (message) {
+                                if (!message.bidId && !message.close) {
+                                    bidController.addBid(message);
+                                }
+                            },
+                            error: function (data) {
+                                logger.error(data);
+                            },
+                            connect: function (data) {
+                                logger.info("Connected To Channel: " + data);
+                            },
+                            disconnect: function (data) {
+                                logger.error("Disconnected From Channel: " + data);
                             }
-                        },
-                        error: function (data) {
-                            logger.error(data);
-                        },
-                        connect: function (data) {
-                            logger.info("Connected To Channel: " + data);
-                        },
-                        disconnect: function (data) {
-                            logger.error("Disconnected From Channel: " + data);
-                        }
-                    });
-                    logger.gameLogger.setLogger(game._id);
-                    logger.gameLogger.log(game._id, "Activated game: ", game.gameName);
-                    res.status(200).send(game);
+                        });
+                        logger.gameLogger.setLogger(game._id);
+                        logger.gameLogger.log(game._id, "Activated game: ", game.gameName);
+                        res.status(200).send(game);
+                    } else {
+                        res.status(500).send(err);
+                    }
                 });
-            } else {
-                res.status(500).send(err);
             }
         });
 };
