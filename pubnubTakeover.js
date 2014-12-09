@@ -86,9 +86,10 @@ var checkTakeOver = function (message) {
                                         // If the laziest server is the current instance
                                         if(laziestServer == instanceName){
                                             console.info("will take over using instance", laziestServer);
+                                            // Perform take over
                                             this.performTakeOver(m);
                                         }
-                                        // Ask the laziest server to pick up the channels
+
 
                                     },
                                     error: function (m) {
@@ -116,7 +117,7 @@ exports.performTakeOver = function (message) {
     }
 
     // Find which of the id's are games
-    dbOperations.GameModel.find({'_id': {$in: [message.channels]}}, function (err, games) {
+    dbOperations.GameModel.find({'_id': {$in: message.channels}}, function (err, games) {
         if(!err) {
             if (games && games.length > 0) {
                 for (var i in games) {
