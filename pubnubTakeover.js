@@ -82,10 +82,14 @@ var checkTakeOver = function (message) {
                                 pubnub.where_now({
                                     uuid: lostServer,
                                     callback: function(m){
+
+                                        // If the laziest server is the current instance
+                                        if(laziestServer == instanceName){
+                                            console.info("will take over using instance", laziestServer);
+                                            this.performTakeOver(m);
+                                        }
                                         // Ask the laziest server to pick up the channels
-                                        var message = {instanceName: laziestServer, channels: m.channels};
-                                        console.info("will take over using instance", laziestServer);
-                                        this.performTakeOver(message)
+
                                     },
                                     error: function (m) {
                                         console.error(m);
@@ -101,12 +105,6 @@ var checkTakeOver = function (message) {
 };
 
 exports.performTakeOver = function (message) {
-
-    // If this is not the requested instance
-    if(message.instanceName != instanceName){
-        // Ignore the response
-        return;
-    }
 
     console.log("Performing take over");
 
