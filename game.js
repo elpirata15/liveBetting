@@ -126,24 +126,6 @@ exports.initGame = function (req, res) {
                 game.status = "Active";
                 game.save(function (err, game) {
                     if (!err) {
-                        // Subscribe to game message socket
-                        pubnub.subscribe({
-                            channel: game._id,
-                            message: function (message) {
-                                if (!message.bidId && !message.close) {
-                                    bidController.addBid(message);
-                                }
-                            },
-                            error: function (data) {
-                                logger.error(data);
-                            },
-                            connect: function (data) {
-                                logger.info("Connected To Channel: " + data);
-                            },
-                            disconnect: function (data) {
-                                logger.error("Disconnected From Channel: " + data);
-                            }
-                        });
                         logger.gameLogger.setLogger(game._id);
                         logger.gameLogger.log(game._id, "Activated game: ", game.gameName);
                         res.status(200).send(game);
@@ -199,7 +181,6 @@ exports.closeGame = function (req, res) {
                 game.status = "Inactive";
                 game.save(function (err, game) {
                     if(!err){
-                        dbOperations.uncacheEntity(dbOperations.caches.gameCache, req.params.id);
                         logger.gameLogger.removeLogger(game._id);
                         logger.info("closed game", game.gameName, "successfully");
                         pubnub.publish({

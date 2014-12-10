@@ -59,33 +59,20 @@ exports.addBid = function (bidMessage) {
     }, 1000);
 
     logger.gameLogger.log(bid.gameId, "bid added successfully");
-
-// Subscribe to bid_id channel
-    pubnub.subscribe({
-        channel: bid.id,
-        callback: function (message, env, channel) {
-            // If this is a close message
-            if (message.close) {
-                // Close bid
-                closeBid(message, channel);
-                // If this a winning option message
-            } else if (message.hasOwnProperty("winningOption")) {
-                winningOptionMessage(message, channel);
-                // This is a bid request from user
-            } else {
-                addParticipant(message, channel);
-            }
-        },
-        connect: function () {
-            logger.info("Connected to bid channel: ", bid.id);
-        },
-        disconnect: function () {
-            logger.error("Disconnected from bid channel: ", bid.id);
-        }
-    });
-
-}
-;
+};
+exports.addBidRequest = function (message, env, channel) {
+    // If this is a close message
+    if (message.close) {
+        // Close bid
+        closeBid(message, channel);
+        // If this a winning option message
+    } else if (message.hasOwnProperty("winningOption")) {
+        winningOptionMessage(message, channel);
+        // This is a bid request from user
+    } else {
+        addParticipant(message, channel);
+    }
+};
 
 // Adds participant to bid option
 var addParticipant = function (bidRequest, bidId) {
@@ -229,7 +216,7 @@ var updateUserBalances = function (bid) {
     if (winningUsers > 0) {
 
         // Calculate winning money  (take 20% off - this is how we make money :D). If there is only one user (entry amount equals the total pool) give user back his money (no winnings)
-        winningMoney = (bid.totalPoolAmount != bid.entryAmount) ? bid.totalPoolAmount * 0.8 / winningUsers : 0;
+        winningMoney = (bid.totalPoolAmount != bid.entryAmount) ? bid.totalPoolAmount / winningUsers : 0;
     }
     // Loop through the options
     for (var i in bid.bidOptions) {
