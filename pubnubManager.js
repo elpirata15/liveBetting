@@ -9,6 +9,9 @@ var bidController = require('./bid');
 
 pubnub.subscribe({
    channel: "servers",
+    callback: function(m){
+      console.log(m);
+    },
     connect: function(){
         console.log("[INFO] Connected to server pool");
     },
@@ -17,7 +20,7 @@ pubnub.subscribe({
     },
     heartbeat: 15
 });
-
+console.log(instanceName);
 pubnub.subscribe({
    channel: instanceName,
     message: function(m){
