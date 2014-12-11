@@ -7,6 +7,7 @@ var serverLogger = require('./serverLogger');
 var gameController = require('./game');
 var bidController = require('./bid');
 var userController = require('./user');
+var pubnubManager = require('./pubnubManager');
 
 
 var secretKey = "ELFcjUgNvdKyiiaXDg2mnjPUgVAx6uaVlbdcqANvqgoyZeZVIxmqlOVykkmr2hcs";
