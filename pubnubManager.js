@@ -1,4 +1,4 @@
-var instanceName = process.env.$DYNO;
+var instanceName = process.env.DYNO;
 var pubnub = require("pubnub").init({
     publish_key: process.env.PUBNUB_PUBLISH_KEY,
     subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY,
