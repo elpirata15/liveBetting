@@ -64,13 +64,13 @@ exports.addBidRequest = function (message, env, channel) {
     // If this is a close message
     if (message.close) {
         // Close bid
-        closeBid(message, channel);
+        closeBid(message, message.bidId);
         // If this a winning option message
     } else if (message.hasOwnProperty("winningOption")) {
-        winningOptionMessage(message, channel);
+        winningOptionMessage(message, message.bidId);
         // This is a bid request from user
     } else {
-        addParticipant(message, channel);
+        addParticipant(message, message.bidId);
     }
 };
 
