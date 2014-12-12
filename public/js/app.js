@@ -23,8 +23,8 @@ angular.module('liveBetManager', [
     $rootScope.activeGame = {};
     $rootScope.uuid = 'console' + Math.random();
     var keys = {
-        publish_key   : 'pub-c-d2e656c9-a59e-48e2-b5c5-3c16fe2124d2',
-        subscribe_key : 'sub-c-71b821d4-7665-11e4-af64-02ee2ddab7fe',
+        publish_key   : 'pub-c-0dd5cf68-51d4-46f1-afeb-e8eeb4780703',
+        subscribe_key : 'sub-c-8bec0072-7663-11e4-af64-02ee2ddab7fe',
         uuid: $rootScope.uuid
     };
     PubNub.init(keys);
