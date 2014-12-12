@@ -1,4 +1,9 @@
-var instanceName = process.env.DYNO;
+var UUID = PUBNUB.db.get('session') || (function(){
+        var uuid = PUBNUB.uuid();
+        PUBNUB.db.set( 'session',uuid);
+        return uuid;
+    })();
+var instanceName = UUID;
 var pubnub = require("pubnub").init({
     publish_key: process.env.PUBNUB_PUBLISH_KEY,
     subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY,
