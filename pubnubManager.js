@@ -1,10 +1,11 @@
-var UUID = PUBNUB.db.get('session') || (function(){
-        var uuid = PUBNUB.uuid();
+var pubnub = require("pubnub");
+var UUID = pubnub.db.get('session') || (function(){
+        var uuid = punub.uuid();
         PUBNUB.db.set( 'session',uuid);
         return uuid;
     })();
 var instanceName = UUID;
-var pubnub = require("pubnub").init({
+pubnub.init({
     publish_key: process.env.PUBNUB_PUBLISH_KEY,
     subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY,
     uuid: instanceName
