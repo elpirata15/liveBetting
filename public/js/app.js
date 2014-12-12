@@ -19,7 +19,7 @@ angular.module('liveBetManager', [
     $routeProvider.otherwise('/login');
 
     localStorageServiceProvider.setPrefix('liveBetManager');
-}]).run(function($rootScope,PubNub, authService, $location){
+}]).run(function($rootScope,PubNub, authService, $location,$http){
     $rootScope.activeGame = {};
     $rootScope.uuid = 'console' + Math.random();
     var keys = {
@@ -28,6 +28,10 @@ angular.module('liveBetManager', [
         uuid: $rootScope.uuid
     };
     PubNub.init(keys);
+
+    $http.get('http://pubnub-balancer.herokuapp.com/').success(function(data){
+       console.log('pinged msg queue');
+    });
 
     $rootScope.$on('$routeChangeStart', function(event, next, current) {
         $rootScope.flash = "";
