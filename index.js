@@ -18,7 +18,8 @@ var day = 1000*60*60*24;
 
 app.set('port', (process.env.PORT || 5000));
 app.use(bodyParser.json());
-app.use(express.static(__dirname + (process.env.PUBLIC_DIR || '/public')));
+var directory = (process.env.PUBLIC_DIR || '/public')
+app.use(express.static(__dirname + directory));
 app.use(session({
     secret: secretKey,
     cookie: {secure:true, maxAge:day, signed:true, overwrite:true},
