@@ -3,3 +3,4 @@ default.log
 .idea
 .idea/workspace.xml
 public/bower_components
+dist

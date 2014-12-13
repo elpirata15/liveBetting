@@ -7,7 +7,7 @@ module.exports = function (grunt) {
                 separator: ';'
             },
             dist: {
-                src: ['public/js/*.js', 'public/js/controllers*.js','public/js/services/*.js' ],
+                src: ['public/js/*.js', 'public/js/controllers/*.js','public/js/services/*.js','public/js/directive/*.js' ],
                 dest: 'dist/js/<%= pkg.name %>.js'
             }
         },
@@ -21,20 +21,12 @@ module.exports = function (grunt) {
                 }
             }
         },
-        jshint: {
-            files: ['*.js'],
-            options: {
-                "globals":{
-                    "angular": true
-                }
-            }
-        },
         copy: {
             all: {
                 files: [{
                     expand: true,
                     cwd: 'public/',
-                    src: ['index.html', 'sampleTeams.json'],
+                    src: ['index.html'],
                     dest: 'dist/',
                     filter: 'isFile'
                 },
@@ -42,16 +34,7 @@ module.exports = function (grunt) {
                     {expand: true,cwd: 'public/', src: ['js/lib/*'], dest: 'dist/', filter: 'isFile'},
                     {expand: true,cwd: 'public/', src: ['modals/*'], dest: 'dist/', filter: 'isFile'},
                     {expand: true,cwd: 'public/', src: ['css/*'], dest: 'dist/', filter: 'isFile'},
-                    {expand: true,cwd: 'public/', src: ['bower.json'], dest: 'dist/'}]
-            }
-        },
-        "bower-install-simple": {
-            options: {
-                cwd: 'dist',
-                color: true
-            },
-            "prod": {
-                production: true
+                    {expand: true,cwd: 'public/', src: ['js/directives/templates/*'], dest: 'dist/', filter: 'isFile'}]
             }
         },
         processhtml: {
@@ -67,10 +50,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks("grunt-bower-install-simple");
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-processhtml');
 
-    grunt.registerTask('default', 'bower-install-simple');
-    grunt.registerTask('travis', ['clean','copy','jshint', 'concat', 'uglify','processhtml','bower-install-simple']);
+    grunt.registerTask('build', ['clean','copy', 'concat', 'uglify','processhtml']);
 };
