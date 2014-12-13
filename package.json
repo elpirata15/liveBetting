@@ -4,7 +4,7 @@
   "description": "Livebetting application",
   "main": "index.js",
   "scripts": {
-    "postinstall": "npm install -g grunt-cli && grunt build && npm install -g bower && bower install"
+    "postinstall": "./post-install.sh"
   },
   "dependencies": {
     "async": "^0.9.0",
