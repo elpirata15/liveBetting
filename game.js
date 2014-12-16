@@ -50,7 +50,7 @@ exports.getWaitingGames = function (req, res) {
         else {
             if (docs.length === 0) {
                 logger.info("No games found");
-                res.status(404).send("No games found");
+                res.status(200).send("No games found");
             } else {
                 logger.error(err);
                 res.status(500).send(err);
