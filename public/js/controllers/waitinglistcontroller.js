@@ -8,7 +8,9 @@ angular.module('liveBetManager').controller('waitingListController', ['$scope', 
         $scope.games = [];
 
         betManagerService.getGamesForManager(authService.user()._id).success(function(data){
-            $scope.games = data;
+            if(data.length > 0) {
+                $scope.games = data;
+            }
         });
 
         $scope.initGame = function(gameId){
