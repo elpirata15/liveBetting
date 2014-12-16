@@ -29,9 +29,13 @@ angular.module('liveBetManager', [
     };
     PubNub.init(keys);
 
-    $http.get('http://pubnub-balancer.herokuapp.com/').success(function(data){
-       console.log('pinged msg queue');
-    });
+    try {
+        $http.get('http://pubnub-balancer.herokuapp.com/').success(function (data) {
+            console.log('pinged msg queue');
+        });
+    } catch (ex) {
+    }
+
 
     $rootScope.$on('$routeChangeStart', function(event, next, current) {
         $rootScope.flash = "";
