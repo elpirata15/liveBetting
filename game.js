@@ -19,10 +19,10 @@ exports.getGames = function (req, res) {
         }
         else {
             if (docs.length === 0) {
-                logger.info("No games found");
+                logger.info(null,["No games found"]);
                 res.status(404).send("No games found");
             } else {
-                logger.error(err);
+                logger.error(null,[err]);
                 res.status(500).send(err);
             }
         }
@@ -49,10 +49,10 @@ exports.getWaitingGames = function (req, res) {
         }
         else {
             if (docs.length === 0) {
-                logger.info("No games found");
+                logger.info(null,["No games found"]);
                 res.status(200).send("No games found");
             } else {
-                logger.error(err);
+                logger.error(null,[err]);
                 res.status(500).send(err);
             }
         }
@@ -63,7 +63,7 @@ exports.getWaitingGames = function (req, res) {
 exports.createGame = function (req, res) {
     var newGame;
     if (req.body._id) {
-        logger.info("Updating game: ", req.body.gameName);
+        logger.info(null,["Updating game: ", req.body.gameName]);
         dbOperations.GameModel.findOne({_id: req.body._id}, function (err, game) {
             if(!err){
                 game.gameName = req.body.gameName;
@@ -75,19 +75,19 @@ exports.createGame = function (req, res) {
                 game.status = "Waiting";
                 game.save(function (err, game) {
                     if(!err){
-                        logger.info("Updated game ", game.gameName);
+                        logger.info(null,["Updated game ", game.gameName]);
                         res.status(200).send(game);
                     } else {
-                        logger.error(err.toString());
+                        logger.error(null,[err.toString()]);
                         res.status(500).send(err.toString());
                     }
                 });
             } else {
-                logger.error(err.toString());
+                logger.error(null,[err.toString()]);
             }
         });
     } else {
-        logger.info("Creating game: ", req.body.gameName);
+        logger.info(null,["Creating game: ", req.body.gameName]);
         newGame = new dbOperations.GameModel({
             gameName: req.body.gameName,
             teams: req.body.teams,
@@ -99,11 +99,11 @@ exports.createGame = function (req, res) {
 
         newGame.save(function (err, game) {
             if (!err) {
-                logger.info("Game created with id " + game.id);
+                logger.info(null,["Game created with id " + game.id]);
                 res.status(200).send(game);
             }
             else {
-                logger.error(err);
+                logger.error(null,[err]);
                 res.status(500).send(err);
             }
         });
@@ -126,8 +126,7 @@ exports.initGame = function (req, res) {
                 game.status = "Active";
                 game.save(function (err, game) {
                     if (!err) {
-                        logger.gameLogger.setLogger(game._id);
-                        logger.gameLogger.log(game._id, "Activated game: ", game.gameName);
+                        logger.info(game._id, ["Activated game: ", game.gameName]);
                         res.status(200).send(game);
                     } else {
                         res.status(500).send(err);
@@ -156,7 +155,7 @@ exports.assignGame = function (req, res) {
                             game.assignedTo = req.body.managerId;
                             game.save(function (err, savedGame) {
                                 if (!err) {
-                                    logger.info("assigned game: ", savedGame.gameName, " to manager ", savedGame.assignedTo);
+                                    logger.info(null,["assigned game: ", savedGame.gameName, " to manager ", savedGame.assignedTo]);
                                     res.status(200).end();
                                 } else {
                                     res.status(500).send(err);
@@ -168,21 +167,20 @@ exports.assignGame = function (req, res) {
                 res.status(404).end();
             }
         } else {
-            logger.error(err.toString());
+            logger.error(null,[err.toString()]);
         }
     });
 };
 
 exports.closeGame = function (req, res) {
-    logger.info("Closing game:", req.params.id);
+    logger.info(null,["Closing game:", req.params.id]);
     dbOperations.GameModel.findOne({_id: req.params.id}, function (err, game) {
         if(!err) {
             if (game) {
                 game.status = "Inactive";
                 game.save(function (err, game) {
                     if(!err){
-                        logger.gameLogger.removeLogger(game._id);
-                        logger.info("closed game", game.gameName, "successfully");
+                        logger.info(null,["closed game", game.gameName, "successfully"]);
                         pubnub.publish({
                             channel: game._id,
                             message: {gameId: game._id, close: true}
@@ -196,7 +194,7 @@ exports.closeGame = function (req, res) {
                 res.status(404).end();
             }
         } else {
-            logger.error(err.toString());
+            logger.error(null,[err.toString()]);
         }
     });
 };

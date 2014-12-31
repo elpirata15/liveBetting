@@ -4,58 +4,17 @@ var pubnub = require("pubnub").init({
     subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY
 });
 
-var ServerLogger = function ServerLogger(gameId){
+var ServerLogger = function ServerLogger(){
 
-    this.gameId = gameId || "";
-
-    this.info = function(){
-        var pubnubMessages = [];
-        for(var i in arguments){
-            pubnubMessages.push(arguments[i]);
-        }
-        var prefix = (this.gameId) ? "[GAME INFO] ("+this.gameId+") " : "[INFO]";
-        console.log(prefix + pubnubMessages.join(''));
+    this.info = function(gameId, args){
+        var prefix = (gameId) ? "[GAME INFO] ("+this.gameId+") " : "[INFO]";
+        console.log(prefix + args.join());
     };
-    this.error = function(){
-        var pubnubMessages = [];
-        for(var i in arguments){
-            pubnubMessages.push(arguments[i]);
-        }
-        var prefix = (this.gameId) ? "[GAME ERROR] ("+this.gameId+") " : "[ERROR]";
-        console.log(chalk.red(prefix + pubnubMessages.join('')));
+    this.error = function(gameId, args){
+        var prefix = (gameId) ? "[GAME ERROR] ("+this.gameId+") " : "[ERROR]";
+        console.log(chalk.red(prefix + args.join()));
     };
 
 };
-
-// per game loggers
-var gameLoggers = {};
-
-ServerLogger.prototype.gameLogger = {
-    setLogger: function (gameId) {
-        gameLoggers[gameId] = new ServerLogger(gameId);
-    },
-    removeLogger: function (gameId) {
-        delete gameLoggers[gameId];
-    },
-    log: function(){
-        var logString = "";
-        for(var i = 1; i<arguments.length; i++)
-        {
-            logString += arguments[i];
-        }
-        gameLoggers[arguments[0]].info(logString);
-    },
-    error: function(){
-        var logString = "";
-        for(var i = 1; i<arguments.length; i++)
-        {
-            logString += arguments[i];
-        }
-        gameLoggers[arguments[0]].error(logString);
-    }
-};
-
 
 module.exports = ServerLogger;
-
-

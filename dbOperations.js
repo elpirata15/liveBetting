@@ -128,7 +128,7 @@ exports.getEntity = function (entityId, cacheType, callback) {
 exports.uncacheEntity = function (cacheType, entity) {
     var key = entity._id || entity;
     redisClient.del(cacheType + "_" + key);
-    console.log("[INFO]Deleted "+ cacheType + "_" + key + " from cache");
+    console.log("[INFO] Deleted "+ cacheType + "_" + key + " from cache");
 };
 
 var cacheEntity = exports.cacheEntity = function (cacheType, entity) {

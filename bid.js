@@ -58,7 +58,7 @@ exports.addBid = function (bidMessage) {
         }
     }, 1000);
 
-    logger.gameLogger.log(bid.gameId, "bid added successfully");
+    logger.info(bid.gameId, ["bid added successfully"]);
 };
 exports.addBidRequest = function (message, env, channel) {
     // If this is a close message
@@ -85,7 +85,7 @@ var addParticipant = function (bidRequest, bidId) {
         if (currentBid) {
 
             ensureUserBalance(bidRequest, currentBid.gameId, function () {
-                logger.info("received bid request for game: " + bidId);
+                logger.info(null, ["received bid request for game: ", bidId]);
 
                 currentBid.totalPoolAmount = parseInt(currentBid.totalPoolAmount, 10) + parseInt(bidRequest.amount, 10);
 
@@ -97,21 +97,21 @@ var addParticipant = function (bidRequest, bidId) {
                         userId: bidRequest.userId,
                         amount: bidRequest.amount
                     });
-                    logger.gameLogger.log(currentBid.gameId, "bid request added successfully");
+                    logger.info(currentBid.gameId, ["bid request added successfully"]);
 
-                    logger.gameLogger.log(currentBid.gameId, "Sending OK to user " + bidRequest.userId);
+                    logger.info(currentBid.gameId, ["Sending OK to user " + bidRequest.userId]);
                     // Send OK to user
                     publishMessage(bidRequest.userId, {info: "OK"});
 
                     dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
 
-                    logger.gameLogger.log(currentBid.gameId, "total pool amount: " + currentBid.totalPoolAmount);
+                    logger.info(currentBid.gameId, ["total pool amount: " + currentBid.totalPoolAmount]);
 
                     // If the bid is inactive
                 } else {
-                    logger.gameLogger.error(currentBid.gameId, "Rejected Bid Request: Bid is Inactive");
+                    logger.error(currentBid.gameId, ["Rejected Bid Request: Bid is Inactive"]);
 
-                    logger.gameLogger.log(currentBid.gameId, "Sending error to user " + bidRequest.userId);
+                    logger.info(currentBid.gameId, ["Sending error to user " + bidRequest.userId]);
 
                     // Publish to user that the bid is rejected
                     publishMessage(bidRequest.userId, {error: "Rejected Bid Request: Bid is Inactive"});
@@ -137,7 +137,7 @@ var closeBid = function (closeMessage, bidId) {
             dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
 
             // Alert the manager
-            logger.gameLogger.log(currentBid.gameId, "Bid " + bidId + " is now Inactive");
+            logger.info(currentBid.gameId, ["Bid " + bidId + " is now Inactive"]);
 
             clearInterval(activeTimers[bidId]);
         }
@@ -159,7 +159,7 @@ var winningOptionMessage = function (winningOptionObject, bidId) {
             dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
 
             // Alert the manager
-            logger.gameLogger.log(currentBid.gameId, "Winning option " + currentBid.winningOption + " set for bid " + bidId + ". Now adding all to DB");
+            logger.info(currentBid.gameId, ["Winning option " + currentBid.winningOption + " set for bid " + bidId + ". Now adding all to DB"]);
 
             sendToDbAndUpdateUsers(currentBid);
         }
@@ -169,7 +169,7 @@ var winningOptionMessage = function (winningOptionObject, bidId) {
 var sendToDbAndUpdateUsers = function (bid) {
 
     // Alert the manager
-    logger.gameLogger.log(bid.gameId, "Saving bid " + bid.id + " to DB and updating users balances");
+    logger.info(bid.gameId, ["Saving bid " + bid.id + " to DB and updating users balances"]);
 
     // Get the game entity
     dbOperations.GameModel.findOne({_id: bid.gameId}, function (err, game) {
@@ -186,21 +186,21 @@ var sendToDbAndUpdateUsers = function (bid) {
                 game.save(function (err, savedGame) {
                     if (!err) {
                         // Alert manager
-                        logger.gameLogger.log(bid.gameId, "Saved bid. Removing from active bids");
+                        logger.info(bid.gameId, ["Saved bid. Removing from active bids"]);
 
                         // Update users balances
                         updateUserBalances(bid);
                     } else {
-                        logger.error(err);
+                        logger.error(null,[err]);
                     }
                 });
             } else {
 
                 // Alert manager
-                logger.gameLogger.error(bid.gameId, "could not find game ", bid.gameId);
+                logger.error(bid.gameId, ["could not find game ", bid.gameId]);
             }
         } else {
-            logger.error(err.toString());
+            logger.error(null,[err.toString()]);
         }
     });
 };
@@ -243,7 +243,7 @@ var updateUserBalances = function (bid) {
                             if (!err) {
 
                                 // Log success
-                                logger.info("Added " + winningMoney + " to user " + savedUser._id + " balance");
+                                logger.info(null,["Added " + winningMoney + " to user " + savedUser._id + " balance"]);
 
                                 // Send OK to user
                                 publishMessage(savedUser._id, {newBalance: savedUser.balance});
@@ -268,12 +268,12 @@ var updateUserBalances = function (bid) {
                 if (err) {
 
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
-                    logger.error(err);
-                    logger.error(bid.toString());
+                    logger.error(null,[err]);
+                    logger.error(null,[bid.toString()]);
                 } else {
 
                     // Log success
-                    logger.info("Updated users balances");
+                    logger.info(null,["Updated users balances"]);
                 }
             });
 
@@ -299,7 +299,7 @@ var updateUserBalances = function (bid) {
                             if (!err) {
 
                                 // Log success
-                                logger.info("Subtracted " + participant.amount + " to user " + savedUser._id + " balance");
+                                logger.info(null,["Subtracted " + participant.amount + " to user " + savedUser._id + " balance"]);
 
                                 // Send OK to user
                                 publishMessage(savedUser._id, {newBalance: savedUser.balance});
@@ -324,12 +324,12 @@ var updateUserBalances = function (bid) {
                 if (err) {
 
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
-                    logger.error(err);
-                    logger.error(bid.toString());
+                    logger.error(null,[err]);
+                    logger.error(null,[bid.toString()]);
                 } else {
 
                     // Log success
-                    logger.info("Updated users balances");
+                    logger.info(null,["Updated users balances"]);
                 }
             });
         }
@@ -351,7 +351,7 @@ var ensureUserBalance = function (bidRequest, gameId, callback) {
             if (user && user.balance >= bidRequest.amount) {
 
                 // Alert manager
-                logger.gameLogger.log(gameId, "User " + user._id + " has sufficient funds to make this bet");
+                logger.info(gameId, ["User " + user._id + " has sufficient funds to make this bet"]);
 
                 callback();
 
@@ -359,13 +359,13 @@ var ensureUserBalance = function (bidRequest, gameId, callback) {
             } else {
 
                 // Alert manager
-                logger.gameLogger.error(gameId, "User " + user._id + " doesn't have sufficient funds to make this bet");
+                logger.error(gameId, ["User " + user._id + " doesn't have sufficient funds to make this bet"]);
                 return false;
             }
         } else {
 
             // Log error
-            logger.error(err);
+            logger.error(null,[err]);
         }
     });
 };

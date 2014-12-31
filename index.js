@@ -113,5 +113,5 @@ app.get('/defaultLog', ensureAdmin, function (req, res) {
 });
 
 app.listen(app.get('port'), function () {
-    logger.info("Node app is running at localhost:" + app.get('port'));
+    logger.info(null,["Node app is running at localhost:" + app.get('port')]);
 });
