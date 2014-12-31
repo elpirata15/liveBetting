@@ -7,11 +7,11 @@ var pubnub = require("pubnub").init({
 var ServerLogger = function ServerLogger(){
 
     this.info = function(gameId, args){
-        var prefix = (gameId) ? "[GAME INFO] ("+this.gameId+") " : "[INFO]";
+        var prefix = (gameId) ? "[GAME INFO] ("+gameId+") " : "[INFO]";
         console.log(prefix + args.join());
     };
     this.error = function(gameId, args){
-        var prefix = (gameId) ? "[GAME ERROR] ("+this.gameId+") " : "[ERROR]";
+        var prefix = (gameId) ? "[GAME ERROR] ("+gameId+") " : "[ERROR]";
         console.log(chalk.red(prefix + args.join()));
     };
 
