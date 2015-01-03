@@ -360,6 +360,7 @@ var ensureUserBalance = function (bidRequest, gameId, callback) {
 
                 // Alert manager
                 logger.error(gameId, ["User " + user._id + " doesn't have sufficient funds to make this bet"]);
+                publishMessage(bidRequest.userId, {error: "You don't have sufficient funds to make this bet."});
                 return false;
             }
         } else {
