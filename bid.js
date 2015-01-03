@@ -51,7 +51,7 @@ exports.addBid = function (bidMessage) {
             for (var i in bid.bidOptions) {
 
                 // Add total participants for option
-                serverMessage.options.push({id: i, participants: bid.bidOptions[i].participants.length});
+                serverMessage.options.push(bid.bidOptions[i].participants.length);
             }
             // Send the message on bid_id_msg channel
             publishMessage(bid.id + "_msg", serverMessage);
