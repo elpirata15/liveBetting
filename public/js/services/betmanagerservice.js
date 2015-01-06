@@ -6,8 +6,8 @@ angular.module('liveBetManager').factory('betManagerService', ['$http', function
         return $http.post('/createGame', game);
     };
 
-    betManagerService.initGame = function(id){
-        return $http.post('/initGame/'+id, null);
+    betManagerService.initGame = function(id, tvDelay){
+        return $http.post('/initGame/'+id, {tvDelay: tvDelay});
     };
 
     betManagerService.getNewBidId = function(){

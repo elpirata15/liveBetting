@@ -22,7 +22,8 @@ exports.getObjectIdFromString = function (idString) {
 
 var participantEntity = new Schema({
     userId: ObjectId,
-    amount: Number
+    amount: Number,
+    timestamp: Date
 });
 
 var optionEntity = new Schema({
@@ -68,16 +69,37 @@ var gameEntity = new Schema({
     timestamp: Date,
     type: String,
     status: String,
+    tvDelay: Number,
     bids: [bidEntity]
 });
 
 var gameModel = exports.GameModel = mongoose.model('games', gameEntity);
+
+var completedOptionEntity = new Schema({
+    optionDescription: String,
+    participants: Number
+});
+
+var completeBidEntity = new Schema({
+    bidId: String,
+    bidDescription: String,
+    gameName: String,
+    gameDate: Date,
+    bidTimestamp: Date,
+    totalPoolAmount: Number,
+    entryAmount: Number,
+    bidOptions: [completedOptionEntity],
+    selectedOption: Number,
+    winningOption: Number,
+    moneyWon: Number
+});
 
 var userEntity = new Schema({
     email: String,
     pass: String,
     fullName: String,
     balance: Number,
+    completedBids: [completeBidEntity],
     group: String, //Admins, Users, Managers, Masters
     status: String // Active, Inactive
 });
@@ -128,7 +150,7 @@ exports.getEntity = function (entityId, cacheType, callback) {
 exports.uncacheEntity = function (cacheType, entity) {
     var key = entity._id || entity;
     redisClient.del(cacheType + "_" + key);
-    console.log("[INFO] Deleted "+ cacheType + "_" + key + " from cache");
+    console.log("[INFO] Deleted " + cacheType + "_" + key + " from cache");
 };
 
 var cacheEntity = exports.cacheEntity = function (cacheType, entity) {

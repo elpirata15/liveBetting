@@ -98,6 +98,8 @@ app.get('/getUsers', ensureAdmin, userController.getUsers);
 
 app.get('/getUser/:id', ensureAdmin, userController.getUserById);
 
+app.get('/getUserBids', ensureUser, userController.getUserBids);
+
 app.get('/getUsersByGroup/:group', ensureManager, userController.getUsersByGroup);
 
 app.post('/login', userController.loginUser);

@@ -8,11 +8,11 @@ var ServerLogger = function ServerLogger(){
 
     this.info = function(gameId, args){
         var prefix = (gameId) ? "[GAME INFO] ("+gameId+") " : "[INFO]";
-        console.log(prefix + args.join());
+        console.log(prefix + args.join(''));
     };
     this.error = function(gameId, args){
         var prefix = (gameId) ? "[GAME ERROR] ("+gameId+") " : "[ERROR]";
-        console.log(chalk.red(prefix + args.join()));
+        console.log(chalk.red(prefix + args.join('')));
     };
 
 };

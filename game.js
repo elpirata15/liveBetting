@@ -124,9 +124,10 @@ exports.initGame = function (req, res) {
             if (!err && games.length > 0) {
                 var game = games[0];
                 game.status = "Active";
+                game.tvDelay = parseInt(req.body.tvDelay);
                 game.save(function (err, game) {
                     if (!err) {
-                        logger.info(game._id, ["Activated game: ", game.gameName]);
+                        logger.info(game._id, ["Activated game: ", game.gameName, " with ", game.tvDelay, " seconds of TV delay"]);
                         res.status(200).send(game);
                     } else {
                         res.status(500).send(err);

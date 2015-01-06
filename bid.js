@@ -36,7 +36,7 @@ exports.addBid = function (bidMessage) {
     bid.bidOptions = bidOptionsArray;
     bid.status = "Active";
     bid.totalPoolAmount = 0;
-
+    bid.timestamp = new Date();
 
     // Add bid to active bids cache
     dbOperations.cacheEntity(dbOperations.caches.bidCache, {entity: bid});
@@ -95,7 +95,8 @@ var addParticipant = function (bidRequest, bidId) {
                     // Add participant to desired option
                     currentBid.bidOptions[bidRequest.option].participants.push({
                         userId: bidRequest.userId,
-                        amount: bidRequest.amount
+                        amount: bidRequest.amount,
+                        timestamp: new Date()
                     });
                     logger.info(currentBid.gameId, ["bid request added successfully"]);
 
@@ -133,6 +134,8 @@ var closeBid = function (closeMessage, bidId) {
 
             // Change bid status to inactive
             currentBid.status = "Inactive";
+
+            currentBid.timestamp = new Date();
 
             dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
 
@@ -177,6 +180,41 @@ var sendToDbAndUpdateUsers = function (bid) {
             // If we found the game
             if (game) {
 
+                // Double check for users abusing the TV delay
+                // Loop through the bid options
+                for(var i in bid.options){
+                    var currentOption = bid.options[i];
+                    var validParticipants = [];
+
+                    // Loop through the participants
+                    for(var j in currentOption.participants){
+                        var currentParticipant = currentOption.participants[j];
+
+                        // Get the current participant timestamp
+                        var currentParticipantTimestamp = new Date(currentParticipant.timestamp);
+
+                        // Get the last acceptable bid timestamp (when the bid was inactive - any tv delay)
+                        var lastAcceptableBidTimestamp = new Date(new Date(bid.timestamp).setSeconds(new Date(bid.timestamp).getSeconds() - game.tvDelay));
+
+                        // The current participant sent the bet before the last acceptable time
+                        if(currentParticipantTimestamp < lastAcceptableBidTimestamp){
+
+                            // Add to valid participants
+                            validParticipants.push(currentParticipant);
+                        } else {
+
+                            // Alert the manager
+                            logger.info(bid.gameId, ["User " + currentParticipant.userId + " sent bid after it was inactive due to TV Delay, removing his bid"]);
+
+                            // Send timeError message to user
+                            publishMessage(currentParticipant.userId, {timeError: "Your bet wasn't accepted because it was sent after the bet was closed."});
+                        }
+                        // Update to valid participants only
+                        currentOption.participants = validParticipants;
+                    }
+                }
+
+
                 // Add bid to game bids
                 game.bids.push(bid);
 
@@ -189,7 +227,7 @@ var sendToDbAndUpdateUsers = function (bid) {
                         logger.info(bid.gameId, ["Saved bid. Removing from active bids"]);
 
                         // Update users balances
-                        updateUserBalances(bid);
+                        updateUserBalances(bid, game.gameName, game.timestamp);
                     } else {
                         logger.error(null,[err]);
                     }
@@ -205,7 +243,7 @@ var sendToDbAndUpdateUsers = function (bid) {
     });
 };
 
-var updateUserBalances = function (bid) {
+var updateUserBalances = function (bid, gameName, gameDate) {
 
     var winningMoney = 0;
 
@@ -218,6 +256,15 @@ var updateUserBalances = function (bid) {
         // Calculate winning money  (take 20% off - this is how we make money :D). If there is only one user (entry amount equals the total pool) give user back his money (no winnings)
         winningMoney = (bid.totalPoolAmount != bid.entryAmount) ? bid.totalPoolAmount / winningUsers : 0;
     }
+
+    var completedBidOptions = [];
+
+    for(var i in bid.bidOptions){
+        completedBidOptions.push({
+            optionDescription: bid.bidOptions[i].bidDescription,
+            participants: bid.bidOptions[i].participants.length});
+    }
+
     // Loop through the options
     for (var i in bid.bidOptions) {
 
@@ -235,6 +282,22 @@ var updateUserBalances = function (bid) {
 
                         // Add the winning money to balance
                         user.balance += winningMoney;
+
+                        var completedBid = {
+                            bidId: bid.id,
+                            bidDescription: bid.bidDescription,
+                            gameName: gameName,
+                            gameDate: gameDate,
+                            bidTimestamp: bid.timestamp,
+                            totalPoolAmount: bid.totalPoolAmount,
+                            entryAmount: bid.entryAmount,
+                            bidOptions: completedBidOptions,
+                            selectedOption: i,
+                            winningOption: bid.winningOption,
+                            moneyWon: winningMoney
+                        };
+
+                        user.completedBids.push(completedBid);
 
                         // Save user
                         user.save(function (err, savedUser) {
