@@ -40,7 +40,7 @@ exports.getUserById = function (req, res) {
     });
 };
 
-exports.getUserBids = function (req, res) {
+exports.getUserBidsFromSession = function (req, res) {
     var currDate = new Date();
     if(req.body.date){
         currDate = req.body.date;
@@ -59,6 +59,19 @@ exports.getUserBids = function (req, res) {
                 res.status(500).send(err.toString);
             }
         });
+};
+
+exports.getAllUserBids = function (req, res) {
+    logger.info(null, ["Getting bids for user ", req.params.id]);
+    dbOperations.UserModel.findOne({_id: req.params.id}, function(err, user){
+        if(!err){
+            logger.info(null, ["Found ", user.completedBids.length, " bids."]);
+            res.status(200).send(user.completedBids);
+        } else {
+            logger.error(null, [err.toString()]);
+            res.status(500).send(err.toString);
+        }
+    });
 };
 
 exports.registerUser = function (req, res) {
