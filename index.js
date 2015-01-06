@@ -98,7 +98,7 @@ app.get('/getUsers', ensureAdmin, userController.getUsers);
 
 app.get('/getUser/:id', ensureAdmin, userController.getUserById);
 
-app.get('/getUserBids', ensureUser, userController.getUserBidsFromSession);
+app.post('/getUserBids', ensureUser, userController.getUserBidsFromSession);
 
 app.get('/getAllUserBids/:id', ensureAdmin, userController.getAllUserBids);
 
