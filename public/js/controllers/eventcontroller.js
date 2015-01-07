@@ -189,7 +189,10 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             // Publish to game channel, in case player got the bid and didn't enter
             PubNub.ngPublish({
                 channel: $scope.game._id,
-                message: {bidId: $scope.bidEntity.id, close: true}
+                message: {
+                    pn_gcm: {data: {bidId: $scope.bidEntity.id, close: true}},
+                    bidId: $scope.bidEntity.id, close: true
+                }
             });
 
             // Notify all clients
