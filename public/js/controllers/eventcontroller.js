@@ -1,3 +1,4 @@
+/* global angular */
 angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', '$location', 'PubNub', 'betManagerService', 'teamsService', 'authService', '$timeout', '$interval', 'localStorageService', 'dialogs',
     function ($scope, $rootScope, $location, PubNub, betManagerService, teamsService, authService, $timeout, $interval, localStorageService, dialogs) {
         $scope.connected = false;
@@ -170,7 +171,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         bidEntity: $scope.bidEntity
                     }
                 });
-                if (!$scope.currentEvent.time || $scope.currentEvent.time == 0)
+                if (!$scope.currentEvent.time || $scope.currentEvent.time === 0)
                     $scope.betOpen = true;
                 else
                     $scope.openLongBet($scope.currentEvent.time);

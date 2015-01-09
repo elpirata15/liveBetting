@@ -1,6 +1,7 @@
 var dbOperations = require('./dbOperations');
 var serverLogger = require('./serverLogger');
 var bcrypt = require('bcrypt-nodejs');
+var _ = require('underscore');
 
 var logger = new serverLogger();
 
@@ -53,7 +54,17 @@ exports.getUserBidsFromSession = function (req, res) {
         .exec(function(err, foundBids){
             if(!err){
                 logger.info(null, ["Found ", foundBids.length, " bids."]);
-                res.status(200).send(foundBids);
+                var foundBidsToSend = [];
+                for(var i in foundBids){
+                    var currentCompletedBidClone = _.clone(foundBids[i]);
+                    var completedBidOptionsObject = {};
+                    for(var j in currentCompletedBidClone.bidOptions){
+                        completedBidOptionsObject[j] = currentCompletedBidClone.bidOptions[j];
+                    }
+                    currentCompletedBidClone.bidOptions = completedBidOptionsObject;
+                    foundBidsToSend.push(currentCompletedBidClone);
+                }
+                res.status(200).send(foundBidsToSend);
             } else {
                 logger.error(null, [err.toString()]);
                 res.status(500).send(err.toString);

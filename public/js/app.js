@@ -1,3 +1,4 @@
+/* global angular */
 angular.module('liveBetManager', [
     'ngCookies',
     'ngRoute',

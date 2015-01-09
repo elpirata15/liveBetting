@@ -84,7 +84,7 @@ var addParticipant = function (bidRequest, bidId) {
         // If we got a bid
         if (currentBid) {
 
-            ensureUserBalance(bidRequest, currentBid.gameId, function () {
+            ensureUserBalance(bidRequest, currentBid.gameId, bidId, function () {
                 logger.info(null, ["received bid request for game: ", bidId]);
 
                 currentBid.totalPoolAmount = parseInt(currentBid.totalPoolAmount, 10) + parseInt(bidRequest.amount, 10);
@@ -102,7 +102,7 @@ var addParticipant = function (bidRequest, bidId) {
 
                     logger.info(currentBid.gameId, ["Sending OK to user " + bidRequest.userId]);
                     // Send OK to user
-                    publishMessage(bidRequest.userId, {info: "OK"});
+                    publishMessage(bidRequest.userId, {bidId: bidId, info: "OK"});
 
                     dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
 
@@ -115,7 +115,7 @@ var addParticipant = function (bidRequest, bidId) {
                     logger.info(currentBid.gameId, ["Sending error to user " + bidRequest.userId]);
 
                     // Publish to user that the bid is rejected
-                    publishMessage(bidRequest.userId, {error: "Rejected Bid Request: Bid is Inactive"});
+                    publishMessage(bidRequest.userId, {bidId: bidId, error: "Rejected Bid Request: Bid is Inactive"});
                 }
             });
         }
@@ -207,7 +207,7 @@ var sendToDbAndUpdateUsers = function (bid) {
                             logger.info(bid.gameId, ["User " + currentParticipant.userId + " sent bid after it was inactive due to TV Delay, removing his bid"]);
 
                             // Send timeError message to user
-                            publishMessage(currentParticipant.userId, {timeError: "Your bet wasn't accepted because it was sent after the bet was closed."});
+                            publishMessage(currentParticipant.userId, {bidId: bid.id, timeError: "Your bet wasn't accepted because it was sent after the bet was closed."});
                         }
                         // Update to valid participants only
                         currentOption.participants = validParticipants;
@@ -403,7 +403,7 @@ var updateUserBalances = function (bid, gameName, gameDate) {
 };
 
 // Ensures a users balance to make a bet
-var ensureUserBalance = function (bidRequest, gameId, callback) {
+var ensureUserBalance = function (bidRequest, gameId, bidId, callback) {
 
     // Find the user
     dbOperations.UserModel.findOne({_id: bidRequest.userId}, function (err, user) {
@@ -423,7 +423,7 @@ var ensureUserBalance = function (bidRequest, gameId, callback) {
 
                 // Alert manager
                 logger.error(gameId, ["User " + user._id + " doesn't have sufficient funds to make this bet"]);
-                publishMessage(bidRequest.userId, {error: "You don't have sufficient funds to make this bet."});
+                publishMessage(bidRequest.userId, {bidId: bidId, error: "You don't have sufficient funds to make this bet."});
                 return false;
             }
         } else {
