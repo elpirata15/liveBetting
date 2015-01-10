@@ -5,7 +5,7 @@ angular.module('liveBetManager').factory('authService', ['$http', '$rootScope', 
 
     authService.login = function (creds, callback) {
         $http.post('/login', creds).success(function (data) {
-            $cookieStore.put("liveBetUser", data._id);
+            $cookieStore.put("liveBetUser", data);
             $cookieStore.put("liveBetGroup", data.group);
             callback(data.group);
         }).error(function (data) {
@@ -38,7 +38,7 @@ angular.module('liveBetManager').factory('authService', ['$http', '$rootScope', 
 
     authService.group = function () {
         if(this.user)
-            return $cookieStore.get("liveBetGroup");
+            return this.user.group;
     };
 
     authService.isAuthenticated = function () {

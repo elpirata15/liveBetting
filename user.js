@@ -188,18 +188,8 @@ exports.loginUser = function(req, res) {
                         if (result) {
                             req.session.uid = user._id;
                             req.session.group = user.group;
-                            user.status = "Active";
-                            user.save(function(err, savedUser) {
-                                if (!err) {
-                                    logger.info(null, ["request approved"]);
-
-                                }
-                                else {
-                                    logger.error(null, ["unable to login user"]);
-
-                                }
-                            });
-
+                            logger.info(null, ["request approved"]);
+                            delete user.completedBids;
                             res.status(200).send(user);
                         }
                         else {
