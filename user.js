@@ -183,44 +183,39 @@ exports.loginUser = function(req, res) {
     }, function(err, user) {
         if (!err) {
             if (user) {
-                if (user.status === "Active") {
-                    res.status(401).send({
-                        error: "User is already logged in on another device."
-                    });
-                }
-                else {
-                    bcrypt.compare(req.body.pass, user.pass, function(err, result) {
-                        if (!err) {
-                            if (result) {
-                                req.session.uid = user._id;
-                                req.session.group = user.group;
-                                user.status = "Active";
-                                user.save(function(err, savedUser) {
-                                    if (!err) {
-                                        logger.info(null, ["request approved"]);
+                bcrypt.compare(req.body.pass, user.pass, function(err, result) {
+                    if (!err) {
+                        if (result) {
+                            req.session.uid = user._id;
+                            req.session.group = user.group;
+                            user.status = "Active";
+                            user.save(function(err, savedUser) {
+                                if (!err) {
+                                    logger.info(null, ["request approved"]);
 
-                                    }
-                                    else {
-                                        logger.error(null, ["unable to login user"]);
+                                }
+                                else {
+                                    logger.error(null, ["unable to login user"]);
 
-                                    }
-                                });
-                                res.status(200).send(user);
-                            }
-                            else {
-                                logger.error(null, ["request denied: Passwords don't match"]);
-                                res.status(401).send({
-                                    error: "Passwords don't match"
-                                });
-                            }
+                                }
+                            });
+
+                            res.status(200).send(user);
                         }
                         else {
-                            logger.error(err);
-                            res.status(500).send(err);
+                            logger.error(null, ["request denied: Passwords don't match"]);
+                            res.status(401).send({
+                                error: "Passwords don't match"
+                            });
                         }
+                    }
+                    else {
+                        logger.error(err);
+                        res.status(500).send(err);
+                    }
 
-                    });
-                }
+                });
+
             }
             else {
                 logger.error(null, ["request denied: No user by this name"]);
@@ -237,31 +232,9 @@ exports.loginUser = function(req, res) {
 };
 
 exports.logoutUser = function(req, res) {
-    dbOperations.UserModel.findOne({
-        _id: req.session.uid
-    }, function(err, user) {
-        if (!err) {
-            if (user) {
-                user.status = "Inactive";
-                user.save(function(err, savedUser) {
-                    if (!err) {
-                        logger.info(null, ["User ", savedUser._id, " logged out."]);
-                        req.session = null;
-                        res.status(200).end();
-                    }
-                    else {
-                        logger.error(null, ["unable to logout user: ", err.toString()]);
-                        res.status(500).send(err);
-                    }
-                });
-            }
-        }
-        else {
-            logger.error(null, ["[ERROR] ", err.toString()]);
-            res.status(500).send(err);
-        }
-    });
-    
+    logger.info(null, ["User ", req.session.uid, " logged out."]);
+    req.session = null;
+    res.status(200).end();
 };
 
 exports.deleteUser = function(req, res) {
