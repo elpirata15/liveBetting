@@ -11,7 +11,7 @@ var logger = new serverLogger();
 
 var activeTimers = {};
 
-var publishMessage = function (channel, message) {
+var publishMessage = function(channel, message) {
     pubnub.publish({
         channel: channel,
         message: message
@@ -19,12 +19,12 @@ var publishMessage = function (channel, message) {
 };
 
 // new Id generator
-exports.newId = function (req, res) {
+exports.newId = function(req, res) {
     res.send(dbOperations.ObjectId());
 };
 
 // Adds bid entity to game (receives bidEntity as parameter)
-exports.addBid = function (bidMessage) {
+exports.addBid = function(bidMessage) {
     // Get the bidEntity from the message (the message from the client contains pn_gcm for android push notifications)
     var bid = bidMessage.bidEntity;
     var bidOptionsArray = [];
@@ -39,52 +39,39 @@ exports.addBid = function (bidMessage) {
     bid.timestamp = new Date();
 
     // Add bid to active bids cache
-    dbOperations.cacheEntity(dbOperations.caches.bidCache, {entity: bid});
-
-    activeTimers[bid.id] = setInterval(function () {
-        // If bid is active
-        if (bid.status == "Active") {
-            // Make server message feedback
-            var serverMessage = {totalPoolAmount: bid.totalPoolAmount, options: []};
-
-            // Loop through all the options
-            for (var i in bid.bidOptions) {
-
-                // Add total participants for option
-                serverMessage.options.push(bid.bidOptions[i].participants.length);
-            }
-            // Send the message on bid_id_msg channel
-            publishMessage(bid.id + "_status", serverMessage);
-        }
-    }, 1000);
+    dbOperations.cacheEntity(dbOperations.caches.bidCache, {
+        entity: bid
+    });
 
     logger.info(bid.gameId, ["bid added successfully"]);
 };
-exports.addBidRequest = function (message, env, channel) {
+exports.addBidRequest = function(message, env, channel) {
     // If this is a close message
     if (message.close) {
         // Close bid
         closeBid(message, message.bidId);
         // If this a winning option message
-    } else if (message.hasOwnProperty("winningOption")) {
+    }
+    else if (message.hasOwnProperty("winningOption")) {
         winningOptionMessage(message, message.bidId);
         // This is a bid request from user
-    } else {
+    }
+    else {
         addParticipant(message, message.bidId);
     }
 };
 
 // Adds participant to bid option
-var addParticipant = function (bidRequest, bidId) {
+var addParticipant = function(bidRequest, bidId) {
 
-    dbOperations.getBidEntity(bidId, function (bidEntity) {
+    dbOperations.getBidEntity(bidId, function(bidEntity) {
 
         var currentBid = bidEntity.entity;
 
         // If we got a bid
         if (currentBid) {
 
-            ensureUserBalance(bidRequest, currentBid.gameId, bidId, function () {
+            ensureUserBalance(bidRequest, currentBid.gameId, bidId, function() {
                 logger.info(null, ["received bid request for game: ", bidId]);
 
                 currentBid.totalPoolAmount = parseInt(currentBid.totalPoolAmount, 10) + parseInt(bidRequest.amount, 10);
@@ -101,22 +88,51 @@ var addParticipant = function (bidRequest, bidId) {
                     logger.info(currentBid.gameId, ["bid request added successfully"]);
 
                     logger.info(currentBid.gameId, ["Sending OK to user " + bidRequest.userId]);
-                    
+
                     // Send OK to user
-                    publishMessage(bidRequest.userId, {bidId: bidId, info: "OK"});
+                    publishMessage(bidRequest.userId, {
+                        bidId: bidId,
+                        info: "OK"
+                    });
 
                     dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
 
                     logger.info(currentBid.gameId, ["total pool amount: " + currentBid.totalPoolAmount]);
 
+                    clearInterval(activeTimers[bidId]);
+
+                    activeTimers[bidId] = setInterval(function() {
+                        // If bid is active
+                        if (currentBid.status == "Active") {
+                            // Make server message feedback
+                            var serverMessage = {
+                                totalPoolAmount: currentBid.totalPoolAmount,
+                                options: []
+                            };
+
+                            // Loop through all the options
+                            for (var i in currentBid.bidOptions) {
+
+                                // Add total participants for option
+                                serverMessage.options.push(currentBid.bidOptions[i].participants.length);
+                            }
+                            // Send the message on bid_id_msg channel
+                            publishMessage(currentBid.id + "_status", serverMessage);
+                        }
+                    }, 1000);
+
                     // If the bid is inactive
-                } else {
+                }
+                else {
                     logger.error(currentBid.gameId, ["Rejected Bid Request: Bid is Inactive"]);
 
                     logger.info(currentBid.gameId, ["Sending error to user " + bidRequest.userId]);
 
                     // Publish to user that the bid is rejected
-                    publishMessage(bidRequest.userId, {bidId: bidId, error: "Rejected Bid Request: Bid is Inactive"});
+                    publishMessage(bidRequest.userId, {
+                        bidId: bidId,
+                        error: "Rejected Bid Request: Bid is Inactive"
+                    });
                 }
             });
         }
@@ -124,9 +140,9 @@ var addParticipant = function (bidRequest, bidId) {
 };
 
 // Closes bid after manager sends close message
-var closeBid = function (closeMessage, bidId) {
+var closeBid = function(closeMessage, bidId) {
 
-    dbOperations.getBidEntity(bidId, function (bidEntity) {
+    dbOperations.getBidEntity(bidId, function(bidEntity) {
 
         var currentBid = bidEntity.entity;
 
@@ -148,9 +164,9 @@ var closeBid = function (closeMessage, bidId) {
     });
 };
 
-var winningOptionMessage = function (winningOptionObject, bidId) {
+var winningOptionMessage = function(winningOptionObject, bidId) {
 
-    dbOperations.getBidEntity(bidId, function (bidEntity) {
+    dbOperations.getBidEntity(bidId, function(bidEntity) {
 
         var currentBid = bidEntity.entity;
 
@@ -170,25 +186,27 @@ var winningOptionMessage = function (winningOptionObject, bidId) {
     });
 };
 
-var sendToDbAndUpdateUsers = function (bid) {
+var sendToDbAndUpdateUsers = function(bid) {
 
     // Alert the manager
     logger.info(bid.gameId, ["Saving bid " + bid.id + " to DB and updating users balances"]);
 
     // Get the game entity
-    dbOperations.GameModel.findOne({_id: bid.gameId}, function (err, game) {
+    dbOperations.GameModel.findOne({
+        _id: bid.gameId
+    }, function(err, game) {
         if (!err) {
             // If we found the game
             if (game) {
 
                 // Double check for users abusing the TV delay
                 // Loop through the bid options
-                for(var i in bid.options){
+                for (var i in bid.options) {
                     var currentOption = bid.options[i];
                     var validParticipants = [];
 
                     // Loop through the participants
-                    for(var j in currentOption.participants){
+                    for (var j in currentOption.participants) {
                         var currentParticipant = currentOption.participants[j];
 
                         // Get the current participant timestamp
@@ -198,17 +216,21 @@ var sendToDbAndUpdateUsers = function (bid) {
                         var lastAcceptableBidTimestamp = new Date(new Date(bid.timestamp).setSeconds(new Date(bid.timestamp).getSeconds() - game.tvDelay));
 
                         // The current participant sent the bet before the last acceptable time
-                        if(currentParticipantTimestamp < lastAcceptableBidTimestamp){
+                        if (currentParticipantTimestamp < lastAcceptableBidTimestamp) {
 
                             // Add to valid participants
                             validParticipants.push(currentParticipant);
-                        } else {
+                        }
+                        else {
 
                             // Alert the manager
                             logger.info(bid.gameId, ["User " + currentParticipant.userId + " sent bid after it was inactive due to TV Delay, removing his bid"]);
 
                             // Send timeError message to user
-                            publishMessage(currentParticipant.userId, {bidId: bid.id, timeError: "Your bet wasn't accepted because it was sent after the bet was closed."});
+                            publishMessage(currentParticipant.userId, {
+                                bidId: bid.id,
+                                timeError: "Your bet wasn't accepted because it was sent after the bet was closed."
+                            });
                         }
                         // Update to valid participants only
                         currentOption.participants = validParticipants;
@@ -222,29 +244,32 @@ var sendToDbAndUpdateUsers = function (bid) {
                 //bid._id = bid.id = dbOperations.getObjectIdFromString(bid.id);
 
                 // Save the game
-                game.save(function (err, savedGame) {
+                game.save(function(err, savedGame) {
                     if (!err) {
                         // Alert manager
                         logger.info(bid.gameId, ["Saved bid. Removing from active bids"]);
 
                         // Update users balances
                         updateUserBalances(bid, game.gameName, game.timestamp);
-                    } else {
-                        logger.error(null,[err]);
+                    }
+                    else {
+                        logger.error(null, [err]);
                     }
                 });
-            } else {
+            }
+            else {
 
                 // Alert manager
                 logger.error(bid.gameId, ["could not find game ", bid.gameId]);
             }
-        } else {
-            logger.error(null,[err.toString()]);
+        }
+        else {
+            logger.error(null, [err.toString()]);
         }
     });
 };
 
-var updateUserBalances = function (bid, gameName, gameDate) {
+var updateUserBalances = function(bid, gameName, gameDate) {
 
     var winningMoney = 0;
 
@@ -260,10 +285,11 @@ var updateUserBalances = function (bid, gameName, gameDate) {
 
     var completedBidOptions = [];
 
-    for(var i in bid.bidOptions){
+    for (var i in bid.bidOptions) {
         completedBidOptions.push({
             optionDescription: bid.bidOptions[i].bidDescription,
-            participants: bid.bidOptions[i].participants.length});
+            participants: bid.bidOptions[i].participants.length
+        });
     }
 
     // Loop through the options
@@ -273,10 +299,12 @@ var updateUserBalances = function (bid, gameName, gameDate) {
         if (i == bid.winningOption) {
 
             // Perform task in parallel for each winning participant
-            async.each(bid.bidOptions[i].participants, function (participant, callback) {
+            async.each(bid.bidOptions[i].participants, function(participant, callback) {
 
                 // Find user entity
-                dbOperations.UserModel.findOne({_id: participant.userId}, function (err, user) {
+                dbOperations.UserModel.findOne({
+                    _id: participant.userId
+                }, function(err, user) {
 
                     // If no error and we found the user
                     if (!err && user) {
@@ -301,54 +329,62 @@ var updateUserBalances = function (bid, gameName, gameDate) {
                         user.completedBids.push(completedBid);
 
                         // Save user
-                        user.save(function (err, savedUser) {
+                        user.save(function(err, savedUser) {
 
                             // If there is no error
                             if (!err) {
 
                                 // Log success
-                                logger.info(null,["Added " + winningMoney + " to user " + savedUser._id + " balance"]);
+                                logger.info(null, ["Added " + winningMoney + " to user " + savedUser._id + " balance"]);
 
                                 // Send OK to user
-                                publishMessage(savedUser._id, {newBalance: savedUser.balance});
+                                publishMessage(savedUser._id, {
+                                    newBalance: savedUser.balance
+                                });
 
                                 // Return with no error
                                 callback();
-                            } else {
+                            }
+                            else {
 
                                 // Return with error
                                 callback(err);
                             }
                         });
-                    } else {
+                    }
+                    else {
 
                         // Return with error
                         callback(err);
                     }
                 });
-            }, function (err) {
+            }, function(err) {
 
                 // If we have an error
                 if (err) {
 
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
-                    logger.error(null,[err]);
-                    logger.error(null,[bid.toString()]);
-                } else {
+                    logger.error(null, [err]);
+                    logger.error(null, [bid.toString()]);
+                }
+                else {
 
                     // Log success
-                    logger.info(null,["Updated users balances"]);
+                    logger.info(null, ["Updated users balances"]);
                 }
             });
 
             // This is not a winning option
-        } else {
+        }
+        else {
 
             // Perform task in parallel for each winning participant
-            async.each(bid.bidOptions[i].participants, function (participant, callback) {
+            async.each(bid.bidOptions[i].participants, function(participant, callback) {
 
                 // Find user entity
-                dbOperations.UserModel.findOne({_id: participant.userId}, function (err, user) {
+                dbOperations.UserModel.findOne({
+                    _id: participant.userId
+                }, function(err, user) {
 
                     // If no error and we found the user
                     if (!err && user) {
@@ -357,43 +393,48 @@ var updateUserBalances = function (bid, gameName, gameDate) {
                         user.balance -= participant.amount;
 
                         // Save user
-                        user.save(function (err, savedUser) {
+                        user.save(function(err, savedUser) {
 
                             // If there is no error
                             if (!err) {
 
                                 // Log success
-                                logger.info(null,["Subtracted " + participant.amount + " to user " + savedUser._id + " balance"]);
+                                logger.info(null, ["Subtracted " + participant.amount + " to user " + savedUser._id + " balance"]);
 
                                 // Send OK to user
-                                publishMessage(savedUser._id, {newBalance: savedUser.balance});
+                                publishMessage(savedUser._id, {
+                                    newBalance: savedUser.balance
+                                });
 
                                 // Return with no error
                                 callback();
-                            } else {
+                            }
+                            else {
 
                                 // Return with error
                                 callback(err);
                             }
                         });
-                    } else {
+                    }
+                    else {
 
                         // Return with error
                         callback(err);
                     }
                 });
-            }, function (err) {
+            }, function(err) {
 
                 // If we have an error
                 if (err) {
 
                     // Log error and add bid object to log for further use (manual fixing of user's balances)
-                    logger.error(null,[err]);
-                    logger.error(null,[bid.toString()]);
-                } else {
+                    logger.error(null, [err]);
+                    logger.error(null, [bid.toString()]);
+                }
+                else {
 
                     // Log success
-                    logger.info(null,["Updated users balances"]);
+                    logger.info(null, ["Updated users balances"]);
                 }
             });
         }
@@ -404,10 +445,12 @@ var updateUserBalances = function (bid, gameName, gameDate) {
 };
 
 // Ensures a users balance to make a bet
-var ensureUserBalance = function (bidRequest, gameId, bidId, callback) {
+var ensureUserBalance = function(bidRequest, gameId, bidId, callback) {
 
     // Find the user
-    dbOperations.UserModel.findOne({_id: bidRequest.userId}, function (err, user) {
+    dbOperations.UserModel.findOne({
+        _id: bidRequest.userId
+    }, function(err, user) {
 
         // If we don't have an error
         if (!err) {
@@ -420,17 +463,22 @@ var ensureUserBalance = function (bidRequest, gameId, bidId, callback) {
                 callback();
 
                 // If no sufficient funds
-            } else {
+            }
+            else {
 
                 // Alert manager
                 logger.error(gameId, ["User " + user._id + " doesn't have sufficient funds to make this bet"]);
-                publishMessage(bidRequest.userId, {bidId: bidId, error: "You don't have sufficient funds to make this bet."});
+                publishMessage(bidRequest.userId, {
+                    bidId: bidId,
+                    error: "You don't have sufficient funds to make this bet."
+                });
                 return false;
             }
-        } else {
+        }
+        else {
 
             // Log error
-            logger.error(null,[err]);
+            logger.error(null, [err]);
         }
     });
 };
