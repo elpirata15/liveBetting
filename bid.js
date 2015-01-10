@@ -54,7 +54,7 @@ exports.addBid = function (bidMessage) {
                 serverMessage.options.push(bid.bidOptions[i].participants.length);
             }
             // Send the message on bid_id_msg channel
-            publishMessage(bid.id + "_msg", serverMessage);
+            publishMessage(bid.id + "_status", serverMessage);
         }
     }, 1000);
 
@@ -101,6 +101,7 @@ var addParticipant = function (bidRequest, bidId) {
                     logger.info(currentBid.gameId, ["bid request added successfully"]);
 
                     logger.info(currentBid.gameId, ["Sending OK to user " + bidRequest.userId]);
+                    
                     // Send OK to user
                     publishMessage(bidRequest.userId, {bidId: bidId, info: "OK"});
 
