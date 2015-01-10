@@ -40,11 +40,8 @@ setInterval(function() {
         method: 'GET'
     };
 
-    var req = http.request(options);
+    http.request(options);
 
-    req.on('error', function(e) {
-        console.log('problem with pubnub balancer: ' + e.message);
-    });
 }, 60000);
 
 // #### USER GROUP RESTRICTION HELPER FUNCTIONS ######

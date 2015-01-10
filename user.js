@@ -238,7 +238,7 @@ exports.loginUser = function(req, res) {
 
 exports.logoutUser = function(req, res) {
     dbOperations.UserModel.findOne({
-        id: req.session.uid
+        _id: req.session.uid
     }, function(err, user) {
         if (!err) {
             if (user) {
