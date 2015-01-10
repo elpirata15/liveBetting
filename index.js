@@ -33,14 +33,9 @@ app.use(session({
 }));
 
 setInterval(function() {
-    var options = {
-        hostname: 'pubnub-balancer.herokuapp.com',
-        port: 80,
-        path: '/',
-        method: 'GET'
-    };
-
-    http.request(options);
+    http.get("http://pubnub-balancer.herokuapp.com/").on('error', function(e) {
+        console.log("Got error: " + e.message);
+    });
 
 }, 60000);
 
