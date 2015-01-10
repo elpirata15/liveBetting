@@ -8,54 +8,79 @@ var gameController = require('./game');
 var bidController = require('./bid');
 var userController = require('./user');
 var pubnubManager = require('./pubnubManager');
+var http = require('http');
 
 
 var secretKey = "ELFcjUgNvdKyiiaXDg2mnjPUgVAx6uaVlbdcqANvqgoyZeZVIxmqlOVykkmr2hcs";
 
 var logger = new serverLogger();
 var app = express();
-var day = 1000*60*60*24;
+var day = 1000 * 60 * 60 * 24;
 
 app.set('port', (process.env.PORT || 5000));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 app.use(session({
     secret: secretKey,
-    cookie: {secure:true, maxAge:day, signed:true, overwrite:true},
+    cookie: {
+        secure: true,
+        maxAge: day,
+        signed: true,
+        overwrite: true
+    },
     saveUninitialized: true,
     resave: true
 }));
 
+setInterval(function() {
+    var options = {
+        hostname: 'pubnub-balancer.herokuapp.com',
+        port: 80,
+        path: '/',
+        method: 'GET'
+    };
+
+    var req = http.request(options);
+
+    req.on('error', function(e) {
+        console.log('problem with pubnub balancer: ' + e.message);
+    });
+}, 60000);
+
 // #### USER GROUP RESTRICTION HELPER FUNCTIONS ######
 
-function ensureAdmin(req, res, next){
-    if(req.session && req.session.group == "Admins"){
+function ensureAdmin(req, res, next) {
+    if (req.session && req.session.group == "Admins") {
         return next();
-    } else {
+    }
+    else {
         res.status(403).send("Forbidden");
     }
 }
 
-function ensureUser(req, res, next){
-    if(req.session){
+function ensureUser(req, res, next) {
+    if (req.session) {
         return next();
-    } else{
+    }
+    else {
         res.status(403).send("Forbidden");
     }
 }
 
-function ensureMaster(req, res, next){
-    if(req.session && (req.session.group == "Masters" || req.session.group == "Admins")){
+function ensureMaster(req, res, next) {
+    if (req.session && (req.session.group == "Masters" || req.session.group == "Admins")) {
         return next();
-    } else{
+    }
+    else {
         res.status(403).send("Forbidden");
     }
 }
 
-function ensureManager(req, res, next){
-    if(req.session && (req.session.group == "Masters" || req.session.group == "Admins" || req.session.group == "Managers" )){
+function ensureManager(req, res, next) {
+    if (req.session && (req.session.group == "Masters" || req.session.group == "Admins" || req.session.group == "Managers")) {
         return next();
-    } else{
+    }
+    else {
         res.status(403).send("Forbidden");
     }
 }
@@ -112,10 +137,10 @@ app.post('/register', userController.registerUser);
 
 app.post('/changeGroup', userController.changeUserGroup);
 
-app.get('/defaultLog', ensureAdmin, function (req, res) {
+app.get('/defaultLog', ensureAdmin, function(req, res) {
     res.sendFile('default.log');
 });
 
-app.listen(app.get('port'), function () {
-    logger.info(null,["Node app is running at localhost:" + app.get('port')]);
+app.listen(app.get('port'), function() {
+    logger.info(null, ["Node app is running at localhost:" + app.get('port')]);
 });

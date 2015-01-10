@@ -159,6 +159,7 @@ exports.assignGame = function (req, res) {
                                     logger.info(null,["assigned game: ", savedGame.gameName, " to manager ", savedGame.assignedTo]);
                                     res.status(200).end();
                                 } else {
+                                    logger.error(null, ["couldn't assign game: ", err.toString()]);
                                     res.status(500).send(err);
                                 }
                             });
