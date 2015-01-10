@@ -37,12 +37,12 @@ angular.module('liveBetManager').factory('authService', ['$http', '$rootScope', 
     };
 
     authService.group = function () {
-        if(this.user())
+        if(this.user)
             return $cookieStore.get("liveBetGroup");
     };
 
     authService.isAuthenticated = function () {
-            return this.user() != null;
+            return this.user != null;
     };
 
     return authService;
