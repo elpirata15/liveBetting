@@ -14,7 +14,7 @@ angular.module('liveBetManager').controller('userController', ['$scope', '$rootS
         authService.login({email: $scope.user.email, pass: $scope.user.pass}, function (result) {
             if (result) {
                 $scope.loggedIn = true;
-                if(authService.group() == "Admins" || authService.group() == "Masters" )
+                if(result === "Admins" || result === "Masters" )
                     $location.path('/gameMaster');
                 else
                     $location.path('/startGame');

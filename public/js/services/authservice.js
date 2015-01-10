@@ -7,7 +7,7 @@ angular.module('liveBetManager').factory('authService', ['$http', '$rootScope', 
         $http.post('/login', creds).success(function (data) {
             $cookieStore.put("liveBetUser", data._id);
             $cookieStore.put("liveBetGroup", data.group);
-            callback(true);
+            callback(data.group);
         }).error(function (data) {
             $rootScope.flash = data.error;
             callback(false);
