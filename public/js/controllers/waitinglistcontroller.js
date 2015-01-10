@@ -12,7 +12,15 @@ angular.module('liveBetManager').controller('waitingListController', ['$scope', 
                 $scope.games = data;
             }
         });
-
+        
+        $scope.doLogout = function(){
+            authService.logout(function (result) {
+                if (result) {
+                    $location.path('/login');
+                }
+            });
+        };
+        
         $scope.initGame = function(gameId){
             betManagerService.initGame(gameId, $scope.tvDelay).success(function(data){
                 localStorageService.set('currentGame',data);

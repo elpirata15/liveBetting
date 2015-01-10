@@ -1,4 +1,5 @@
 <div class="jumbotron">
+    <button type="button" class="btn btn-default" style="margin-top:8px;" ng-click="doLogout()"><span class="glyphicon glyphicon-off"></span> CLOSE GAME</button>
     <h1>Your games</h1>
     <button type="button" class="btn btn-default btn-lg" ng-repeat="game in games" ng-click="startGame(game._id)">{{game.gameName}}</button>
 </div>
