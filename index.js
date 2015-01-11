@@ -8,6 +8,7 @@ var gameController = require('./game');
 var bidController = require('./bid');
 var userController = require('./user');
 var pubnubManager = require('./pubnubManager');
+var mailer = require('./mailer');
 var http = require('http');
 
 
@@ -31,6 +32,14 @@ app.use(session({
     saveUninitialized: true,
     resave: true
 }));
+
+// ### GENERAL ERROR HANDLER ######
+app.use(function(err, req, res, next){
+    console.error(err.stack);
+    pubnubManager.disconnect();
+    mailer.sendErrorEmail(err.stack);
+});
+
 
 setInterval(function() {
     http.get("http://pubnub-balancer.herokuapp.com/").on('error', function(e) {

@@ -12,7 +12,7 @@ var ServerLogger = function ServerLogger(){
     };
     this.error = function(gameId, args){
         var prefix = (gameId) ? "[GAME ERROR] ("+gameId+") " : "[ERROR]";
-        console.log(chalk.red(prefix + args.join('')));
+        console.error(chalk.red(prefix + args.join('')));
     };
 
 };

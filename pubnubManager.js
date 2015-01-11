@@ -14,10 +14,10 @@ pubnub.subscribe({
       console.log(m);
     },
     connect: function(){
-        console.log("[INFO] Connected to server pool");
+        console.log("[INFO] Connected",instanceName, "to server pool");
     },
     disconnect:function(){
-        console.log("[INFO] Disconnected from server pool");
+        console.log("[INFO] Disconnected",instanceName, "from server pool");
     },
     heartbeat: 15
 });
@@ -32,4 +32,13 @@ pubnub.subscribe({
         }
     }
 });
+
+exports.removeFromPool = function(){
+  pubnub.unsubscribe({
+      channel: 'servers',
+      callback: function(){
+          console.log("[INFO] Disconnected",instanceName, "from server pool");
+      }
+  });
+};
 
