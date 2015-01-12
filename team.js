@@ -13,7 +13,7 @@ exports.newTeam = function(req, res) {
                 if (team) {
                     logger.info(null, ["Updating team:", req.body.teamName]);
                     team.teamName = req.body.teamName,
-                        team.teamLeague = req.body.teamLeague,
+                        team.teamLeagues = req.body.teamLeagues,
                         team.teamCountry = req.body.teamCountry,
                         team.players = req.body.players
 
@@ -43,7 +43,7 @@ exports.newTeam = function(req, res) {
         logger.info(null, ["Creating a new team:", req.body.teamName]);
         var newTeam = new dbOperations.TeamModel({
             teamName: req.body.teamName,
-            teamLeague: req.body.teamLeague,
+            teamLeagues: req.body.teamLeagues,
             teamCountry: req.body.teamCountry,
             players: req.body.players
         });

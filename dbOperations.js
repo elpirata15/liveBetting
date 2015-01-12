@@ -27,7 +27,7 @@ var playerEntity = new Schema({
 
 var teamEntity = new Schema({
    teamName: String,
-   teamLeague: String,
+   teamLeagues: [String],
    teamCountry: String,
    players: [playerEntity]
 });
