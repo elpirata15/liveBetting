@@ -189,8 +189,13 @@ exports.loginUser = function(req, res) {
                             req.session.uid = user._id;
                             req.session.group = user.group;
                             logger.info(null, ["request approved"]);
-                            delete user.completedBids;
-                            res.status(200).send(user);
+                            var userToSend = {
+                                _id: user._id,
+                                group: user.group,
+                                email: user.email,
+                                fullName: user.fullName
+                            };
+                            res.status(200).send(userToSend);
                         }
                         else {
                             logger.error(null, ["request denied: Passwords don't match"]);
