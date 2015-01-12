@@ -17,7 +17,8 @@ angular.module('liveBetManager', [
     $routeProvider.when('/eventManager', {templateUrl: 'partials/eventmanager.html', controller:'eventController', restrict:['Managers','Masters']});
     $routeProvider.when('/login', {templateUrl: 'partials/user/login.html', controller:'userController'});
     $routeProvider.when('/register', {templateUrl: 'partials/user/register.html', controller:'userController'});
-    $routeProvider.when('/')
+    $routeProvider.when('/teams', {templateUrl: 'partials/teams.html', controller: 'teamsController', restrict: ['Managers','Masters']});
+    $routeProvider.when('/team/:id', {templateUrl: 'partials/team.html', controller: 'teamController', restrict: ['Managers','Masters']});
     $routeProvider.otherwise('/login');
 
     localStorageServiceProvider.setPrefix('liveBetManager');
