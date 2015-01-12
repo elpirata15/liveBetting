@@ -20,6 +20,20 @@ exports.getObjectIdFromString = function (idString) {
     return typedObjectId(idString);
 };
 
+var playerEntity = new Schema({
+   playerName: String,
+   playerNumber: Number
+});
+
+var teamEntity = new Schema({
+   teamName: String,
+   teamLeague: String,
+   teamCountry: String,
+   players: [playerEntity]
+});
+
+exports.TeamModel = mongoose.model('teams', teamEntity);
+
 var participantEntity = new Schema({
     userId: ObjectId,
     amount: Number,
@@ -30,16 +44,6 @@ var optionEntity = new Schema({
     optionDescription: String,
     participants: [participantEntity]
 });
-
-/*var bidRequestEntity = new Schema({
- userId: ObjectId,
- bidId: ObjectId,
- gameId: ObjectId,
- bidOption: Number,
- status: String,
- winAmount: Number,
- betAmount: Number
- });*/
 
 var bidEntity = new Schema({
     id: ObjectId,
@@ -55,11 +59,6 @@ var bidEntity = new Schema({
     entryAmount: Number,
     winningOption: Number
 }, {_id: false});
-
-var teamEntity = new Schema({
-    teamName: String,
-    teamId: String
-});
 
 var gameEntity = new Schema({
     gameName: String,

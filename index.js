@@ -7,6 +7,7 @@ var serverLogger = require('./serverLogger');
 var gameController = require('./game');
 var bidController = require('./bid');
 var userController = require('./user');
+var teamContoller = require('./team');
 var pubnubManager = require('./pubnubManager');
 var mailer = require('./mailer');
 var http = require('http');
@@ -36,10 +37,29 @@ app.use(session({
 // ### GENERAL ERROR HANDLER ######
 app.use(function(err, req, res, next){
     console.error(err.stack);
-    pubnubManager.disconnect();
-    mailer.sendErrorEmail(err.stack);
+    pubnubManager.removeFromPool(function(){
+        mailer.sendErrorEmail(err.stack);
+        setTimeout(function() {
+            process.exit(1);
+        }, 10);
+    });
+    
 });
 
+function exitGracefully(){
+    pubnubManager.removeFromPool(function(){
+        process.exit(0);    
+    });
+}
+
+process.on('SIGINT', function() {
+  exitGracefully();
+});
+
+process.on('SIGTERM', function() {
+  exitGracefully();
+});
+// ################################
 
 setInterval(function() {
     http.get("http://pubnub-balancer.herokuapp.com/").on('error', function(e) {
@@ -137,6 +157,16 @@ app.post('/logout', userController.logoutUser);
 app.post('/register', userController.registerUser);
 
 app.post('/changeGroup', userController.changeUserGroup);
+
+// ######### TEAM FUNCTIONS #########
+
+app.post('/createOrUpdateTeam', ensureMaster, teamContoller.newTeam);
+
+app.get('/removeTeam/:id', ensureManager, teamContoller.removeTeam);
+
+app.get('/getTeam/:id', ensureManager, teamContoller.getTeam);
+
+// #######################################
 
 app.get('/defaultLog', ensureAdmin, function(req, res) {
     res.sendFile('default.log');

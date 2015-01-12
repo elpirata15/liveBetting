@@ -19,7 +19,7 @@ exports.getUsers = function(req, res) {
 };
 
 exports.getUsersByGroup = function(req, res) {
-    logger.info(null, ["Getting all users for group ", req.params.group]);
+    logger.info(null, ["Getting all users for group", req.params.group]);
     dbOperations.UserModel.find({
         group: req.params.group
     }, function(err, users) {
@@ -53,14 +53,14 @@ exports.getUserBidsFromSession = function(req, res) {
     if (req.body.date) {
         currDate = req.body.date;
     }
-    logger.info(null, ["Getting bids for user ", req.session.uid, " for date ", currDate]);
+    logger.info(null, ["Getting bids for user", req.session.uid, "for date", currDate]);
     var startingDate = new Date(new Date(currDate).setHours(new Date(currDate).getHours() - 24));
     dbOperations.UserModel
         .where('_id', req.session.uid)
         .where('completedBids.gameDate').lte(currDate).gte(startingDate)
         .exec(function(err, foundBids) {
             if (!err) {
-                logger.info(null, ["Found ", foundBids.length, " bids."]);
+                logger.info(null, ["Found", foundBids.length, "bids."]);
                 var foundBidsToSend = [];
                 for (var i in foundBids) {
                     var currentCompletedBidClone = _.clone(foundBids[i]);
@@ -81,12 +81,12 @@ exports.getUserBidsFromSession = function(req, res) {
 };
 
 exports.getAllUserBids = function(req, res) {
-    logger.info(null, ["Getting bids for user ", req.params.id]);
+    logger.info(null, ["Getting bids for user", req.params.id]);
     dbOperations.UserModel.findOne({
         _id: req.params.id
     }, function(err, user) {
         if (!err) {
-            logger.info(null, ["Found ", user.completedBids.length, " bids."]);
+            logger.info(null, ["Found", user.completedBids.length, "bids."]);
             res.status(200).send(user.completedBids);
         }
         else {
@@ -98,10 +98,10 @@ exports.getAllUserBids = function(req, res) {
 
 exports.registerUser = function(req, res) {
     if (!req.body._id) {
-        logger.info(null, ["Creating new user ", req.body.email]);
+        logger.info(null, ["Creating new user", req.body.email]);
     }
     else {
-        logger.info(null, ["Updating user ", req.body.email]);
+        logger.info(null, ["Updating user", req.body.email]);
     }
     dbOperations.UserModel.findOne({
         email: req.body.email
@@ -127,7 +127,7 @@ exports.registerUser = function(req, res) {
 
                             newUser.save(function(err, user) {
                                 if (!err) {
-                                    logger.info(null, ["Registered user ", user.email, " with ID", user._id]);
+                                    logger.info(null, ["Registered user", user.email, "with ID", user._id]);
                                     req.session.uid = user._id;
                                     req.session.group = user.group;
                                     res.status(200).send(user);
@@ -146,7 +146,7 @@ exports.registerUser = function(req, res) {
 
                                     user.save(function(err, user) {
                                         if (!err) {
-                                            logger.info(null, ["Updated user ", user.email]);
+                                            logger.info(null, ["Updated user", user.email]);
                                             req.session.uid = user._id;
                                             req.session.group = user.group;
                                             res.status(200).send(user);
@@ -177,7 +177,7 @@ exports.registerUser = function(req, res) {
 };
 
 exports.loginUser = function(req, res) {
-    logger.info(null, ["login request by ", req.body.email]);
+    logger.info(null, ["login request by", req.body.email]);
     dbOperations.UserModel.findOne({
         email: req.body.email
     }, function(err, user) {
@@ -222,7 +222,7 @@ exports.loginUser = function(req, res) {
 };
 
 exports.logoutUser = function(req, res) {
-    logger.info(null, ["User ", req.session.uid, " logged out."]);
+    logger.info(null, ["User", req.session.uid, "logged out."]);
     req.session = null;
     res.status(200).end();
 };
@@ -256,7 +256,7 @@ exports.changeUserGroup = function(req, res) {
             user.group = req.body.group;
             user.save(function(err, user) {
                 if (!err) {
-                    logger.info(null, ["changed user ", user.email, " group to ", user.group]);
+                    logger.info(null, ["changed user", user.email, "group to", user.group]);
                     res.status(200).send("Successful. please re-login.");
                 }
                 else {

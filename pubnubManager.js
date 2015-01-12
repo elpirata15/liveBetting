@@ -33,11 +33,12 @@ pubnub.subscribe({
     }
 });
 
-exports.removeFromPool = function(){
+exports.removeFromPool = function(callback){
   pubnub.unsubscribe({
       channel: 'servers',
       callback: function(){
           console.log("[INFO] Disconnected",instanceName, "from server pool");
+          callback();
       }
   });
 };

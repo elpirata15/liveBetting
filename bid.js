@@ -72,7 +72,7 @@ var addParticipant = function(bidRequest, bidId) {
         if (currentBid) {
 
             ensureUserBalance(bidRequest, currentBid.gameId, bidId, function() {
-                logger.info(null, ["received bid request for game: ", bidId]);
+                logger.info(null, ["received bid request for game:", bidId]);
 
                 currentBid.totalPoolAmount = parseInt(currentBid.totalPoolAmount, 10) + parseInt(bidRequest.amount, 10);
 
@@ -87,7 +87,7 @@ var addParticipant = function(bidRequest, bidId) {
                     });
                     logger.info(currentBid.gameId, ["bid request added successfully"]);
 
-                    logger.info(currentBid.gameId, ["Sending OK to user " + bidRequest.userId]);
+                    logger.info(currentBid.gameId, ["Sending OK to user",bidRequest.userId]);
 
                     // Send OK to user
                     publishMessage(bidRequest.userId, {
@@ -97,7 +97,7 @@ var addParticipant = function(bidRequest, bidId) {
 
                     dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
 
-                    logger.info(currentBid.gameId, ["total pool amount: " + currentBid.totalPoolAmount]);
+                    logger.info(currentBid.gameId, ["total pool amount:",currentBid.totalPoolAmount]);
 
                     clearInterval(activeTimers[bidId]);
 
@@ -126,7 +126,7 @@ var addParticipant = function(bidRequest, bidId) {
                 else {
                     logger.error(currentBid.gameId, ["Rejected Bid Request: Bid is Inactive"]);
 
-                    logger.info(currentBid.gameId, ["Sending error to user " + bidRequest.userId]);
+                    logger.info(currentBid.gameId, ["Sending error to user",bidRequest.userId]);
 
                     // Publish to user that the bid is rejected
                     publishMessage(bidRequest.userId, {
@@ -157,7 +157,7 @@ var closeBid = function(closeMessage, bidId) {
             dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
 
             // Alert the manager
-            logger.info(currentBid.gameId, ["Bid " + bidId + " is now Inactive"]);
+            logger.info(currentBid.gameId, ["Bid",bidId,"is now Inactive"]);
 
             clearInterval(activeTimers[bidId]);
         }
@@ -179,7 +179,7 @@ var winningOptionMessage = function(winningOptionObject, bidId) {
             dbOperations.cacheEntity(dbOperations.caches.bidCache, bidEntity);
 
             // Alert the manager
-            logger.info(currentBid.gameId, ["Winning option " + currentBid.winningOption + " set for bid " + bidId + ". Now adding all to DB"]);
+            logger.info(currentBid.gameId, ["Winning option",currentBid.winningOption,"set for bid",bidId,". Now adding all to DB"]);
 
             sendToDbAndUpdateUsers(currentBid);
         }
@@ -189,7 +189,7 @@ var winningOptionMessage = function(winningOptionObject, bidId) {
 var sendToDbAndUpdateUsers = function(bid) {
 
     // Alert the manager
-    logger.info(bid.gameId, ["Saving bid " + bid.id + " to DB and updating users balances"]);
+    logger.info(bid.gameId, ["Saving bid",bid.id,"to DB and updating users balances"]);
 
     // Get the game entity
     dbOperations.GameModel.findOne({
@@ -224,7 +224,7 @@ var sendToDbAndUpdateUsers = function(bid) {
                         else {
 
                             // Alert the manager
-                            logger.info(bid.gameId, ["User " + currentParticipant.userId + " sent bid after it was inactive due to TV Delay, removing his bid"]);
+                            logger.info(bid.gameId, ["User",currentParticipant.userId,"sent bid after it was inactive due to TV Delay, removing his bid"]);
 
                             // Send timeError message to user
                             publishMessage(currentParticipant.userId, {
@@ -260,7 +260,7 @@ var sendToDbAndUpdateUsers = function(bid) {
             else {
 
                 // Alert manager
-                logger.error(bid.gameId, ["could not find game ", bid.gameId]);
+                logger.error(bid.gameId, ["could not find game", bid.gameId]);
             }
         }
         else {
@@ -271,6 +271,19 @@ var sendToDbAndUpdateUsers = function(bid) {
 
 var updateUserBalances = function(bid, gameName, gameDate) {
 
+    var completedBidOptions = [];
+
+    var totalParticipants = 0;
+    
+    for (var i in bid.bidOptions) {
+        var participants = bid.bidOptions[i].participants.length;
+        totalParticipants += participants;
+        completedBidOptions.push({
+            optionDescription: bid.bidOptions[i].bidDescription,
+            participants: participants
+        });
+    }
+    
     var winningMoney = 0;
 
     // Get winning option participants
@@ -280,16 +293,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
     if (winningUsers > 0) {
 
         // Calculate winning money  (take 20% off - this is how we make money :D). If there is only one user (entry amount equals the total pool) give user back his money (no winnings)
-        winningMoney = (bid.totalPoolAmount != bid.entryAmount) ? bid.totalPoolAmount / winningUsers : 0;
-    }
-
-    var completedBidOptions = [];
-
-    for (var i in bid.bidOptions) {
-        completedBidOptions.push({
-            optionDescription: bid.bidOptions[i].bidDescription,
-            participants: bid.bidOptions[i].participants.length
-        });
+        winningMoney = (bid.totalPoolAmount != bid.entryAmount && winningUsers != totalParticipants) ? bid.totalPoolAmount / winningUsers : 0;
     }
 
     // Loop through the options
@@ -335,7 +339,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
                             if (!err) {
 
                                 // Log success
-                                logger.info(null, ["Added " + winningMoney + " to user " + savedUser._id + " balance"]);
+                                logger.info(null, ["Added",winningMoney,"to user",savedUser._id,"balance"]);
 
                                 // Send OK to user
                                 publishMessage(savedUser._id, {
@@ -399,7 +403,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
                             if (!err) {
 
                                 // Log success
-                                logger.info(null, ["Subtracted " + participant.amount + " to user " + savedUser._id + " balance"]);
+                                logger.info(null, ["Subtracted",participant.amount,"to user",savedUser._id,"balance"]);
 
                                 // Send OK to user
                                 publishMessage(savedUser._id, {
@@ -458,7 +462,7 @@ var ensureUserBalance = function(bidRequest, gameId, bidId, callback) {
             if (user && user.balance >= bidRequest.amount) {
 
                 // Alert manager
-                logger.info(gameId, ["User " + user._id + " has sufficient funds to make this bet"]);
+                logger.info(gameId, ["User",user._id,"has sufficient funds to make this bet"]);
 
                 callback();
 
@@ -467,7 +471,7 @@ var ensureUserBalance = function(bidRequest, gameId, bidId, callback) {
             else {
 
                 // Alert manager
-                logger.error(gameId, ["User " + user._id + " doesn't have sufficient funds to make this bet"]);
+                logger.error(gameId, ["User",user._id,"doesn't have sufficient funds to make this bet"]);
                 publishMessage(bidRequest.userId, {
                     bidId: bidId,
                     error: "You don't have sufficient funds to make this bet."

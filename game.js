@@ -63,7 +63,7 @@ exports.getWaitingGames = function (req, res) {
 exports.createGame = function (req, res) {
     var newGame;
     if (req.body._id) {
-        logger.info(null,["Updating game: ", req.body.gameName]);
+        logger.info(null,["Updating game:", req.body.gameName]);
         dbOperations.GameModel.findOne({_id: req.body._id}, function (err, game) {
             if(!err){
                 game.gameName = req.body.gameName;
@@ -75,7 +75,7 @@ exports.createGame = function (req, res) {
                 game.status = "Waiting";
                 game.save(function (err, game) {
                     if(!err){
-                        logger.info(null,["Updated game ", game.gameName]);
+                        logger.info(null,["Updated game", game.gameName]);
                         res.status(200).send(game);
                     } else {
                         logger.error(null,[err.toString()]);
@@ -87,7 +87,7 @@ exports.createGame = function (req, res) {
             }
         });
     } else {
-        logger.info(null,["Creating game: ", req.body.gameName]);
+        logger.info(null,["Creating game:", req.body.gameName]);
         newGame = new dbOperations.GameModel({
             gameName: req.body.gameName,
             teams: req.body.teams,
@@ -99,7 +99,7 @@ exports.createGame = function (req, res) {
 
         newGame.save(function (err, game) {
             if (!err) {
-                logger.info(null,["Game created with id " + game.id]);
+                logger.info(null,["Game created with id",game.id]);
                 res.status(200).send(game);
             }
             else {
@@ -127,7 +127,7 @@ exports.initGame = function (req, res) {
                 game.tvDelay = parseInt(req.body.tvDelay);
                 game.save(function (err, game) {
                     if (!err) {
-                        logger.info(game._id, ["Activated game: ", game.gameName, " with ", game.tvDelay, " seconds of TV delay"]);
+                        logger.info(game._id, ["Activated game:", game.gameName, "with", game.tvDelay, "seconds of TV delay"]);
                         res.status(200).send(game);
                     } else {
                         res.status(500).send(err);
@@ -156,10 +156,10 @@ exports.assignGame = function (req, res) {
                             game.assignedTo = req.body.managerId;
                             game.save(function (err, savedGame) {
                                 if (!err) {
-                                    logger.info(null,["assigned game: ", savedGame.gameName, " to manager ", savedGame.assignedTo]);
+                                    logger.info(null,["assigned game:", savedGame.gameName, "to manager", savedGame.assignedTo]);
                                     res.status(200).end();
                                 } else {
-                                    logger.error(null, ["couldn't assign game: ", err.toString()]);
+                                    logger.error(null, ["couldn't assign game:", err.toString()]);
                                     res.status(500).send(err);
                                 }
                             });
