@@ -12,15 +12,19 @@ exports.newTeam = function(req, res) {
             if (!err) {
                 if (team) {
                     logger.info(null, ["Updating team:", req.body.teamName]);
-                    team.teamName = req.body.teamName,
-                        team.teamLeagues = req.body.teamLeagues,
-                        team.teamCountry = req.body.teamCountry,
-                        team.players = req.body.players
+                    team.teamName = req.body.teamName;
+                    team.teamLeagues = req.body.teamLeagues;
+                    team.teamCountry = req.body.teamCountry;
+                    team.players = [];
+                    for (var i in req.body.players) {
+                        team.players.push(req.body.players[i]);
+                    }
+
 
                     team.save(function(err, savedTeam) {
                         if (!err) {
-                            logger.info(null, ["Updated team", savedTeam._id, ]);
-                            res.stats(200).send(savedTeam);
+                            logger.info(null, ["Updated team", savedTeam._id]);
+                            res.status(200).send(savedTeam);
                         }
                         else {
                             logger.error(null, [err.toString()]);
@@ -39,14 +43,19 @@ exports.newTeam = function(req, res) {
                 res.status(500).send(err);
             }
         });
-    } else {
+    }
+    else {
         logger.info(null, ["Creating a new team:", req.body.teamName]);
         var newTeam = new dbOperations.TeamModel({
             teamName: req.body.teamName,
             teamLeagues: req.body.teamLeagues,
             teamCountry: req.body.teamCountry,
-            players: req.body.players
+            players: []
         });
+
+        for (var i in req.body.players) {
+            newTeam.players.push(req.body.players[i]);
+        }
 
         newTeam.save(function(err, savedTeam) {
             if (!err) {
@@ -61,25 +70,40 @@ exports.newTeam = function(req, res) {
     }
 };
 
-exports.getTeam = function(req, res){
-    dbOperations.TeamModel.findOne({_id: req.params.id}, function(err, team){
-       if(err){
-           logger.error(null, ["Failed to get team: ", err.toString()]);
+exports.getTeam = function(req, res) {
+    dbOperations.TeamModel.findOne({
+        _id: req.params.id
+    }, function(err, team) {
+        if (err) {
+            logger.error(null, ["Failed to get team: ", err.toString()]);
             res.status(500).send(err);
-       } 
-       
-       res.status(200).send(team);
-    });
-}
+        }
 
-exports.removeTeam = function(req, res){
-    dbOperations.TeamModel.remove({_id: req.params.id}, function(err){
-        if(err){
+        res.status(200).send(team);
+    });
+};
+
+exports.getTeams = function(req, res) {
+    dbOperations.TeamModel.find({}, function(err, team) {
+        if (err) {
+            logger.error(null, ["Failed to get teams: ", err.toString()]);
+            res.status(500).send(err);
+        }
+
+        res.status(200).send(team);
+    });
+};
+
+exports.removeTeam = function(req, res) {
+    dbOperations.TeamModel.remove({
+        _id: req.params.id
+    }, function(err) {
+        if (err) {
             logger.error(null, ["Failed to remove team: ", err.toString()]);
             res.status(500).send(err);
         }
-        
-        logger.error(null, ["Removed team: ", req.params.id]);
+
+        logger.info(null, ["Removed team: ", req.params.id]);
         res.status(200).end();
     });
-}
+};

@@ -74,16 +74,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
 
     $scope.messages = [];
     var counter = 0;
-    PubNub.ngSubscribe({
-        channel: 'adminSocket',
-        message: function (message) {
-            $scope.messages.push({id: counter, text: message[0]});
-            counter++;
-            $timeout(function () {
-                $scope.$apply();
-            });
-        }
-    });
+    
 
     $scope.reassign = function () {
         ModalService.showModal({

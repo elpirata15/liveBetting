@@ -1,0 +1,58 @@
+<div class="btn-group btn-group-justified">
+    <a href="/#/teams" class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> Teams</a>
+    <a ng-controller="userController" ng-click="doLogout()" class="btn btn-default"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+</div>
+<br/>
+
+<div class="row">
+    <div class="col-xs-5">
+        <h2><b>Team Data: {{team.teamName}}</b></h2>
+        <form class="form-horizontal">
+            <fieldset>
+                <div class="form-group">
+                    <label for="teamName" class="col-xs-3 control-label">Team Name</label>
+                    <div class="col-xs-9">
+                        <input id="teamName" type="text" class="form-control" ng-model="team.teamName">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="teamLeagues" class="col-xs-3 control-label">Team Leagues</label>
+                    <div class="col-xs-9">
+                        <input id="teamLeagues" type="text" class="form-control" ng-model="team.teamLeagues">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="teamLeagues" class="col-xs-3 control-label">Team Country</label>
+                    <div class="col-xs-9">
+                        <select class="form-control" ng-options="item.name as item.name for item in countries" ng-model="team.teamCountry"></select>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div class="col-xs-7">
+        <h2><b>Players:</b></h2>
+        <div class="row" ng-repeat="player in team.players">
+            <div class="col-xs-3">
+                <div class="form-group">
+                    <label for="playerNumber" class="col-xs-6 control-label">Number</label>
+                    <div class="col-xs-6">
+                        <input id="playerNumber" type="text" class="form-control" ng-model="player.playerNumber">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-7">
+                <div class="form-group">
+                    <label for="playerName" class="col-xs-3 control-label">Name</label>
+                    <div class="col-xs-9">
+                        <input id="playerName" type="text" class="form-control" ng-model="player.playerName">
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary col-xs-2" ng-click="removePlayer($index)"><span class="glyphicon glyphicon-remove"></span> Remove</button>
+        </div>
+        <br/>
+        <button type="button" class="btn btn-primary col-xs-4" ng-click="addPlayer()"><span class="glyphicon glyphicon-plus-sign"></span> Add Player</button>
+    </div>
+</div>
+<button type="button" class="btn btn-primary col-xs-4" ng-click="save()"><span class="glyphicon glyphicon-floppy-save"></span> Save</button>

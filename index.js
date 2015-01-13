@@ -20,6 +20,7 @@ var app = express();
 var day = 1000 * 60 * 60 * 24;
 
 app.set('port', (process.env.PORT || 5000));
+app.set('host', (process.env.IP || "localhost"));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 app.use(session({
@@ -166,12 +167,15 @@ app.get('/removeTeam/:id', ensureManager, teamContoller.removeTeam);
 
 app.get('/getTeam/:id', ensureManager, teamContoller.getTeam);
 
+app.get('/getTeams', ensureManager, teamContoller.getTeams);
+
 // #######################################
 
 app.get('/defaultLog', ensureAdmin, function(req, res) {
     res.sendFile('default.log');
 });
 
-app.listen(app.get('port'), function() {
-    logger.info(null, ["Node app is running at localhost:" + app.get('port')]);
+app.listen(app.get('port'), app.get('host'), function() {
+    
+    logger.info(null, ["Node app is running at " +app.get('host') +":" + app.get('port')]);
 });
