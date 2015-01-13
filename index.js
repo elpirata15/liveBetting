@@ -20,7 +20,7 @@ var app = express();
 var day = 1000 * 60 * 60 * 24;
 
 app.set('port', (process.env.PORT || 5000));
-app.set('host', (process.env.IP || "localhost"));
+app.set('host', process.env.IP);
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 app.use(session({
@@ -36,29 +36,29 @@ app.use(session({
 }));
 
 // ### GENERAL ERROR HANDLER ######
-app.use(function(err, req, res, next){
+app.use(function(err, req, res, next) {
     console.error(err.stack);
-    pubnubManager.removeFromPool(function(){
+    pubnubManager.removeFromPool(function() {
         mailer.sendErrorEmail(err.stack);
         setTimeout(function() {
             process.exit(1);
         }, 10);
     });
-    
+
 });
 
-function exitGracefully(){
-    pubnubManager.removeFromPool(function(){
-        process.exit(0);    
+function exitGracefully() {
+    pubnubManager.removeFromPool(function() {
+        process.exit(0);
     });
 }
 
 process.on('SIGINT', function() {
-  exitGracefully();
+    exitGracefully();
 });
 
 process.on('SIGTERM', function() {
-  exitGracefully();
+    exitGracefully();
 });
 // ################################
 
@@ -175,7 +175,13 @@ app.get('/defaultLog', ensureAdmin, function(req, res) {
     res.sendFile('default.log');
 });
 
-app.listen(app.get('port'), app.get('host'), function() {
-    
-    logger.info(null, ["Node app is running at " +app.get('host') +":" + app.get('port')]);
-});
+if (app.get('host')) {
+    app.listen(app.get('port'), app.get('host'), function() {
+        logger.info(null, ["Node app is running at " + app.get('host') + ":" + app.get('port')]);
+    });
+}
+else {
+    app.listen(app.get('port'), function() {
+        logger.info(null, ["Node app is running at localhost:" + app.get('port')]);
+    });
+}
