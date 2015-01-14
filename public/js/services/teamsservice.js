@@ -3,12 +3,9 @@ angular.module('liveBetManager').factory('teamsService', ['$http', function($htt
     var apiKey = "tZUXOOZ8Lf7spqPCBkcSjaRqJzeXyvTk";
 
 
-    teamsService.getClubs = function(){
-      return $http.get('http://worldcup.kimonolabs.com/api/clubs?fields=name,id&apikey='+apiKey+'&limit=500');
-    };
-    teamsService.getPlayers = function(clubId){
-        return $http.get('http://worldcup.kimonolabs.com/api/players?fields=nickname&apikey='+apiKey+'&clubId='+clubId);
-    };
+    teamsService.getGameTeams = function(gameId){
+        return $http.get('/getGameTeams/'+gameId);
+    }
     
     teamsService.getLeagues = function(){
         return $http.get('/getLeagues');

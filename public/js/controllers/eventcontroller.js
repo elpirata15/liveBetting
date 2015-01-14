@@ -90,14 +90,6 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         };
         $scope.teams = $scope.game.teams;
 
-        teamsService.getTeam($scope.teams[0]).success(function (data) {
-            $scope.teams[0] = data;
-        });
-
-        teamsService.getTeam($scope.teams[1]).success(function (data) {
-            $scope.teams[1] = data;
-        });
-
         $scope.bidEntityTemplate = {
             gameId: $scope.game._id,
             gameName: $scope.game.gameName,

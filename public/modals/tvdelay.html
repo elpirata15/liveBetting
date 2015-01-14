@@ -1,23 +1,28 @@
-
-            <div class="modal-header">
-                <button type="button" class="close" ng-click="cancel" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">TV Delay</h4>
+<div class="modal-header">
+    <button type="button" class="close" ng-click="cancel" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">Game Settings</h4>
+</div>
+<div class="modal-body">
+    <form class="form-horizontal">
+        <fieldset>
+            <legend>Please input delay in seconds if scouting from a TV broadcast</legend>
+            <div class="form-group">
+                <label for="delay" class="col-lg-2 control-label">Delay (in seconds):</label>
+                <div class="col-lg-10">
+                    <input id="delay" type="number" ng-model="tvDelay" class="form-control">
+                </div>
             </div>
-            <div class="modal-body">
-                <form class="form-horizontal">
-                    <fieldset>
-                        <legend>Please input delay in seconds if scouting from a TV broadcast</legend>
-                        <div class="form-group">
-                            <label for="delay" class="col-lg-2 control-label">Delay (in seconds):</label>
-                            <div class="col-lg-10">
-                                <input id="delay" type="number" ng-model="tvDelay" class="form-control">
-                            </div>
-                        </div>
-
-                    </fieldset>
-                </form>
-                <button type="button" class="btn btn-primary" ng-keyup="hitEnter($event)" ng-click="save()" data-dismiss="modal">OK</button>
-            </div>
+        </fieldset>
+    </form>
+    <div class="col-xs-12">
+        <lineup-selection team="team1" ng-model="team1.lineup" bench="team1.bench"></lineup-selection>
+        <br/>
+    </div>
+    <div class="col-xs-12">
+        <lineup-selection team="team2" ng-model="team2.lineup" bench="team2.bench"></lineup-selection>
+    </div>
+    <button type="button" class="btn btn-primary" ng-keyup="hitEnter($event)" ng-click="save()" data-dismiss="modal">OK</button>
+</div>
 
 
 <!--<div class="modal-header"><h4 class="modal-title"><span class="glyphicon glyphicon-star"></span> User\'s Name</h4></div><div class="modal-body"><ng-form name="nameDialog" novalidate role="form"><div class="form-group input-group-lg" ng-class="{true: \'has-error\'}[nameDialog.username.$dirty && nameDialog.username.$invalid]"><label class="control-label" for="course">Name:</label><input type="text" class="form-control" name="username" id="username" ng-model="user.name" ng-keyup="hitEnter($event)" required><span class="help-block">Enter your full name, first &amp; last.</span></div></ng-form></div><div class="modal-footer"><button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button><button type="button" class="btn btn-primary" ng-click="save()" ng-disabled="(nameDialog.$dirty && nameDialog.$invalid) || nameDialog.$pristine">Save</button></div>'-->

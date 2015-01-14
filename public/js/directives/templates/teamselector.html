@@ -2,9 +2,9 @@
         <div class="panel panel-primary">
             <div class="panel-heading"  style="text-align:center;text-transform: capitalize">{{teams[0].teamName}}</div>
             <div class="panel-body">
-                <div class="col-xs-4" ng-repeat="player in teams[0].players">
-                    <button type="button" ng-click="setSelectedPlayer(player.playerName, teams[0].teamName, 0)"
-                            class="btn btn-block" ng-class="{'btn-default': selectedPlayer[0] != player.playerName, 'btn-primary': selectedPlayer[0] == player.playerName}">{{player.playerName}}
+                <div class="col-xs-4" ng-repeat="player in teams[0].lineup">
+                    <button type="button" ng-click="setSelectedPlayer(player, teams[0].teamName, 0)"
+                            class="btn btn-block" ng-class="{'btn-default': selectedPlayer[0] != player, 'btn-primary': selectedPlayer[0] == player}">{{player}}
                     </button>
                 </div>
             </div>
@@ -14,9 +14,9 @@
         <div class="panel panel-warning">
             <div class="panel-heading" style="text-align:center;text-transform: capitalize">{{teams[1].teamName}}</div>
             <div class="panel-body">
-                <div class="col-xs-4" ng-repeat="player in teams[1].players">
-                    <button type="button" ng-click="setSelectedPlayer(player.playerName, teams[1].teamName, 1)"
-                            class="btn btn-block" ng-class="{'btn-default': selectedPlayer[1] != player.playerName, 'btn-warning': selectedPlayer[1] == player.playerName}">{{player.playerName}}
+                <div class="col-xs-4" ng-repeat="player in teams[1].lineup">
+                    <button type="button" ng-click="setSelectedPlayer(player, teams[1].teamName, 1)"
+                            class="btn btn-block" ng-class="{'btn-default': selectedPlayer[1] != player, 'btn-warning': selectedPlayer[1] == player}">{{player}}
                     </button>
                 </div>
             </div>
