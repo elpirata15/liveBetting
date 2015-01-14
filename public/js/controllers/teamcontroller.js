@@ -1,5 +1,5 @@
 /* global angular */
-angular.module('liveBetManager').controller('teamController', ['$scope', '$rootScope', '$routeParams', 'teamsService', 'ModalService', '$timeout', 'dialogs', function($scope, $rootScope, $routeParams, teamsService, ModalService, $timeout, dialogs) {
+angular.module('liveBetManager').controller('teamController', ['$scope', '$rootScope', '$routeParams', 'teamsService', 'ModalService', '$timeout', 'dialogs','$location', function($scope, $rootScope, $routeParams, teamsService, ModalService, $timeout, dialogs,$location) {
 
     $scope.team = {};
     if($routeParams.id){
@@ -30,7 +30,7 @@ angular.module('liveBetManager').controller('teamController', ['$scope', '$rootS
         $scope.team.teamLeagues = teamsArray;
         teamsService.updateTeam($scope.team).success(function(data){
             $scope.team = data;
-            window.location = "/#/teams";
+            $location.path('/teams');
         });
     };
 }]);
