@@ -167,6 +167,8 @@ app.get('/removeTeam/:id', ensureManager, teamContoller.removeTeam);
 
 app.get('/getTeam/:id', ensureManager, teamContoller.getTeam);
 
+app.get('/getTeamPlayers/:id', ensureManager, teamContoller.getTeamPlayers);
+
 app.get('/getTeams', ensureManager, teamContoller.getTeams);
 
 // #######################################

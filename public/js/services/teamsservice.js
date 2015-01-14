@@ -23,7 +23,7 @@ angular.module('liveBetManager').factory('teamsService', ['$http', function($htt
     };
     
     teamsService.getPlayers2 = function(teamId){
-        return $http.get('/getPlayers/'+teamId);
+        return $http.get('/getTeamPlayers/'+teamId);
     };
     
     teamsService.updateTeam = function(team){

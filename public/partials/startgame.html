@@ -8,10 +8,10 @@
         <div class="form-group">
             <label for="teams" class="col-lg-2 control-label">Teams</label>
             <div class="col-lg-5">
-                <input type="text" class="form-control" id="teams" ng-model="team1" placeholder="Team 1" typeahead="team as team.name for team in availableTeams | filter:{name:$viewValue}">
+                <input type="text" class="form-control" id="teams" ng-model="team1" placeholder="Team 1" typeahead="team as team.teamName for team in availableTeams | filter:{teamName:$viewValue}">
             </div>
             <div class="col-lg-5">
-                <input type="text" class="form-control" id="teams2" ng-model="team2" placeholder="Team 2" typeahead="team as team.name for team in availableTeams | filter:{name:$viewValue}">
+                <input type="text" class="form-control" id="teams2" ng-model="team2" placeholder="Team 2" typeahead="team as team.teamName for team in availableTeams | filter:{teamName:$viewValue}">
             </div>
         </div>
         <div class="form-group">

@@ -83,6 +83,19 @@ exports.getTeam = function(req, res) {
     });
 };
 
+exports.getTeamPlayers = function(req, res) {
+    dbOperations.TeamModel.findOne({
+        _id: req.params.id
+    }, function(err, team) {
+        if (err) {
+            logger.error(null, ["Failed to get team players: ", err.toString()]);
+            res.status(500).send(err);
+        }
+
+        res.status(200).send(team.players);
+    });
+};
+
 exports.getTeams = function(req, res) {
     dbOperations.TeamModel.find({}, function(err, team) {
         if (err) {

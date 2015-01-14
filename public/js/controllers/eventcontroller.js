@@ -90,18 +90,12 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         };
         $scope.teams = $scope.game.teams;
 
-        teamsService.getPlayers($scope.teams[0].teamId).success(function (data) {
-            $scope.teams[0].players = [];
-            for (var j in data) {
-                $scope.teams[0].players.push({playerName: data[j].nickname});
-            }
+        teamsService.getTeam($scope.teams[0]).success(function (data) {
+            $scope.teams[0] = data;
         });
 
-        teamsService.getPlayers($scope.teams[1].teamId).success(function (data) {
-            $scope.teams[1].players = [];
-            for (var j in data) {
-                $scope.teams[1].players.push({playerName: data[j].nickname});
-            }
+        teamsService.getTeam($scope.teams[1]).success(function (data) {
+            $scope.teams[1] = data;
         });
 
         $scope.bidEntityTemplate = {

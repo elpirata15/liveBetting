@@ -29,7 +29,8 @@ angular.module('liveBetManager').controller('teamController', ['$scope', '$rootS
         }
         $scope.team.teamLeagues = teamsArray;
         teamsService.updateTeam($scope.team).success(function(data){
-            $scope.team = data; 
+            $scope.team = data;
+            window.location = "/#/teams";
         });
     };
 }]);
