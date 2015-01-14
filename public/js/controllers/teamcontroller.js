@@ -4,7 +4,9 @@ angular.module('liveBetManager').controller('teamController', ['$scope', '$rootS
     $scope.team = {};
     if($routeParams.id){
         teamsService.getTeam($routeParams.id).success(function(data){
-            $scope.team = data; 
+            $scope.team = data;
+            var teamLeaguesString = $scope.team.teamLeagues.join(',');
+            $scope.team.teamLeagues = teamLeaguesString;
         });
     }
     
