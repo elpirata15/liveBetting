@@ -1,3 +1,4 @@
+/*global angular*/
 angular.module('liveBetManager').directive('teamSelector', function() {
     return {
         restrict: 'E',
@@ -74,7 +75,7 @@ angular.module('liveBetManager').directive('teamSelector', function() {
         link: function(scope, element, attrs) {
             
             scope.$watch('team', function(newVal){
-               if(newVal.bench){
+               if(newVal && newVal.bench){
                    scope.selectedPlayers = angular.copy(newVal.bench);
                } 
             });

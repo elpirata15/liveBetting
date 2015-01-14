@@ -4,6 +4,12 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.connected = false;
         $scope.log = [];
         $scope.game = localStorageService.get('currentGame');
+        
+        // Update local storage in any event of game details change
+        $scope.$watch('game', function(newVal){
+           localStorageService.set('currentGame', newVal);
+        },true);
+        
         $scope.eventDescription = {teams: []};
         $scope.selectedOption;
         $scope.currentEvent;
@@ -207,6 +213,26 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             });
             $scope.betOpen = false;
             $scope.showResults = false;
+            
+            
+            if($scope.currentEvent.eventName === "Substitution"){
+                // Take substituted (out) player from lineup to bench
+                var outPlayerIndex = $scope.teamsToPlayers[$scope.eventDescription.teamName].lineup.indexOf($scope.eventDescription.playerName);
+                $scope.teamsToPlayers[$scope.eventDescription.teamName].lineup.splice(outPlayerIndex, 1);
+                $scope.teamsToPlayers[$scope.eventDescription.teamName].bench.push($scope.eventDescription.playerName);
+                
+                // Take substituted (in) player from bench to lineup
+                var inPlayerName = $scope.currentEvent.eventOptions[optionIndex];
+                var inPlayerIndex = $scope.teamsToPlayers[$scope.eventDescription.teamName].bench.indexOf(inPlayerName);
+                $scope.teamsToPlayers[$scope.eventDescription.teamName].lineup.push(inPlayerName);
+                $scope.teamsToPlayers[$scope.eventDescription.teamName].bench.splice(inPlayerIndex, 1);
+                
+                $timeout(function(){
+                   $scope.$apply(); 
+                });
+            }
+            
+            $scope.changeEventTemplate($scope.events.substitution);
         };
 
         $scope.openLongBet = function (time) {
