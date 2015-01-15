@@ -49,21 +49,21 @@ exports.getUserById = function(req, res) {
 };
 
 exports.getUserBidsFromSession = function(req, res) {
-    var currDate = new Date();
-    if (req.body.date) {
-        currDate = req.body.date;
-    }
-    logger.info(null, ["Getting bids for user", req.session.uid, "for date", currDate]);
-    var startingDate = new Date(new Date(currDate).setHours(new Date(currDate).getHours() - 24));
+    logger.info(null, ["Getting bids for user", req.session.uid]);
     dbOperations.UserModel
         .where('_id', req.session.uid)
-        .where('completedBids.gameDate').lte(currDate).gte(startingDate)
         .exec(function(err, foundBids) {
             if (!err) {
                 logger.info(null, ["Found", foundBids.length, "bids."]);
                 var foundBidsToSend = [];
-                for (var i in foundBids) {
-                    var currentCompletedBidClone = _.clone(foundBids[i]);
+                var selectedfoundBids = [];
+                if(req.body.startIndex && req.body.bidNumber){
+                    selectedfoundBids = foundBids.splice(req.body.startIndex, req.body.bidNumber);
+                } else {
+                    selectedfoundBids = foundBids;
+                }
+                for (var i in selectedfoundBids) {
+                    var currentCompletedBidClone = _.clone(selectedfoundBids[i]);
                     var completedBidOptionsObject = {};
                     for (var j in currentCompletedBidClone.bidOptions) {
                         completedBidOptionsObject[j] = currentCompletedBidClone.bidOptions[j];
