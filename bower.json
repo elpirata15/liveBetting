@@ -25,7 +25,7 @@
     "angular-modal-service": "~0.4.0",
     "angular-bootstrap": "~0.11.2",
     "angular-sanitize": "~1.3.1",
-    "angular-bootstrap-slider": "~0.0.8"
+    "angular-bootstrap-slider": "~0.0.8",
     "angular-loading-bar":"~0.6.0",
     "angular-animate": "~1.3.9"
   },
