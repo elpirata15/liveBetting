@@ -66,7 +66,7 @@ var gameEntity = new Schema({
     assignedTo: String,
     location: String,
     timestamp: Date,
-    type: String,
+    gameLeague: String,
     status: String,
     tvDelay: Number,
     bids: [bidEntity]

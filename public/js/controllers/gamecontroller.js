@@ -1,14 +1,17 @@
-angular.module('liveBetManager').controller('gameController', ['$scope', '$rootScope', '$location', 'PubNub', 'betManagerService', 'teamsService', 'authService', '$timeout', 'localStorageService',
-    function ($scope, $rootScope, $location, PubNub, betManagerService, teamsService, authService, $timeout, localStorageService) {
+/*global angular*/
+angular.module('liveBetManager').controller('gameController', ['$scope', '$rootScope', '$location', 'PubNub', 'betManagerService', 'teamsService', 'authService', '$timeout', 'localStorageService', '$filter',
+    function ($scope, $rootScope, $location, PubNub, betManagerService, teamsService, authService, $timeout, localStorageService, $filter) {
         $scope.game = {};
         $scope.team1 = "";
         $scope.team2 = "";
         $scope.availableTeams = [];
-
+        $scope.displayTeams = [];
+        $scope.leagues = ["UEFA Champions League", "Premier League", "Serie A", "Bundesliga", "La Liga"];
         teamsService.getAllTeams().success(function (data) {
             $scope.availableTeams = data;
+            $scope.displayTeams = data;
         });
-
+        
         $scope.startGame = function () {
             //$scope.game.assignedTo = $scope.game.assignedTo._id;
             $scope.game.gameName = $scope.team1.teamName + " vs. " + $scope.team2.teamName;

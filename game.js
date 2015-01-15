@@ -76,9 +76,9 @@ exports.createGame = function(req, res) {
                 game.gameName = req.body.gameName;
                 game.teams = req.body.teams;
                 game.timestamp = new Date(req.body.timestamp);
+                game.gameLeague = req.body.gameLeague;
                 game.assignedTo = req.body.assignedTo;
                 game.location = req.body.location;
-                game.type = req.body.type;
                 game.status = "Waiting";
                 game.save(function(err, game) {
                     if (!err) {
@@ -100,10 +100,10 @@ exports.createGame = function(req, res) {
         logger.info(null, ["Creating game:", req.body.gameName]);
         newGame = new dbOperations.GameModel({
             gameName: req.body.gameName,
+            gameLeague: req.body.gameLeague,
             teams: req.body.teams,
             timestamp: new Date(req.body.timestamp),
             location: req.body.location,
-            type: req.body.type,
             status: "Waiting"
         });
 
