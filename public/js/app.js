@@ -3,12 +3,14 @@ angular.module('liveBetManager', [
     'ngCookies',
     'ngRoute',
     'ngSanitize',
+    'ngAnimate',
     'LocalStorageModule',
     'angularModalService',
     'pubnub.angular.service',
     'ngGrid',
     'dialogs.main',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'angular-loading-bar'
 ]).config(['$routeProvider', 'localStorageServiceProvider', function($routeProvider, localStorageServiceProvider) {
     //$routeProvider.when('/', {templateUrl: 'partials/home.html', controller:'homeController'});
     $routeProvider.when('/gameMaster', {
@@ -804,7 +806,7 @@ angular.module('liveBetManager', [
         $rootScope.flash = "";
         if (authService.group() != "Admins") {
             if (next.restrict && next.restrict.indexOf(authService.group()) < 0 && !authService.isAuthenticated()) {
-                $rootScope.returnUrl = current;
+                $rootScope.returnUrl = location.hash;
                 $location.path('/login');
             }
         }
