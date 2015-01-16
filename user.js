@@ -1,5 +1,6 @@
 var dbOperations = require('./dbOperations');
 var serverLogger = require('./serverLogger');
+var uuid = require('node-uuid');
 var bcrypt = require('bcrypt-nodejs');
 var _ = require('underscore');
 
@@ -122,7 +123,8 @@ exports.registerUser = function(req, res) {
                                 fullName: req.body.fullName,
                                 balance: 0,
                                 group: req.body.group,
-                                status: "Active"
+                                status: "Active",
+                                uuid: uuid.v1()
                             });
 
                             newUser.save(function(err, user) {
@@ -193,7 +195,8 @@ exports.loginUser = function(req, res) {
                                 _id: user._id,
                                 group: user.group,
                                 email: user.email,
-                                fullName: user.fullName
+                                fullName: user.fullName,
+                                uuid: user.uuid
                             };
                             res.status(200).send(userToSend);
                         }

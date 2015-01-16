@@ -100,7 +100,8 @@ var userEntity = new Schema({
     balance: Number,
     completedBids: [completeBidEntity],
     group: String, //Admins, Users, Managers, Masters
-    status: String // Active, Inactive
+    status: String, // Active, Inactive
+    uuid: String
 });
 
 exports.UserModel = mongoose.model('users', userEntity);

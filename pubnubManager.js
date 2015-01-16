@@ -1,4 +1,3 @@
-var uuid = require('node-uuid');
 var instanceName = "server_"+process.env.DYNO;
 var pubnub = require("pubnub").init({
     publish_key: process.env.PUBNUB_PUBLISH_KEY,
