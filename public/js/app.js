@@ -1,5 +1,5 @@
 /* global angular */
-angular.module('liveBetManager', [
+var app = angular.module('liveBetManager', [
     'ngCookies',
     'ngRoute',
     'ngSanitize',
@@ -9,9 +9,8 @@ angular.module('liveBetManager', [
     'pubnub.angular.service',
     'ngGrid',
     'dialogs.main',
-    'ui.bootstrap',
-    'angular-loading-bar'
-]).config(['$routeProvider', 'localStorageServiceProvider', function($routeProvider, localStorageServiceProvider) {
+    'ui.bootstrap'
+]).config(['$routeProvider', 'localStorageServiceProvider', '$httpProvider', function ($routeProvider, localStorageServiceProvider, $httpProvider) {
     $routeProvider.when('/gameMaster', {
         templateUrl: 'partials/gamemaster.html',
         controller: 'gameMasterController',
@@ -50,29 +49,37 @@ angular.module('liveBetManager', [
         controller: 'teamController',
         restrict: ['Managers', 'Masters']
     });
+    $routeProvider.when('/reporting/:currentView?', {
+        templateUrl: 'partials/reporting/home.html',
+        controller: 'reportingController',
+        restrict: ['Admins']
+    });
     $routeProvider.otherwise('/login');
 
+    $httpProvider.interceptors.push('httpSpinner');
+
     localStorageServiceProvider.setPrefix('liveBetManager');
-}]).run(function($rootScope, PubNub, authService, $location, $http, localStorageService) {
+}]).run(function ($rootScope, PubNub, authService, $location, $http, localStorageService) {
     $rootScope.activeGame = {};
-    var localUuid = localStorageService.get('uuid') || function() {
-        var uuid = 'console' + Math.random();
-        localStorageService.set('uuid', uuid);
-        localUuid = uuid;
-    };
+    var localUuid = localStorageService.get('uuid') || function () {
+            var uuid = 'console' + Math.random();
+            localStorageService.set('uuid', uuid);
+            localUuid = uuid;
+        };
     $rootScope.keys = {
         publish_key: 'pub-c-d2e656c9-a59e-48e2-b5c5-3c16fe2124d2',
         subscribe_key: 'sub-c-71b821d4-7665-11e4-af64-02ee2ddab7fe',
-        uuid: localUuid()
+        uuid: localUuid
     };
-        
+
 
     try {
-        $http.get('http://pubnub-balancer.herokuapp.com/').success(function(data) {
+        $http.get('http://pubnub-balancer.herokuapp.com/').success(function (data) {
             console.log('pinged msg queue');
         });
     }
-    catch (ex) {}
+    catch (ex) {
+    }
 
     $rootScope.countries = [{
         name: 'Afghanistan',
@@ -805,7 +812,7 @@ angular.module('liveBetManager', [
         code: 'ZW'
     }];
 
-    $rootScope.$on('$routeChangeStart', function(event, next, current) {
+    $rootScope.$on('$routeChangeStart', function (event, next, current) {
         $rootScope.flash = "";
         if (authService.group() != "Admins") {
             if (next.restrict && next.restrict.indexOf(authService.group()) < 0 && !authService.isAuthenticated()) {
@@ -814,17 +821,38 @@ angular.module('liveBetManager', [
             }
         }
     });
-}).controller('ModalController', function($scope, close, betManagerService) {
+
+    $rootScope.$on('loading:progress', function(){
+        $('#spinner').show();
+    });
+
+    $rootScope.$on('loading:finish', function(){
+        $('#spinner').hide();
+    });
+}).controller('ModalController', function ($scope, close, betManagerService) {
 
     $scope.chosenName = undefined;
 
-    betManagerService.getManagers().success(function(data) {
+    betManagerService.getManagers().success(function (data) {
         $scope.managers = data;
     });
 
-    $scope.close = function(result) {
+    $scope.close = function (result) {
         result = result || $scope.chosenName;
         close(result, 500); // close, but give 500ms for bootstrap to animate
     };
 
+}).factory('httpSpinner', function($q, $rootScope, $window){
+    var loadingCount = 0;
+    return {
+        'request': function (request) {
+            if(++loadingCount === 1) $rootScope.$broadcast('loading:progress');
+
+            return request || $q.when(request);
+        },
+        'response': function (response) {
+            if(--loadingCount === 0) $rootScope.$broadcast('loading:finish');
+            return response || $q.when(response);
+        }
+    }
 });

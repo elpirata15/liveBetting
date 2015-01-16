@@ -8,7 +8,9 @@ var gameController = require('./game');
 var bidController = require('./bid');
 var userController = require('./user');
 var teamContoller = require('./team');
-var pubnubManager = require('./pubnubManager');
+if(!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
+    var pubnubManager = require('./pubnubManager');
+}
 var mailer = require('./mailer');
 var http = require('http');
 

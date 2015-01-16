@@ -10,11 +10,8 @@ angular.module('liveBetManager').controller('userController', ['$scope', '$rootS
             pass: $scope.user.pass
         }, function(result) {
             if (result) {
-                
                 $scope.loggedIn = true;
-                if ($rootScope.returnUrl) {
-                    window.location = "/" + $rootScope.returnUrl;
-                }
+                window.location = "http://" + location.path + "/";
             }
         });
     };

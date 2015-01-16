@@ -1,0 +1,22 @@
+<div class="navbar navbar-default">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" style="cursor: pointer" ng-click="changeView('#/reporting/')">Fuego Reporting</a>
+    </div>
+    <div class="navbar-collapse collapse navbar-responsive-collapse">
+        <ul class="nav navbar-nav">
+            <li ng-class="{'active':currentView === 'liveGame'}"><a style="cursor: pointer" ng-click="changeView('#/reporting/liveGame')">Live Game Report</a></li>
+            <li ng-class="{'active':currentView === 'revenue'}"><a style="cursor: pointer" ng-click="changeView('#/reporting/revenue')">Revenue Report</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+        </ul>
+    </div>
+</div>
+<p ng-if="currentView === 'home'" align="center"><img src="../../img/logosmall.png" alt="Fuego Logo"></p>
+<div ng-include="includes[currentView]" style="height:100%"></div>

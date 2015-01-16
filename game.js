@@ -13,6 +13,7 @@ var logger = new serverLogger();
 
 // For client - get games you can subscribe to
 exports.getGames = function(req, res) {
+    logger.info(null, ["Getting all games"]);
     dbOperations.GameModel.where('status').in(['Active', 'Waiting']).exec(function(err, docs) {
         if (!err && docs.length > 0) {
             return res.status(200).send(docs);
@@ -61,6 +62,25 @@ exports.getWaitingGames = function(req, res) {
                 res.status(500).send(err);
             }
         }
+    });
+};
+
+exports.getGameBids = function(req, res){
+    logger.info(null, ["Getting bids for game", req.params.gameId]);
+    dbOperations.GameModel.findOne({
+        _id: req.params.gameId
+    }, function(err, game){
+        if(err){
+            logger.error(null, ["Failed to get game bids:", err.toString()]);
+            res.status(500).send(err);
+        }
+        if(!game){
+            logger.error(null, ["Failed to get game bids: no game by this Id"]);
+            res.status(500).send("no game by this Id");
+        }
+
+        res.status(200).send(game.bids);
+
     });
 };
 
