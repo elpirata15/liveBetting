@@ -11,7 +11,7 @@ angular.module('liveBetManager').controller('userController', ['$scope', '$rootS
         }, function(result) {
             if (result) {
                 $scope.loggedIn = true;
-                window.location = "http://" + location.path + "/";
+                window.location = "http://" + location.host + "/";
             }
         });
     };
