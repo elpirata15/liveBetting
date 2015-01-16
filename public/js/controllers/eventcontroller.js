@@ -1,6 +1,8 @@
 /* global angular */
 angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', '$location', 'PubNub', 'betManagerService', 'teamsService', 'authService', '$timeout', '$interval', 'localStorageService', 'dialogs',
     function ($scope, $rootScope, $location, PubNub, betManagerService, teamsService, authService, $timeout, $interval, localStorageService, dialogs) {
+        PubNub.init($rootScope.keys);
+        
         $scope.connected = false;
         $scope.log = [];
         $scope.game = localStorageService.get('currentGame');

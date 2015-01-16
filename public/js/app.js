@@ -12,7 +12,6 @@ angular.module('liveBetManager', [
     'ui.bootstrap',
     'angular-loading-bar'
 ]).config(['$routeProvider', 'localStorageServiceProvider', function($routeProvider, localStorageServiceProvider) {
-    //$routeProvider.when('/', {templateUrl: 'partials/home.html', controller:'homeController'});
     $routeProvider.when('/gameMaster', {
         templateUrl: 'partials/gamemaster.html',
         controller: 'gameMasterController',
@@ -56,17 +55,17 @@ angular.module('liveBetManager', [
     localStorageServiceProvider.setPrefix('liveBetManager');
 }]).run(function($rootScope, PubNub, authService, $location, $http, localStorageService) {
     $rootScope.activeGame = {};
-    var localUuid = localStorageService.get('uuid') || function(){
+    var localUuid = localStorageService.get('uuid') || function() {
         var uuid = 'console' + Math.random();
         localStorageService.set('uuid', uuid);
         localUuid = uuid;
     };
-    var keys = {
+    $rootScope.keys = {
         publish_key: 'pub-c-d2e656c9-a59e-48e2-b5c5-3c16fe2124d2',
         subscribe_key: 'sub-c-71b821d4-7665-11e4-af64-02ee2ddab7fe',
         uuid: localUuid()
     };
-    PubNub.init(keys);
+        
 
     try {
         $http.get('http://pubnub-balancer.herokuapp.com/').success(function(data) {

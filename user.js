@@ -52,28 +52,25 @@ exports.getUserById = function(req, res) {
 exports.getUserBidsFromSession = function(req, res) {
     logger.info(null, ["Getting bids for user", req.session.uid]);
     dbOperations.UserModel
-        .where('_id', req.session.uid)
-        .exec(function(err, user) {
+        .findOne({_id:req.session.uid}).lean().exec(function(err, user) {
             if (!err) {
                 var foundBids = user.completedBids;
                 logger.info(null, ["Found", foundBids.length, "bids."]);
-                var foundBidsToSend = [];
                 var selectedfoundBids = [];
-                if(req.body.startIndex && req.body.bidNumber){
+                if(req.body.startIndex && req.body.bidNumber &&
+                ((req.body.bidNumber - req.body.startIndex) < foundBids.length)){
                     selectedfoundBids = foundBids.splice(req.body.startIndex, req.body.bidNumber);
                 } else {
                     selectedfoundBids = foundBids;
                 }
                 for (var i in selectedfoundBids) {
-                    var currentCompletedBidClone = _.clone(selectedfoundBids[i]);
                     var completedBidOptionsObject = {};
-                    for (var j in currentCompletedBidClone.bidOptions) {
-                        completedBidOptionsObject[j] = currentCompletedBidClone.bidOptions[j];
+                    for (var j in selectedfoundBids[i].bidOptions) {
+                        completedBidOptionsObject[j] = selectedfoundBids[i].bidOptions[j];
                     }
-                    currentCompletedBidClone.bidOptions = completedBidOptionsObject;
-                    foundBidsToSend.push(currentCompletedBidClone);
+                    selectedfoundBids[i].bidOptions = completedBidOptionsObject;
                 }
-                res.status(200).send(foundBidsToSend);
+                res.status(200).send(selectedfoundBids);
             }
             else {
                 logger.error(null, [err.toString()]);

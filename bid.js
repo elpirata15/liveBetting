@@ -279,7 +279,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
         var participants = bid.bidOptions[i].participants.length;
         totalParticipants += participants;
         completedBidOptions.push({
-            optionDescription: bid.bidOptions[i].bidDescription,
+            optionDescription: bid.bidOptions[i].optionDescription,
             participants: participants
         });
     }
