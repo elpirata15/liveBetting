@@ -50,6 +50,9 @@ exports.getUserById = function(req, res) {
 };
 
 exports.getUserBidsFromSession = function(req, res) {
+    if(!req.session.uid){
+        res.status(403).end();
+    }
     logger.info(null, ["Getting bids for user", req.session.uid]);
     dbOperations.UserModel
         .findOne({_id:req.session.uid}).lean().exec(function(err, user) {
