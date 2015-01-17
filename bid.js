@@ -397,6 +397,23 @@ var updateUserBalances = function(bid, gameName, gameDate) {
                         // Add the winning money to balance
                         user.balance -= participant.amount;
 
+                        var completedBid = {
+                            bidId: bid.id,
+                            bidDescription: bid.bidDescription,
+                            gameName: gameName,
+                            gameId: bid.gameId,
+                            gameDate: gameDate,
+                            bidTimestamp: bid.timestamp,
+                            totalPoolAmount: bid.totalPoolAmount,
+                            entryAmount: bid.entryAmount,
+                            bidOptions: completedBidOptions,
+                            selectedOption: i,
+                            winningOption: bid.winningOption,
+                            moneyWon: 0
+                        };
+
+                        user.completedBids.push(completedBid);
+
                         // Save user
                         user.save(function(err, savedUser) {
 
