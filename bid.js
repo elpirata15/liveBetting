@@ -320,6 +320,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
                             bidId: bid.id,
                             bidDescription: bid.bidDescription,
                             gameName: gameName,
+                            gameId: bid.gameId,
                             gameDate: gameDate,
                             bidTimestamp: bid.timestamp,
                             totalPoolAmount: bid.totalPoolAmount,

@@ -83,6 +83,7 @@ var completeBidEntity = new Schema({
     bidId: String,
     bidDescription: String,
     gameName: String,
+    gameId: ObjectId,
     gameDate: Date,
     bidTimestamp: Date,
     totalPoolAmount: Number,
