@@ -11,7 +11,11 @@ angular.module('liveBetManager').controller('userController', ['$scope', '$rootS
         }, function(result) {
             if (result) {
                 $scope.loggedIn = true;
-                window.location = "http://" + location.host + "/";
+                if(location.host === "reporting.alphabetters.co"){
+                    window.location = "http://" + location.host + "/#/reports";
+                } else {
+                    window.location = "http://" + location.host + "/";
+                }
             }
         });
     };
@@ -20,7 +24,7 @@ angular.module('liveBetManager').controller('userController', ['$scope', '$rootS
         authService.logout(function(result) {
             if (result) {
                 $scope.loggedIn = false;
-                $location.path('/');
+                window.location = "http://" + location.host + "/";
             }
         });
     };
@@ -29,7 +33,7 @@ angular.module('liveBetManager').controller('userController', ['$scope', '$rootS
         authService.register($scope.user, function(result) {
             if (result === true) {
                 $scope.loggedIn = true;
-                $location.path('/');
+                window.location = "http://" + location.host + "/";
             }
         });
     };

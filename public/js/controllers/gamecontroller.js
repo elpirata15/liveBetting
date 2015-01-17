@@ -19,7 +19,7 @@ angular.module('liveBetManager').controller('gameController', ['$scope', '$rootS
             //$scope.game.teams.push({teamName: $scope.team1.teamName, teamId: $scope.team1._id}, {teamName: $scope.team2.teamName, teamId: $scope.team2._id});
             $scope.game.timestamp = new Date($scope.date.getFullYear(), $scope.date.getMonth(), $scope.date.getDate(), $scope.time.getHours(), $scope.time.getMinutes());
             betManagerService.createGame($scope.game).success(function () {
-                $location.path("/#/gameMaster");
+                window.location = "/#/";
                 alert('game created');
             });
         };

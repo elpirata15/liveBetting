@@ -11,49 +11,32 @@ var app = angular.module('liveBetManager', [
     'dialogs.main',
     'ui.bootstrap'
 ]).config(['$routeProvider', 'localStorageServiceProvider', '$httpProvider', function ($routeProvider, localStorageServiceProvider, $httpProvider) {
-    $routeProvider.when('/gameMaster', {
-        templateUrl: 'partials/gamemaster.html',
-        controller: 'gameMasterController',
-        restrict: ['Masters']
-    });
-    $routeProvider.when('/gameMaster/newGame', {
-        templateUrl: 'partials/startgame.html',
-        controller: 'gameController',
-        restrict: ['Masters']
-    });
-    $routeProvider.when('/startGame', {
-        templateUrl: 'partials/gamewaitinglist.html',
-        controller: 'waitingListController',
-        restrict: ['Managers', 'Masters']
-    });
-    $routeProvider.when('/eventManager', {
-        templateUrl: 'partials/eventmanager.html',
-        controller: 'eventController',
-        restrict: ['Managers', 'Masters']
-    });
-    $routeProvider.when('/login', {
-        templateUrl: 'partials/user/login.html',
-        controller: 'userController'
-    });
-    $routeProvider.when('/register', {
-        templateUrl: 'partials/user/register.html',
-        controller: 'userController'
-    });
-    $routeProvider.when('/teams', {
-        templateUrl: 'partials/teams.html',
-        controller: 'teamsController',
-        restrict: ['Managers', 'Masters']
-    });
-    $routeProvider.when('/team/:id?', {
-        templateUrl: 'partials/team.html',
-        controller: 'teamController',
-        restrict: ['Managers', 'Masters']
-    });
-    $routeProvider.when('/reporting/:currentView?', {
-        templateUrl: 'partials/reporting/home.html',
-        controller: 'reportingController',
-        restrict: ['Admins']
-    });
+
+    switch(location.hostname){
+        case "manager.alphabetters.co":{
+            $routeProvider.when('/', {templateUrl: 'partials/gamewaitinglist.html', controller: 'waitingListController', restrict: ['Managers', 'Masters']});
+            $routeProvider.when('/event', {templateUrl: 'partials/eventmanager.html', controller: 'eventController', restrict: ['Managers', 'Masters']});
+            break;
+        }
+        case "master.alphabetters.co":{
+            $routeProvider.when('/', {templateUrl: 'partials/gamemaster.html', controller: 'gameMasterController', restrict: ['Masters']});
+            $routeProvider.when('/newGame', {templateUrl: 'partials/startgame.html', controller: 'gameController', restrict: ['Masters']});
+            break;
+        }
+        case "reporting.alphabetters.co":{
+            $routeProvider.when('/reports/:currentView?', {templateUrl: 'partials/reporting/home.html', controller: 'reportingController', restrict: ['Admins']});
+            break;
+        }
+        case "teams.alphabetters.co":{
+            $routeProvider.when('/', {templateUrl: 'partials/teams.html', controller: 'teamsController', restrict: ['Managers', 'Masters']});
+            $routeProvider.when('/team/:id?', {templateUrl: 'partials/team.html', controller: 'teamController', restrict: ['Managers', 'Masters']});
+            break;
+        }
+    }
+
+    $routeProvider.when('/login', {templateUrl: 'partials/user/login.html', controller: 'userController'});
+    $routeProvider.when('/register', {templateUrl: 'partials/user/register.html', controller: 'userController'});
+
     $routeProvider.otherwise('/login');
 
     $httpProvider.interceptors.push('httpSpinner');
