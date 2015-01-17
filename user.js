@@ -57,7 +57,7 @@ exports.getUserBidsFromSession = function(req, res) {
                 var foundBids = user.completedBids;
                 logger.info(null, ["Found", foundBids.length, "bids."]);
                 var selectedfoundBids = [];
-                if(req.body.startIndex && req.body.bidNumber &&
+                if(req.body.startIndex >= 0 && req.body.bidNumber > 0 &&
                 ((req.body.bidNumber - req.body.startIndex) < foundBids.length)){
                     selectedfoundBids = foundBids.splice(req.body.startIndex, req.body.bidNumber);
                 } else {
