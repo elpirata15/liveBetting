@@ -2,7 +2,7 @@ var pubnub = require("pubnub").init({
     publish_key: process.env.PUBNUB_PUBLISH_KEY,
     subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY
 });
-var dbOperations = require('./dbOperations');
+var dbOperations = require("./dbOperations");
 var serverLogger = require('./serverLogger');
 
 // default server channel logger

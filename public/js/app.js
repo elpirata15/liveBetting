@@ -95,6 +95,7 @@ var app = angular.module('liveBetManager', [
         });
     }
     catch (ex) {
+        ;
     }
 
     $rootScope.countries = [{
