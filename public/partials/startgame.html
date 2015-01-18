@@ -23,7 +23,8 @@
         <div class="form-group">
             <label for="location" class="col-lg-2 control-label">Location</label>
             <div class="col-lg-10">
-                <input type="text" class="form-control" id="location" ng-model="game.location" placeholder="Camp Nou">
+                <!--<select id="location" class="form-control" ng-model="game.location" ng-options="stadium.stadiumName as stadium.teamName for stadium in stadiums | filter: filterStadiums"></select>-->
+                <input type="text" class="form-control" id="location" ng-model="game.location" placeholder="Type to search" typeahead="stadium.stadiumName as stadium.stadiumName for stadium in stadiums | filter: {stadiumName:$viewValue}">
             </div>
         </div>
         <div class="form-group">
