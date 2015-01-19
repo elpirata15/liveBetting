@@ -35,14 +35,17 @@
                     <div class="row-fluid">
                         <div class="col-xs-9">
                             <h4><b>Money wagered in game: </b>${{totalGameMoney}}</h4>
-                            <div class="panel panel-default">
+                            <div ng-repeat="bid in activeBids" ng-class="{'panel panel-success':bid.status === 'Active','panel panel-warning':bid.status === 'Inactive'}">
                                 <div class="panel-heading">
                                     <h4 class="panel-title"><b>Current Open Bets:</b></h4>
                                 </div>
                                 <div class="panel-body">
-                                    <h4 align="center"><b>{{currentBid.bidDescription}}</b></h4>
-                                    <p><b>Total pool amount: </b>{{currentBid.totalPoolAmount}}</p>
+                                    <h4 align="center"><b>{{bid.bidDescription}}</b></h4>
+                                    <p><b>Total pool amount: </b>{{bid.totalPoolAmount}}</p>
                                     <p align="center"><b>Bet Statistics</b></p>
+                                    <ul>
+                                        <li ng-repeat="option in bid.options"><b>{{option.optionDescription}}: </b>{{option.participants}}</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
