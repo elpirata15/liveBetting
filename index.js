@@ -136,6 +136,8 @@ app.post('/closeGame/:id', ensureManager, gameController.closeGame);
 
 app.get('/getGameTeams/:id', ensureManager, gameController.getGameTeams);
 
+app.post('/setGameScore', ensureManager, gameController.gameScore);
+
 // #### BID FUNCTIONS #####
 
 // Adds bid entity to game (receives bid entity as parameter)

@@ -9,19 +9,40 @@
     <div class="navbar-collapse collapse navbar-responsive-collapse">
         <ul class="nav navbar-nav navbar-left" style="margin-left:50px">
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle">Ongoing Long Bets <b class="caret"></b>  <span class="badge" ng-show="longBetsLength > 0">{{longBetsLength}}</span></a>
+                <a data-toggle="dropdown" class="dropdown-toggle">Ongoing Long Bets <b class="caret"></b> <span
+                        class="badge" ng-show="longBetsLength > 0">{{longBetsLength}}</span></a>
                 <ul class="dropdown-menu" style="width:250px">
                     <li><span class="col-xs-10" style="text-align: center; border-right:1px inset;padding-bottom: 10px"><b>Bet
                         Description</b></span><span style="top:4px;padding-bottom: 10px"
                                                     class="col-xs-2 glyphicon glyphicon-time"></span></li>
-                    <li ng-repeat="bet in longBets"><span class="col-xs-10" style="border-right:1px inset"><a ng-click="showLongBetModal(bet.bidEntity)" style="cursor:pointer">{{bet.bidEntity.bidDescription}}</a></span><span
+                    <li ng-repeat="bet in longBets"><span class="col-xs-10" style="border-right:1px inset"><a
+                            ng-click="showLongBetModal(bet.bidEntity)" style="cursor:pointer">{{bet.bidEntity.bidDescription}}</a></span><span
                             class="col-xs-2">{{bet.ttl}}</span></li>
                 </ul>
             </li>
         </ul>
-        <ul class="nav navbar-nav pull-right">
-            <li><button type="button" class="btn btn-default" style="margin-top:8px;" ng-click="closeGame()"><span class="glyphicon glyphicon-off"></span> CLOSE GAME</button></li>
-            <li><a><span ng-class="{'red':!connected, 'green':connected}">&bull;</span> Broadcast Connection</a></li>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li class="active" style="margin-top:15px; margin-right:20px"><b>Game Score:</b></li>
+            <li>
+                <div class="row" style="margin-top:8px;">
+                    <div class="col-xs-1" style="margin-top:8px; padding-right:0px;padding-left:0px;text-align: center"><b>H</b></div>
+                    <div class="col-xs-3" style="padding-left:0px; padding-right: 0px">
+                        <input type="number" class="form-control" placeholder="H" ng-model="gameScore.home">
+                    </div>
+                    <div class="col-xs-1" style="margin-top:8px; padding-right:0px;padding-left:0px;text-align: center"><b> : </b></div>
+                    <div class="col-xs-3" style="padding-left:0px; padding-right: 0px"><input type="number" placeholder="A" class="form-control" ng-model="gameScore.away">
+                    </div>
+                    <div class="col-xs-1" style="margin-top:8px; padding-right:0px;padding-left:0px;text-align: center"><b>A</b></div>
+                    <button type="button" class="btn btn-default" style="margin-right:20px"
+                            ng-click="updateScore()"><span class="glyphicon glyphicon-open"></span></button>
+                </div>
+            </li>
+            <li>
+                <button type="button" class="btn btn-default" style="margin-top:8px;margin-right:20px"
+                        ng-click="closeGame()"><span class="glyphicon glyphicon-off"></span> CLOSE GAME
+                </button>
+            </li>
         </ul>
     </div>
 </div>
@@ -49,6 +70,7 @@
                            selection-count="currentEvent.viewElements.eventTeamSelector.selectionCount"
                            ng-model="eventDescription"></team-selector>
             <p align="center" ng-show="currentEvent.viewElements.distanceParamInput"><b>Distance</b></p>
+
             <div class="btn-group btn-group-justified col-xs-4" style="padding-bottom: 10px"
                  ng-if="currentEvent.viewElements.distanceParamInput">
                 <a class="btn btn-lg"
@@ -101,7 +123,8 @@
                     </button>
                 </div>
             </div>
-            <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent.eventOptions.length > 0 && (!currentEvent.time || currentEvent.time == 0)">
+            <div class="well well-lg col-xs-8 col-xs-offset-2"
+                 ng-show="currentEvent.eventOptions.length > 0 && (!currentEvent.time || currentEvent.time == 0)">
                 <bet-options
                         publish-action="publishWinningResult" options="currentEvent.eventOptions"
                         ng-disabled="!showResults"></bet-options>
@@ -113,6 +136,6 @@
 <!--<pre>selectedPlayer:{{eventDescription|json}}</pre>-->
 <!--<pre>selectedOption:{{selectedOption|json}}</pre>-->
 <!--<pre>{{bidEntity|json}}</pre>-->
-        <!--<pre>{{eventDescription.eventLength|json}}</pre>-->
-        <!--<pre>{{longBetsLength}}</pre>-->
+<!--<pre>{{eventDescription.eventLength|json}}</pre>-->
+<!--<pre>{{longBetsLength}}</pre>-->
 </div>

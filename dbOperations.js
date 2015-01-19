@@ -64,6 +64,7 @@ var gameEntity = new Schema({
     gameName: String,
     teams: [ObjectId],
     assignedTo: String,
+    gameScore: String,
     location: String,
     timestamp: Date,
     gameLeague: String,

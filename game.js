@@ -134,6 +134,24 @@ exports.createGame = function(req, res) {
     }
 };
 
+exports.gameScore = function(req, res){
+    dbOperations.GameModel.findOne({_id:req.body.id}, function(err, game){
+        if(err){
+            logger.error(req.body.id, ["Failed to update game score:", err.toString()]);
+            res.status(500).send(err);
+        }
+
+        game.gameScore = req.body.gameScore;
+        game.save(function(err, savedGame){
+           if(err){
+               logger.error(req.body.id, ["Failed to update game score:", err.toString()]);
+               res.status(500).send(err);
+           }
+            logger.info(req.body.id, ["Updated game score:", savedGame.gameScore]);
+            res.status(200).end();
+        });
+    });
+};
 
 // Initialize previously created game
 exports.initGame = function(req, res) {
