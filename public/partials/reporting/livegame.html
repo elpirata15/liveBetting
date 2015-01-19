@@ -33,10 +33,21 @@
                 </div>
                 <div class="panel-body">
                     <div class="row-fluid">
-                        <div class="col-xs-5"></div>
-                        <div class="col-xs-4"></div>
+                        <div class="col-xs-9">
+                            <h4><b>Money wagered in game: </b>${{totalGameMoney}}</h4>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"><b>Current Open Bets:</b></h4>
+                                </div>
+                                <div class="panel-body">
+                                    <h4 align="center"><b>{{currentBid.bidDescription}}</b></h4>
+                                    <p><b>Total pool amount: </b>{{currentBid.totalPoolAmount}}</p>
+                                    <p align="center"><b>Bet Statistics</b></p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-xs-3">
-                            <h4 align="center"><b>Past Bids:</b></h4>
+                            <h4 align="center"><b>Past Bets:</b></h4>
                             <div class="panel-group" id="accordion2" role="tablist" aria-multiselectable="true">
                                 <div class="panel panel-default" ng-repeat="bid in currentGame.bids">
                                     <div class="panel-heading" role="tab" id="heading{{bid.id}}">

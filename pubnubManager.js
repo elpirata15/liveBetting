@@ -42,3 +42,10 @@ exports.removeFromPool = function(callback){
   });
 };
 
+exports.publishMessage = function(channel, message){
+    pubnub.publish({
+        channel: channel,
+        message: message
+    });
+};
+

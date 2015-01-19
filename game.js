@@ -1,7 +1,4 @@
-var pubnub = require("pubnub").init({
-    publish_key: process.env.PUBNUB_PUBLISH_KEY,
-    subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY
-});
+var pubnub = require("./pubnubManager");
 var dbOperations = require("./dbOperations");
 var serverLogger = require('./serverLogger');
 
@@ -239,13 +236,11 @@ exports.closeGame = function(req, res) {
                 game.save(function(err, game) {
                     if (!err) {
                         logger.info(null, ["closed game", game.gameName, "successfully"]);
-                        pubnub.publish({
-                            channel: game._id,
-                            message: {
+                        pubnub.publishMessage(game._id, {
                                 gameId: game._id,
                                 close: true
-                            }
-                        });
+                            });
+                        var liveGame = pubnub.liveGames.child(game._id);
                         res.status(200).end();
                     }
                     else {

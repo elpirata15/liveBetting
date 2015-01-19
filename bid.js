@@ -1,7 +1,4 @@
-var pubnub = require("pubnub").init({
-    publish_key: process.env.PUBNUB_PUBLISH_KEY,
-    subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY
-});
+var pubnub = require("./pubnubManager");
 var async = require('async');
 var dbOperations = require('./dbOperations');
 var serverLogger = require("./serverLogger");
@@ -12,10 +9,7 @@ var logger = new serverLogger();
 var activeTimers = {};
 
 var publishMessage = function(channel, message) {
-    pubnub.publish({
-        channel: channel,
-        message: message
-    });
+    pubnub.publishMessage(channel, message);
 };
 
 // new Id generator
@@ -37,7 +31,6 @@ exports.addBid = function(bidMessage) {
     bid.status = "Active";
     bid.totalPoolAmount = 0;
     bid.timestamp = new Date();
-
     // Add bid to active bids cache
     dbOperations.cacheEntity(dbOperations.caches.bidCache, {
         entity: bid
