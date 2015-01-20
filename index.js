@@ -115,10 +115,12 @@ function ensureManager(req, res, next) {
 app.get('/getGames', ensureUser, gameController.getGames);
 
 // Get single game info
-//app.get('/getGame/:id', ensureUser, gameController.getGames);
+app.get('/getGame/:id', ensureMaster, gameController.getGame);
 
 // For event managers - get waiting events
 app.get('/getWaitingGames/:id', ensureManager, gameController.getWaitingGames);
+
+app.get('/getActiveGamesId', ensureMaster, gameController.getLiveGameList);
 
 // ## Create game entity in DB and start game
 app.post('/createGame', ensureMaster, gameController.createGame);
@@ -135,8 +137,6 @@ app.post('/assignGame/', ensureMaster, gameController.assignGame);
 app.post('/closeGame/:id', ensureManager, gameController.closeGame);
 
 app.get('/getGameTeams/:id', ensureManager, gameController.getGameTeams);
-
-app.post('/setGameScore', ensureManager, gameController.gameScore);
 
 // #### BID FUNCTIONS #####
 

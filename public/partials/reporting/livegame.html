@@ -16,7 +16,7 @@
                          aria-labelledby="heading{{leagueIds[league]}}">
                         <div class="panel-body">
                             <div class="btn-group-vertical">
-                                <a style="cursor: pointer" ng-click="selectGame(game)" ng-repeat="game in games[league]" class="btn btn-default">{{game.gameName}}</a>
+                                <a style="cursor: pointer" ng-click="selectGame(game._id)" ng-repeat="game in games[league]" class="btn btn-default">{{game.gameName}}</a>
                             </div>
                         </div>
                     </div>

@@ -32,6 +32,14 @@ angular.module('liveBetManager').factory('betManagerService', ['$http', function
     betManagerService.getGames = function(){
         return $http.get('/getGames');
     };
+    
+    betManagerService.getGame = function(gameId){
+        return $http.get('/getGame/'+gameId);
+    };
+    
+    betManagerService.getActiveGamesId = function(){
+        return $http.get('/getActiveGamesId');
+    };
 
     betManagerService.getGamesForManager = function(manager){
         return $http.get('/getWaitingGames/'+manager);

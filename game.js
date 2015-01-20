@@ -25,17 +25,32 @@ exports.getGames = function(req, res) {
     });
 };
 
-//// Get single game info
-//exports.getGame = function (req, res) {
-//    logger.info('getting game info for game ', req.res.id);
-//    dbOperations.getEntity(req.params.id, dbOperations.caches.gameCache, function (game) {
-//        if (game) {
-//            return game;
-//        } else {
-//            res.status(404).end();
-//        }
-//    });
-//};
+// Get single game info
+exports.getGame = function (req, res) {
+    logger.info(null,['getting game info for game ', req.params.id]);
+    dbOperations.GameModel.findOne({_id: req.params.id}, function(err, game){
+        if(err){
+            logger.error(null,['Error getting game info for game ', err.toString()]);
+            res.status(500).send(err);
+        }
+        if (game) {
+            res.status(200).send(game);
+        } else {
+            res.status(404).end();
+        }
+    });
+};
+
+exports.getLiveGameList = function(req, res){
+    dbOperations.GameModel.find({status: "Active"}, 'gameName gameLeague', function(err, docs){
+        if(err){
+           logger.error(null,['Error getting active game list: ', err.toString()]);
+            res.status(500).send(err);
+        }
+        
+        res.status(200).send(docs);
+    });  
+};
 
 // For event managers - get waiting events
 exports.getWaitingGames = function(req, res) {
