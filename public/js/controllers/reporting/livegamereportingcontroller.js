@@ -5,6 +5,7 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
     $scope.currentGame = null;
     $scope.activeBids = {};
     $scope.leagueIds = {};
+    $scope.subscribedStatus = {};
     $scope.totalGameMoney = 0;
     betManagerService.getActiveGamesId().success(function(data) {
         var gamesByLeague = {};
@@ -73,10 +74,23 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
             message: $scope.updateBid
         });
 
-        PubNub.subscribe({
-            channel: message.bidEntity.id + "_msg",
-            message: $scope.updateStatus
-        });
+
+    };
+
+    $scope.subscribeStatus = function(id) {
+        if ($scope.subscribedStatus) {
+            delete $scope.subscribedStatus[id];
+            PubNub.unsubscribe({
+                channel: id + "_status"
+            });
+        }
+        else {
+            $scope.subscribedStatus[id] = true;
+            PubNub.subscribe({
+                channel: id + "_status",
+                message: $scope.updateStatus
+            });
+        }
     };
 
     $scope.updateBid = function(message) {

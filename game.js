@@ -41,6 +41,25 @@ exports.getGame = function (req, res) {
     });
 };
 
+exports.findGameByDateLeague = function(req, res){
+    var league = req.body.gameLeague || ""; 
+    logger.info(null,['getting',league,'games from dates', req.body.startDate, "-",req.body.endDate]);
+    var query = dbOperations.GameModel.find({});
+    if(league !== ''){
+        query = dbOperations.GameModel.find({'gameLeague':league});
+    }
+    query.where('timestamp').lte(req.body.endDate).gte(req.body.startDate)
+    .exec(function(err, games){
+        if(err){
+            logger.error(null,['Error getting games ', err.toString()]);
+            res.status(500).send(err);
+        }
+        logger.info(null, ['Found',games.length,'games']);
+        res.status(200).send(games);
+    });
+    
+};
+
 exports.getLiveGameList = function(req, res){
     dbOperations.GameModel.find({status: "Active"}, 'gameName gameLeague', function(err, docs){
         if(err){
