@@ -26,7 +26,7 @@ angular.module('liveBetManager').controller('waitingListController', ['$scope', 
         $scope.initGame = function(gameId) {
             betManagerService.initGame(gameId, $scope.preGameParams).success(function(data) {
                 localStorageService.set('currentGame', data);
-                $location.path('/eventManager');
+                $location.path('/event');
             });
         };
 
