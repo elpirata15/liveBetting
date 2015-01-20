@@ -8,6 +8,7 @@ var gameController = require('./game');
 var bidController = require('./bid');
 var userController = require('./user');
 var teamContoller = require('./team');
+var reportingController = require('./reports');
 if(!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
     var pubnubManager = require('./pubnubManager');
 }
@@ -137,6 +138,8 @@ app.post('/assignGame/', ensureMaster, gameController.assignGame);
 app.post('/closeGame/:id', ensureManager, gameController.closeGame);
 
 app.get('/getGameTeams/:id', ensureManager, gameController.getGameTeams);
+
+app.get('/getGamesMap/:id', reportingController.getRevenueReport);
 
 // #### BID FUNCTIONS #####
 
