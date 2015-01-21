@@ -27,6 +27,25 @@ angular.module('liveBetManager').controller('revenueReportingController', ['$sco
         });
     };
 
+    $scope.getCsv = function(){
+        var endOfDayDate = new Date(new Date($scope.reportReq.timestamp.to).setHours(23,59));
+        var dateFilter = {$gte: $scope.reportReq.timestamp.from, $lte: endOfDayDate};
+        var reportReq = angular.copy($scope.reportReq);
+        reportReq.timestamp = dateFilter;
+        if(reportReq.gameLeague === "All")
+            delete reportReq.gameLeague;
+        betManagerService.getGamesReport(reportReq).success(function(data){
+            var csvString = [];
+            csvString.push('Game Name,Date/Time,Total Bets,Total Participants,Total Money Wagered');
+            for(var i in data){
+                csvString.push(data[i].gameName+","+new Date(data[i].timestamp).toLocaleString()+","+data[i].bidNumber+","+data[i].totalParticipants+','+data[i].totalPools);
+            }
+
+            var csvBlob = new Blob(csvString, {type: 'text/csv'});
+            saveAs(csvBlob, "Revenue.csv");
+        });
+    };
+
     $scope.getGame = function(gameId){
         if(!$scope.bids[gameId]) {
             betManagerService.getGame(gameId).success(function (data) {
