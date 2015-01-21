@@ -238,9 +238,12 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 $timeout(function(){
                    $scope.$apply(); 
                 });
+
+                $scope.changeEventTemplate($scope.events.substitution);
             }
-            
-            $scope.changeEventTemplate($scope.events.substitution);
+
+            $scope.changeEventTemplate($scope.events.corner);
+
         };
 
         $scope.openLongBet = function (time) {
