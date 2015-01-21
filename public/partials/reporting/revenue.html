@@ -1,0 +1,100 @@
+<div ng-controller="revenueReportingController">
+    <h3><b>Game Revenue Report</b></h3>
+    <hr>
+    <ng-form name="reportParams">
+        <div class="row">
+            <div class="form-group col-xs-4">
+                <label for="leagueSelect" class="control-label col-xs-3">League: <span
+                        style="color:red">*</span></label>
+
+                <div class="col-xs-8">
+                    <select id="leagueSelect" required class="form-control" ng-options="league for league in leagues"
+                            ng-model="reportReq.gameLeague"></select>
+                </div>
+            </div>
+            <div class="form-group col-xs-4">
+                <label for="fromSelector" class="control-label col-xs-3">From: <span style="color:red">*</span></label>
+
+                <div class="col-xs-8">
+                    <input id="fromSelector" required type="date" ng-model="reportReq.timestamp.from"
+                           class="form-control">
+                </div>
+            </div>
+            <div class="form-group col-xs-4">
+                <label for="toSelector" class="control-label col-xs-3">To: <span style="color:red">*</span></label>
+
+                <div class="col-xs-8">
+                    <input id="toSelector" required type="date" ng-model="reportReq.timestamp.to" class="form-control">
+                </div>
+            </div>
+        </div>
+    </ng-form>
+    <hr>
+    <div class="col-xs-3 pull-right">
+        <button type="button" ng-disabled="reportParams.$invalid" class="btn btn-success" ng-click="getReport()"><span
+                class="glyphicon glyphicon-play-circle"></span> Get Report
+        </button>
+        <button type="button" ng-disabled="reportParams.$invalid" class="btn btn-default" ng-click="getReport()"><span
+                class="glyphicon glyphicon-floppy-save"></span> Download CSV
+        </button>
+    </div>
+    <br/><br/><br/><br/>
+    <table class="table table-striped table-hover" style="border-collapse:collapse;">
+        <thead>
+        <tr>
+            <th style="width:15px"></th>
+            <th>Game Name</th>
+            <th>Date/Time</th>
+            <th>Total Bets</th>
+            <th>Total Participants</th>
+            <th>Total Money Wagered ($)</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat-start="(gameId, game) in reportData.entities" data-toggle="collapse" data-target="#{{gameId}}" class="accordion-toggle">
+                <td><button ng-click="getGame(gameId)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button></td>
+                <td><a style="cursor: pointer" ng-click="openGame(gameId)">{{game.gameName}}</a></td>
+                <td>{{game.timestamp | date: "EEE, MMM d, y @ HH:mm"}}</a></td>
+                <td>{{game.bidNumber}}</a></td>
+                <td>{{game.totalParticipants}}</a></td>
+                <td>{{game.totalPools}}</a></td>
+            </tr>
+            <tr ng-repeat-end>
+                <td colspan="12" class="hiddenRow">
+                    <div class="accordion-body collapse" id="{{gameId}}">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Bet Description</th>
+                                    <th>Entry Amount</th>
+                                    <th>Date/Time</th>
+                                    <th>Participants</th>
+                                    <th>Money Wagered</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="bid in bids[gameId]">
+                                    <td>{{bid.bidDescription}}</td>
+                                    <td>${{bid.entryAmount}}</td>
+                                    <td>{{bid.timestamp | date: "HH:mm:ss"}}</td>
+                                    <td>{{bid.participants}}</td>
+                                    <td>${{bid.totalPoolAmount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr >
+        </tbody>
+        <tfoot ng-show="reportData">
+            <tr>
+                <td></td>
+                <td>For {{reportData.totals.games}} Games: </td>
+                <td></td>
+                <td>Total Bets: {{reportData.totals.bids}}</td>
+                <td>Total Participants: {{reportData.totals.participants}}</td>
+                <td>Total Money Wagered: ${{reportData.totals.money}}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

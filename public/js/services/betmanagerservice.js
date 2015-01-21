@@ -44,5 +44,9 @@ angular.module('liveBetManager').factory('betManagerService', ['$http', function
     betManagerService.getGamesForManager = function(manager){
         return $http.get('/getWaitingGames/'+manager);
     };
+
+    betManagerService.getGamesReport = function(reportReq){
+        return $http.post('/getGamesMap', {filter: reportReq});
+    };
     return betManagerService;
 }]);

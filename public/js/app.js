@@ -75,7 +75,7 @@ var app = angular.module('liveBetManager', [
 
     localStorageServiceProvider.setPrefix('liveBetManager');
 }]).run(function ($rootScope, PubNub, authService, $location, $http, localStorageService) {
-    $rootScope.activeGame = {};
+    $rootScope.leagues = ["UEFA Champions League", "Premier League", "Serie A", "Bundesliga", "La Liga"];
     var localUuid = localStorageService.get('uuid');
     if (!localUuid) {
         var uuid = 'console' + Math.random();

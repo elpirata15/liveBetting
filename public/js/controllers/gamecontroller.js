@@ -6,7 +6,7 @@ angular.module('liveBetManager').controller('gameController', ['$scope', '$rootS
         $scope.team2 = "";
         $scope.availableTeams = [];
         $scope.displayTeams = [];
-        $scope.leagues = ["UEFA Champions League", "Premier League", "Serie A", "Bundesliga", "La Liga"];
+        $scope.leagues = $rootScope.leagues;
         $scope.stadiums = [{
             teamName: 'Arsenal',
             stadiumName: 'Emirates Stadium'

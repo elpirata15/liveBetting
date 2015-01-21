@@ -27,11 +27,11 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
     });
     $scope.$on('$destroy', function() {
         if ($scope.currentGame) {
-            PubNub.unsubscribe({
+            PubNub.ngUnsubscribe({
                 channel: $scope.currentGame._id
             });
             for (var i in $scope.activeBids) {
-                PubNub.unsubscribe({
+                PubNub.ngUnsubscribe({
                     channel: i + "_msg," + i + "_status"
                 });
             }
@@ -40,11 +40,11 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
 
     $scope.selectGame = function(gameId) {
         if ($scope.currentGame) {
-            PubNub.unsubscribe({
+            PubNub.ngUnsubscribe({
                 channel: $scope.currentGame._id
             });
             for (var i in $scope.activeBids) {
-                PubNub.unsubscribe({
+                PubNub.ngUnsubscribe({
                     channel: i + "_msg," + i + "_status"
                 });
             }
@@ -55,7 +55,7 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
             for (var i in data.bids) {
                 $scope.totalGameMoney += parseInt(data.bids[i].totalPoolAmount, 10);
             }
-            PubNub.subscribe({
+            PubNub.ngSubscribe({
                 channel: data._id,
                 message: $scope.addBid
             });
@@ -69,7 +69,7 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
 
         $scope.activeBids[message.bidEntity.id] = message.bidEntity;
 
-        PubNub.subscribe({
+        PubNub.ngSubscribe({
             channel: message.bidEntity.id + "_msg",
             message: $scope.updateBid
         });
@@ -80,13 +80,13 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
     $scope.subscribeStatus = function(id) {
         if ($scope.subscribedStatus) {
             delete $scope.subscribedStatus[id];
-            PubNub.unsubscribe({
+            PubNub.ngUnsubscribe({
                 channel: id + "_status"
             });
         }
         else {
             $scope.subscribedStatus[id] = true;
-            PubNub.subscribe({
+            PubNub.ngSubscribe({
                 channel: id + "_status",
                 message: $scope.updateStatus
             });
@@ -101,7 +101,7 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
             $scope.activeBids[message.bidId].winningOption = message.winningOption;
             $scope.currentGame.bids.push($scope.activeBids[message.bidId]);
             delete $scope.activeBids[message.bidId];
-            PubNub.unsubscribe({
+            PubNub.ngUnsubscribe({
                 channel: message.bidId + "_msg," + message.bidId + "_status"
             });
         }

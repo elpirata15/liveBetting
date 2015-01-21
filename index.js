@@ -139,7 +139,7 @@ app.post('/closeGame/:id', ensureManager, gameController.closeGame);
 
 app.get('/getGameTeams/:id', ensureManager, gameController.getGameTeams);
 
-app.get('/getGamesMap/:id', reportingController.getRevenueReport);
+app.post('/getGamesMap', reportingController.getRevenueReport);
 
 // #### BID FUNCTIONS #####
 
