@@ -99,8 +99,8 @@ var app = angular.module('liveBetManager', [
         localUuid = uuid;
     }
     $rootScope.keys = {
-        publish_key: 'pub-c-d2e656c9-a59e-48e2-b5c5-3c16fe2124d2',
-        subscribe_key: 'sub-c-71b821d4-7665-11e4-af64-02ee2ddab7fe',
+        publish_key: 'pub-c-c19ea9af-2db3-412a-ab10-c9dba996fd4d',
+        subscribe_key: 'sub-c-b6bf2cc2-a25d-11e4-90a2-0619f8945a4f',
         uuid: localUuid
     };
 
