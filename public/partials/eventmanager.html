@@ -20,6 +20,17 @@
                             class="col-xs-2">{{bet.ttl}}</span></li>
                 </ul>
             </li>
+            <li>
+                <button type="button" ng-show="!started" class="btn btn-default" style="margin-top:8px;margin-right:20px"
+                        ng-click="startGame()"><span class="glyphicon glyphicon-time"></span> START GAME
+                </button>
+                <button type="button" ng-show="started && !paused" class="btn btn-default" style="margin-top:8px;margin-right:20px"
+                        ng-click="pauseGame()"><span class="glyphicon glyphicon-pause"></span> HALF-TIME
+                </button>
+                <button type="button" ng-show="started && paused" class="btn btn-default" style="margin-top:8px;margin-right:20px"
+                        ng-click="pauseGame()"><span class="glyphicon glyphicon-play"></span> RESUME
+                </button>
+            </li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
@@ -52,7 +63,7 @@
             <b><span class="glyphicon glyphicon-arrow-down"></span> Choose an event</b>
             <button type="button" class="btn btn-block"
                     ng-class="{'btn-default':currentEvent.eventName!=item.eventName, 'btn-info':currentEvent.eventName==item.eventName}"
-                    ng-disabled="betOpen"
+                    ng-disabled="betOpen || !started"
                     style=" margin-bottom: 10px;"
                     ng-click="changeEventTemplate(item)" ng-repeat="item in events" ng-if="!item.alwaysLast">
                 {{item.eventName}}

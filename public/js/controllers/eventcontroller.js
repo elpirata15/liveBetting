@@ -2,30 +2,69 @@
 angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', '$location', 'PubNub', 'betManagerService', 'teamsService', 'authService', '$timeout', '$interval', 'localStorageService', 'dialogs',
     function ($scope, $rootScope, $location, PubNub, betManagerService, teamsService, authService, $timeout, $interval, localStorageService, dialogs) {
         PubNub.init($rootScope.keys);
-        
+
         $scope.connected = false;
         $scope.log = [];
         $scope.game = localStorageService.get('currentGame');
-        
+
         // Update local storage in any event of game details change
-        $scope.$watch('game', function(newVal){
-           localStorageService.set('currentGame', newVal);
-        },true);
-        
+        $scope.$watch('game', function (newVal) {
+            localStorageService.set('currentGame', newVal);
+        }, true);
+
         $scope.eventDescription = {teams: []};
-        $scope.gameScore = {home:0, away: 0};
+        $scope.gameScore = {home: 0, away: 0};
         $scope.selectedOption;
         $scope.currentEvent;
+        $scope.game.started = false;
+        $scope.game.paused = false;
         $scope.longBets = {};
         $scope.longBetsLength = 0;
         $scope.amounts = [10, 25, 50, 100];
 
-        $scope.updateScore = function(){
+        $scope.startGame = function () {
+            betManagerService.startGame($scope.game._id).success(function () {
+                $scope.started = true;
+                PubNub.ngPublish({
+                    channel: $scope.game._id,
+                    message: {
+                        pn_gcm: {
+                            data: {
+                                gameId: $scope.game._id,
+                                started: true
+                            }
+                        },
+                        gameMessage: {
+                            gameId: $scope.game._id,
+                            started: true
+                        }
+                    }
+                });
+                PubNub.ngPublish({
+                    channel: 'allGames',
+                    message: {gameId: $scope.game._id, started: true}
+                });
+            });
+        };
+
+        $scope.pauseGame = function () {
+            $scope.paused = !$scope.paused;
+            PubNub.ngPublish({
+                channel: $scope.game._id,
+                message: {gameId: $scope.game._id, halfTime: $scope.paused}
+            });
+            PubNub.ngPublish({
+                channel: 'allGames',
+                message: {gameId: $scope.game._id, halfTime: $scope.paused}
+            });
+        };
+
+        $scope.updateScore = function () {
             var score = $scope.gameScore.home + ":" + $scope.gameScore.away;
             betManagerService.updateScore($scope.game._id, score);
         };
 
-        $scope.doLogout = function(){
+        $scope.doLogout = function () {
             authService.logout(function (result) {
                 if (result) {
                     $location.path('/login');
@@ -42,7 +81,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 toString: function () {
                     return "Corner: " + $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName;
                 },
-                eventOptions: ['Goal', 'Out', 'Corner Again','Foul','Block']
+                eventOptions: ['Goal', 'Out', 'Corner Again', 'Foul', 'Block']
             },
             penalty: {
                 eventName: 'Penalty',
@@ -66,18 +105,18 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 eventOptions: ['Goal', 'Out', 'Block']
             },
             /*foul: {
-                eventName: 'Foul',
-                viewElements: {
-                    eventTeamSelector: {selectionCount: '2'}
-                },
-                toString: function () {
-                    return "Foul: " + (($scope.eventDescription.teams[0]) ? $scope.eventDescription.teams[0].playerName : "undefined") + " from " +
-                        (($scope.eventDescription.teams[0]) ? $scope.eventDescription.teams[0].teamName : "undefined") +
-                        " made a foul on " + (($scope.eventDescription.teams[1]) ? $scope.eventDescription.teams[1].playerName : "undefined") + " from " +
-                        (($scope.eventDescription.teams[1]) ? $scope.eventDescription.teams[1].teamName : "undefined");
-                },
-                eventOptions: ['Red Card', 'Yellow Card', 'They Will Fight']
-            },*/
+             eventName: 'Foul',
+             viewElements: {
+             eventTeamSelector: {selectionCount: '2'}
+             },
+             toString: function () {
+             return "Foul: " + (($scope.eventDescription.teams[0]) ? $scope.eventDescription.teams[0].playerName : "undefined") + " from " +
+             (($scope.eventDescription.teams[0]) ? $scope.eventDescription.teams[0].teamName : "undefined") +
+             " made a foul on " + (($scope.eventDescription.teams[1]) ? $scope.eventDescription.teams[1].playerName : "undefined") + " from " +
+             (($scope.eventDescription.teams[1]) ? $scope.eventDescription.teams[1].teamName : "undefined");
+             },
+             eventOptions: ['Red Card', 'Yellow Card', 'They Will Fight']
+             },*/
             substitution: {
                 eventName: 'Substitution',
                 viewElements: {
@@ -221,22 +260,22 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             });
             $scope.betOpen = false;
             $scope.showResults = false;
-            
-            
-            if($scope.currentEvent.eventName === "Substitution"){
+
+
+            if ($scope.currentEvent.eventName === "Substitution") {
                 // Take substituted (out) player from lineup to bench
                 var outPlayerIndex = $scope.teamsToPlayers[$scope.eventDescription.teamName].lineup.indexOf($scope.eventDescription.playerName);
                 $scope.teamsToPlayers[$scope.eventDescription.teamName].lineup.splice(outPlayerIndex, 1);
                 $scope.teamsToPlayers[$scope.eventDescription.teamName].bench.push($scope.eventDescription.playerName);
-                
+
                 // Take substituted (in) player from bench to lineup
                 var inPlayerName = $scope.currentEvent.eventOptions[optionIndex];
                 var inPlayerIndex = $scope.teamsToPlayers[$scope.eventDescription.teamName].bench.indexOf(inPlayerName);
                 $scope.teamsToPlayers[$scope.eventDescription.teamName].lineup.push(inPlayerName);
                 $scope.teamsToPlayers[$scope.eventDescription.teamName].bench.splice(inPlayerIndex, 1);
-                
-                $timeout(function(){
-                   $scope.$apply(); 
+
+                $timeout(function () {
+                    $scope.$apply();
                 });
 
                 $scope.changeEventTemplate($scope.events.substitution);

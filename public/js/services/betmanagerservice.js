@@ -6,6 +6,10 @@ angular.module('liveBetManager').factory('betManagerService', ['$http', function
         return $http.post('/createGame', game);
     };
 
+    betManagerService.startGame = function(gameId){
+        return $http.post('/startGame/'+gameId, null);
+    };
+
     betManagerService.initGame = function(id, params){
         return $http.post('/initGame/'+id, {preGameParams: params});
     };

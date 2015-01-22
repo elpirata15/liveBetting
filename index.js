@@ -141,6 +141,8 @@ app.get('/getGameTeams/:id', ensureManager, gameController.getGameTeams);
 
 app.post('/getGamesMap', reportingController.getRevenueReport);
 
+app.post('/startGame/:id', ensureManager, gameController.startGame);
+
 // #### BID FUNCTIONS #####
 
 // Adds bid entity to game (receives bid entity as parameter)
