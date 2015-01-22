@@ -18,9 +18,9 @@
                             Already logged in as {{user.email}}. Please <a ng-click="doLogout()" style="cursor: pointer">logout</a> before continuing.
                             <br/>
                         </div>
-                        <input type="email" ng-model="user.email" placeholder="E-mail" class="form-control">
+                        <input type="email" ng-model="user.email" ng-disabled="loggedIn" placeholder="E-mail" class="form-control">
                         <br/>
-                        <input type="password" ng-model="user.pass" placeholder="Password" class="form-control">
+                        <input type="password" ng-model="user.pass" ng-disabled="loggedIn" placeholder="Password" class="form-control">
                         <br/>
                         <button type="button" ng-click="doLogin()"
                                 class="col-xs-4 col-xs-offset-4 btn btn-large btn-primary">Log In

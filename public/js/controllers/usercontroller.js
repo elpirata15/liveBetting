@@ -1,7 +1,7 @@
 /*global angular*/
 angular.module('liveBetManager').controller('userController', ['$scope', '$rootScope', 'authService', '$timeout', '$location', function($scope, $rootScope, authService, $timeout, $location) {
 
-    $scope.user = {};
+    $scope.user = authService.user() || {};
     $scope.loggedIn = authService.isAuthenticated();
 
     $scope.doLogin = function() {
@@ -11,11 +11,7 @@ angular.module('liveBetManager').controller('userController', ['$scope', '$rootS
         }, function(result) {
             if (result) {
                 $scope.loggedIn = true;
-                if(location.host === "reporting.alphabetters.co"){
-                    window.location = "http://" + location.host + "/#/reports";
-                } else {
-                    window.location = "http://" + location.host + "/";
-                }
+                window.location = "http://" + location.host + "/";
             }
         });
     };
