@@ -9,8 +9,8 @@
     </div>
     <div class="navbar-collapse collapse navbar-responsive-collapse">
         <ul class="nav navbar-nav">
-            <li ng-class="{'active':location.hash.indexOf('liveGame') > -1}"><a style="cursor: pointer" ng-click="changeView('#/liveGame')">Live Game Report</a></li>
-            <li ng-class="{'active':location.hash.indexOf('revenue') > -1}"><a style="cursor: pointer" ng-click="changeView('#/revenue')">Revenue Report</a></li>
+            <li ng-class="{'active':currentView === 'liveGame'}"><a style="cursor: pointer" ng-click="changeView('#/liveGame')">Live Game Report</a></li>
+            <li ng-class="{'active':currentView === 'revenue'}"><a style="cursor: pointer" ng-click="changeView('#/revenue')">Revenue Report</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="mailto: support@alphabetters.com">Contact Us</a></li>
@@ -18,5 +18,5 @@
         </ul>
     </div>
 </div>
-<p ng-if="location.hash === '#/'" align="center"><img src="../../img/logosmall.png" alt="Fuego Logo"></p>
+<p ng-if="currentView == ''" align="center"><img src="../../img/logosmall.png" alt="Fuego Logo"></p>
 <div ng-include="includes[currentView]" style="height:100%"></div>
