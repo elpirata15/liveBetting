@@ -322,14 +322,21 @@ exports.closeGame = function (req, res) {
                     if (!err) {
                         logger.info(null, ["closed game", game.gameName, "successfully"]);
                         pubnub.publishMessage(game._id, {
-                            gameId: game._id,
-                            close: true
+                            pn_gcm: {
+                                data: {
+                                    gameId: game._id,
+                                    close: true
+                                }
+                            },
+                            gameMessage: {
+                                gameId: game._id,
+                                close: true
+                            }
                         });
                         pubnub.publishMessage('allGames', {
                             gameId: game._id,
                             close: true
                         });
-                        var liveGame = pubnub.liveGames.child(game._id);
                         res.status(200).end();
                     }
                     else {

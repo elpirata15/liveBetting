@@ -23,6 +23,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.amounts = [10, 25, 50, 100];
 
         $scope.startGame = function () {
+            var now = new Date();
             betManagerService.startGame($scope.game._id).success(function () {
                 $scope.started = true;
                 PubNub.ngPublish({
@@ -31,18 +32,20 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         pn_gcm: {
                             data: {
                                 gameId: $scope.game._id,
-                                started: true
+                                started: true,
+                                timestamp: now
                             }
                         },
                         gameMessage: {
                             gameId: $scope.game._id,
-                            started: true
+                            started: true,
+                            timestamp: now
                         }
                     }
                 });
                 PubNub.ngPublish({
                     channel: 'allGames',
-                    message: {gameId: $scope.game._id, started: true}
+                    message: {gameId: $scope.game._id, started: true, timestamp: now}
                 });
             });
         };
@@ -51,7 +54,17 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             $scope.paused = !$scope.paused;
             PubNub.ngPublish({
                 channel: $scope.game._id,
-                message: {gameId: $scope.game._id, halfTime: $scope.paused}
+                message: {
+                    pn_gcm: {
+                        data: {
+                            gameId: $scope.game._id,
+                            halfTime: $scope.paused
+                        }
+                    }, gameMessage: {
+                        gameId: $scope.game._id,
+                        halfTime: $scope.paused
+                    }
+                }
             });
             PubNub.ngPublish({
                 channel: 'allGames',
