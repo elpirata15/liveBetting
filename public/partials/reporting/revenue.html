@@ -80,7 +80,7 @@
                                 <tr ng-repeat="bid in bids[gameId]">
                                     <td>{{bid.bidDescription}}</td>
                                     <td>${{bid.entryAmount}}</td>
-                                    <td>{{bid.timestamp | date: "HH:mm:ss"}}</td>
+                                    <td>{{bid.timestamp}}</td>
                                     <td>{{bid.participants}}</td>
                                     <td>${{bid.totalPoolAmount}}</td>
                                 </tr>

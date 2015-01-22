@@ -67,8 +67,14 @@ angular.module('liveBetManager').controller('revenueReportingController', ['$sco
         var bidDate = new Date(bidTimestamp);
         var diff = Math.abs(bidDate - gameDate);
         var diffMili = diff / 60000;
-        var mins = Math.floor(diffMili);
-        var sec = (diffMili - mins) * 60;
+        var mins = Math.floor(diffMili).toString();
+        var sec = Math.floor((diffMili - mins) * 60).toString();
+        if(mins.length === 1){
+            mins = "0"+mins;
+        }
+        if(sec.length === 1){
+            sec = "0"+sec;
+        }
         return mins + ":" + sec;
     };
 
@@ -89,6 +95,7 @@ angular.module('liveBetManager').controller('revenueReportingController', ['$sco
                         timestamp: getBidMinutes(data.timestamp, data.bids[i].timestamp)
                     });
                 }
+                
                 $scope.bids[gameId] = bids;
             });
         }
