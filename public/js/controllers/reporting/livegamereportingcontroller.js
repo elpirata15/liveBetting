@@ -63,6 +63,12 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
     };
 
     $scope.addBid = function(message) {
+        
+        if(message.score){
+            $scope.currentGame.gameScore = message.score;
+            return;
+        }
+        
         if (!$scope.game.bids) {
             $scope.game.bids = [];
         }

@@ -10,71 +10,87 @@ var app = angular.module('liveBetManager', [
     'ngGrid',
     'dialogs.main',
     'ui.bootstrap'
-]).config(['$routeProvider', 'localStorageServiceProvider', '$httpProvider', function ($routeProvider, localStorageServiceProvider, $httpProvider) {
+]).config(['$routeProvider', 'localStorageServiceProvider', '$httpProvider', function($routeProvider, localStorageServiceProvider, $httpProvider) {
 
     switch (location.hostname) {
         case "manager.alphabetters.co":
-        {
-            $routeProvider.when('/', {
-                templateUrl: 'partials/gamewaitinglist.html',
-                controller: 'waitingListController',
-                restrict: ['Managers', 'Masters']
-            });
-            $routeProvider.when('/event', {
-                templateUrl: 'partials/eventmanager.html',
-                controller: 'eventController',
-                restrict: ['Managers', 'Masters']
-            });
-            break;
-        }
+            {
+                $routeProvider.when('/', {
+                    templateUrl: 'partials/gamewaitinglist.html',
+                    controller: 'waitingListController',
+                    restrict: ['Managers', 'Masters']
+                });
+                $routeProvider.when('/event', {
+                    templateUrl: 'partials/eventmanager.html',
+                    controller: 'eventController',
+                    restrict: ['Managers', 'Masters']
+                });
+                break;
+            }
         case "master.alphabetters.co":
-        {
-            $routeProvider.when('/', {
-                templateUrl: 'partials/gamemaster.html',
-                controller: 'gameMasterController',
-                restrict: ['Masters']
-            });
-            $routeProvider.when('/newGame', {
-                templateUrl: 'partials/startgame.html',
-                controller: 'gameController',
-                restrict: ['Masters']
-            });
-            break;
-        }
+            {
+                $routeProvider.when('/', {
+                    templateUrl: 'partials/gamemaster.html',
+                    controller: 'gameMasterController',
+                    restrict: ['Masters']
+                });
+                $routeProvider.when('/newGame', {
+                    templateUrl: 'partials/startgame.html',
+                    controller: 'gameController',
+                    restrict: ['Masters']
+                });
+                break;
+            }
         case "reporting.alphabetters.co":
-        {
-            $routeProvider.when('/reports/:currentView?', {
-                templateUrl: 'partials/reporting/home.html',
-                controller: 'reportingController',
-                restrict: ['Admins']
-            });
-            break;
-        }
+            {
+                $routeProvider.when('/', {
+                    templateUrl: 'partials/reporting/home.html',
+                    controller: 'reportingController',
+                    restrict: ['Admins']
+                });
+                $routeProvider.when('/liveGame', {
+                    templateUrl: 'partials/reporting/home.html',
+                    controller: 'reportingController',
+                    restrict: ['Admins']
+                });
+                $routeProvider.when('/revenue', {
+                    templateUrl: 'partials/reporting/home.html',
+                    controller: 'reportingController',
+                    restrict: ['Admins']
+                });
+                break;
+            }
         case "teams.alphabetters.co":
-        {
-            $routeProvider.when('/', {
-                templateUrl: 'partials/teams.html',
-                controller: 'teamsController',
-                restrict: ['Managers', 'Masters']
-            });
-            $routeProvider.when('/team/:id?', {
-                templateUrl: 'partials/team.html',
-                controller: 'teamController',
-                restrict: ['Managers', 'Masters']
-            });
-            break;
-        }
+            {
+                $routeProvider.when('/', {
+                    templateUrl: 'partials/teams.html',
+                    controller: 'teamsController',
+                    restrict: ['Managers', 'Masters']
+                });
+                $routeProvider.when('/team/:id?', {
+                    templateUrl: 'partials/team.html',
+                    controller: 'teamController',
+                    restrict: ['Managers', 'Masters']
+                });
+                break;
+            }
     }
 
-    $routeProvider.when('/login', {templateUrl: 'partials/user/login.html', controller: 'userController'});
-    $routeProvider.when('/register', {templateUrl: 'partials/user/register.html', controller: 'userController'});
+    $routeProvider.when('/login', {
+        templateUrl: 'partials/user/login.html',
+        controller: 'userController'
+    });
+    $routeProvider.when('/register', {
+        templateUrl: 'partials/user/register.html',
+        controller: 'userController'
+    });
 
     $routeProvider.otherwise('/login');
 
     $httpProvider.interceptors.push('httpSpinner');
 
     localStorageServiceProvider.setPrefix('liveBetManager');
-}]).run(function ($rootScope, PubNub, authService, $location, $http, localStorageService) {
+}]).run(function($rootScope, PubNub, authService, $location, $http, localStorageService) {
     $rootScope.leagues = ["UEFA Champions League", "Premier League", "Serie A", "Bundesliga", "La Liga"];
     var localUuid = localStorageService.get('uuid');
     if (!localUuid) {
@@ -90,12 +106,11 @@ var app = angular.module('liveBetManager', [
 
 
     try {
-        $http.get('http://pubnub-balancer.herokuapp.com/').success(function (data) {
+        $http.get('http://pubnub-balancer.herokuapp.com/').success(function(data) {
             console.log('pinged msg queue');
         });
     }
-    catch (ex) {
-        ;
+    catch (ex) {;
     }
 
     $rootScope.countries = [{
@@ -829,7 +844,7 @@ var app = angular.module('liveBetManager', [
         code: 'ZW'
     }];
 
-    $rootScope.$on('$routeChangeStart', function (event, next, current) {
+    $rootScope.$on('$routeChangeStart', function(event, next, current) {
         $rootScope.flash = "";
         if (authService.group() != "Admins") {
             if (next.restrict && next.restrict.indexOf(authService.group()) < 0 && !authService.isAuthenticated()) {
@@ -839,35 +854,35 @@ var app = angular.module('liveBetManager', [
         }
     });
 
-    $rootScope.$on('loading:progress', function () {
+    $rootScope.$on('loading:progress', function() {
         $('#spinner').show();
     });
 
-    $rootScope.$on('loading:finish', function () {
+    $rootScope.$on('loading:finish', function() {
         $('#spinner').hide();
     });
-}).controller('ModalController', function ($scope, close, betManagerService) {
+}).controller('ModalController', function($scope, close, betManagerService) {
 
     $scope.chosenName = undefined;
 
-    betManagerService.getManagers().success(function (data) {
+    betManagerService.getManagers().success(function(data) {
         $scope.managers = data;
     });
 
-    $scope.close = function (result) {
+    $scope.close = function(result) {
         result = result || $scope.chosenName;
         close(result, 500); // close, but give 500ms for bootstrap to animate
     };
 
-}).factory('httpSpinner', function ($q, $rootScope, $window) {
+}).factory('httpSpinner', function($q, $rootScope, $window) {
     var loadingCount = 0;
     return {
-        'request': function (request) {
+        'request': function(request) {
             if (++loadingCount === 1) $rootScope.$broadcast('loading:progress');
 
             return request || $q.when(request);
         },
-        'response': function (response) {
+        'response': function(response) {
             if (--loadingCount === 0) $rootScope.$broadcast('loading:finish');
             return response || $q.when(response);
         }

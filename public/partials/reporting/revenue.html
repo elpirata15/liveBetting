@@ -44,7 +44,9 @@
         <tr>
             <th style="width:15px"></th>
             <th>Game Name</th>
+            <th>Location</th>
             <th>Date/Time</th>
+            <th>Score</th>
             <th>Total Bets</th>
             <th>Total Participants</th>
             <th>Total Money Wagered ($)</th>
@@ -54,7 +56,9 @@
             <tr ng-repeat-start="(gameId, game) in reportData.entities" data-toggle="collapse" data-target="#{{gameId}}" class="accordion-toggle">
                 <td><button ng-click="getGame(gameId)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus-sign"></span></button></td>
                 <td><a style="cursor: pointer" ng-click="openGame(gameId)">{{game.gameName}}</a></td>
+                <td>{{game.location}}</td>
                 <td>{{game.timestamp | date: "EEE, MMM d, y @ HH:mm"}}</a></td>
+                <td>{{game.gameScore}}</td>
                 <td>{{game.bidNumber}}</a></td>
                 <td>{{game.totalParticipants}}</a></td>
                 <td>{{game.totalPools}}</a></td>
@@ -92,6 +96,7 @@
                 <td>For {{reportData.totals.games}} Games: </td>
                 <td></td>
                 <td>Total Bets: {{reportData.totals.bids}}</td>
+                <td></td>
                 <td>Total Participants: {{reportData.totals.participants}}</td>
                 <td>Total Money Wagered: ${{reportData.totals.money}}</td>
             </tr>

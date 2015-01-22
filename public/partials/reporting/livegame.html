@@ -27,12 +27,13 @@
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h4 class="panel-title">
-                        {{currentGame.gameName}}
+                        {{currentGame.gameName}} @ {{currentGame.location}}
                     </h4>
                 </div>
                 <div class="panel-body">
                     <div class="row-fluid">
                         <div class="col-xs-9">
+                            <h4><b>Score: </b>{{currentGame.gameScore}}</h4>
                             <h4><b>Money wagered in game: </b>${{totalGameMoney}}</h4>
                             <div ng-repeat="bid in activeBids" ng-class="{'panel panel-success':bid.status === 'Active','panel panel-warning':bid.status === 'Inactive'}">
                                 <div class="panel-heading" role="tab" id="heading{{bid.id}}">

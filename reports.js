@@ -10,18 +10,20 @@ exports.getRevenueReport = function(req, res){
             for(var i in this.bids){
                 for(var j in this.bids[i].bidOptions){
                     emit(this.bids[i].id,{totalPoolAmount: this.bids[i].totalPoolAmount, participants:this.bids[i].bidOptions[j].participants.length, gameName: this.gameName, gameId: this._id,
-                    timestamp: this.timestamp});
+                    timestamp: this.timestamp, gameScore:this.gameScore || "0:0", location:this.location});
                 }
             }
         },
         reduce: function(k, vals){
-            var result = {poolAmount: 0, participants:0, gameName: null, gameId: null, timestamp: null};
+            var result = {poolAmount: 0, participants:0, gameName: null, gameId: null, timestamp: null, gameScore: null, location:null};
             for(var i in vals){
                 result.poolAmount = vals[i].totalPoolAmount;
                 result.participants += vals[i].participants;
                 result.gameName = vals[i].gameName;
                 result.gameId = vals[i].gameId;
                 result.timestamp = vals[i].timestamp;
+                result.gameScore = vals[i].gameScore;
+                result.location = vals[i].location;
             }
             return result;
         }
@@ -38,6 +40,8 @@ exports.getRevenueReport = function(req, res){
             finalResult[result[i].value.gameId].totalParticipants += result[i].value.participants;
             finalResult[result[i].value.gameId].bidNumber++;
             finalResult[result[i].value.gameId].timestamp = result[i].value.timestamp;
+            finalResult[result[i].value.gameId].gameScore = result[i].value.gameScore;
+            finalResult[result[i].value.gameId].location = result[i].value.location;
         }
         res.status(200).send(finalResult);
     });

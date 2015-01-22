@@ -182,6 +182,8 @@ exports.gameScore = function(req, res){
                res.status(500).send(err);
            }
             logger.info(req.body.id, ["Updated game score:", savedGame.gameScore]);
+            // Publish new score on gameId channel
+            pubnub.publishMessage(req.body.id, {score: savedGame.gameScore});
             res.status(200).end();
         });
     });
