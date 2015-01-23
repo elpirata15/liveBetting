@@ -56,7 +56,7 @@ exports.getUserBidsFromSession = function(req, res) {
     logger.info(null, ["Getting bids for user", req.session.uid]);
     dbOperations.UserModel
         .findOne({_id:req.session.uid}).lean().exec(function(err, user) {
-            if (!err) {
+            if (!err && user) {
                 var foundBids = user.completedBids;
                 logger.info(null, ["Found", foundBids.length, "bids."]);
                 var selectedfoundBids = [];
