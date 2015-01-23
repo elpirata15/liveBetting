@@ -9,9 +9,7 @@ var bidController = require('./bid');
 var userController = require('./user');
 var teamContoller = require('./team');
 var reportingController = require('./reports');
-if (!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
-    var pubnubManager = require('./pubnubManager');
-}
+var pubnubManager = require('./pubnubManager');
 var mailer = require('./mailer');
 var http = require('http');
 
@@ -23,6 +21,7 @@ var app = express();
 var day = 1000 * 60 * 60 * 24;
 
 app.set('port', (process.env.PORT || 5000));
+exports.port = app.get('port');
 app.set('host', process.env.IP);
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));

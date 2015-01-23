@@ -1,12 +1,13 @@
 var vows = require('vows'),
     assert = require('assert'),
-    request = require('request');
+    request = require('request'),
+    server = require('../index');
 vows.describe('Test Login').addBatch({
    'A user logs in': {
        'with invalid creds':{
            topic: function(){
                var options = {
-                   url: 'http://www.alphabetters.co/login',
+                   url: 'http://localhost:'+server.port+'/login',
                    method: 'POST',
                    body: {email: 'elirankon@gmail.com', pass:'Elir$fdf'},
                    json: true
@@ -20,7 +21,7 @@ vows.describe('Test Login').addBatch({
        'with valid creds':{
            topic: function(){
                var options = {
-                   url: 'http://www.alphabetters.co/login',
+                   url: 'http://localhost:'+server.port+'/login',
                    method: 'POST',
                    body: {email: 'elirankon@gmail.com', pass:'Elir@nk0n86'},
                    json: true
