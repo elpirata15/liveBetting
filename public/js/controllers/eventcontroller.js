@@ -14,18 +14,22 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
 
         $scope.eventDescription = {teams: []};
         $scope.gameScore = {home: 0, away: 0};
-        $scope.selectedOption;
-        $scope.currentEvent;
+        $scope.selectedOption = null;
+        $scope.currentEvent = null;
         $scope.game.started = false;
         $scope.game.paused = false;
         $scope.longBets = {};
         $scope.longBetsLength = 0;
         $scope.amounts = [10, 25, 50, 100];
 
-        $scope.startGame = function () {
-            var now = new Date();
-            betManagerService.startGame($scope.game._id).success(function () {
+        $scope.startGame = function (resume) {
+            var now = null;
+            if(!resume){
+                now = new Date();
+            }
+            betManagerService.startGame($scope.game._id, now).success(function () {
                 $scope.started = true;
+                $scope.paused = false;
                 PubNub.ngPublish({
                     channel: $scope.game._id,
                     message: {
@@ -51,24 +55,29 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         };
 
         $scope.pauseGame = function () {
-            $scope.paused = !$scope.paused;
-            PubNub.ngPublish({
-                channel: $scope.game._id,
+            var now = new Date();
+            betManagerService.pauseGame($scope.game._id, now).success(function(){
+                $scope.paused = true;
+                PubNub.ngPublish({
+                    channel: $scope.game._id,
                 message: {
                     pn_gcm: {
                         data: {
                             gameId: $scope.game._id,
-                            halfTime: $scope.paused
+                            halfTime: true,
+                            timestamp: now
                         }
                     }, gameMessage: {
                         gameId: $scope.game._id,
-                        halfTime: $scope.paused
+                        halfTime: true,
+                        timestamp: now
                     }
                 }
             });
             PubNub.ngPublish({
                 channel: 'allGames',
-                message: {gameId: $scope.game._id, halfTime: $scope.paused}
+                message: {gameId: $scope.game._id, halfTime: true, timestamp: now}
+                });
             });
         };
 

@@ -201,7 +201,7 @@ exports.initGame = function (req, res) {
         .exec(function (err, games) {
             if (!err && games.length > 0) {
                 var game = games[0];
-                game.status = "Active";
+
                 game.tvDelay = parseInt(req.body.preGameParams.tvDelay);
                 game.save(function (err, game) {
                     if (!err) {
@@ -240,12 +240,36 @@ exports.startGame = function (req, res) {
             logger.error(null, ["Could not start game: game not found"]);
             res.status(500).send("Could not start game: game not found");
         }
-        game.timestamp = new Date();
+        game.status = "Active";
+        if(req.body.startTime) {
+            game.timestamp = req.body.startTime;
+        }
         game.save(function(err, savedGame){
            if(err){
                logger.error(null, ["Could not save game", err.toString()]);
                res.status(500).send(err);
            }
+            res.status(200).end();
+        });
+    });
+};
+
+exports.setHalfTime = function(req, res){
+    dbOperations.GameModel.findOne({_id: req.params.id}, function(err, game){
+        if (err) {
+            logger.error(null, ["Could not pause game", err.toString()]);
+            res.status(500).send(err);
+        }
+        if(!game){
+            logger.error(null, ["Could not pause game: game not found"]);
+            res.status(500).send("Could not pause game: game not found");
+        }
+        game.status = "HalfTime";
+        game.save(function(err, savedGame){
+            if(err){
+                logger.error(null, ["Could not save game", err.toString()]);
+                res.status(500).send(err);
+            }
             res.status(200).end();
         });
     });

@@ -28,7 +28,7 @@
                         ng-click="pauseGame()"><span class="glyphicon glyphicon-pause"></span> HALF-TIME
                 </button>
                 <button type="button" ng-show="started && paused" class="btn btn-default" style="margin-top:8px;margin-right:20px"
-                        ng-click="pauseGame()"><span class="glyphicon glyphicon-play"></span> RESUME
+                        ng-click="startGame()"><span class="glyphicon glyphicon-play"></span> RESUME
                 </button>
             </li>
         </ul>
@@ -63,7 +63,7 @@
             <b><span class="glyphicon glyphicon-arrow-down"></span> Choose an event</b>
             <button type="button" class="btn btn-block"
                     ng-class="{'btn-default':currentEvent.eventName!=item.eventName, 'btn-info':currentEvent.eventName==item.eventName}"
-                    ng-disabled="betOpen || !started"
+                    ng-disabled="betOpen || !started || paused"
                     style=" margin-bottom: 10px;"
                     ng-click="changeEventTemplate(item)" ng-repeat="item in events" ng-if="!item.alwaysLast">
                 {{item.eventName}}
@@ -71,7 +71,7 @@
             <button type="button" class="btn btn-block"
                     ng-class="{'btn-default':currentEvent.eventName!=events.customEvent.eventName, 'btn-info':currentEvent.eventName==events.customEvent.eventName} "
                     style=" margin-bottom: 10px;"
-                    ng-disabled="betOpen"
+                    ng-disabled="betOpen || !started || paused"
                     ng-click="changeEventTemplate(events.customEvent)">{{events.customEvent.eventName}}
             </button>
         </div>
