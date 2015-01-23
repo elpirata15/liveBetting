@@ -9,7 +9,7 @@ var bidController = require('./bid');
 var userController = require('./user');
 var teamContoller = require('./team');
 var reportingController = require('./reports');
-if(!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
+if (!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
     var pubnubManager = require('./pubnubManager');
 }
 var mailer = require('./mailer');
@@ -39,34 +39,33 @@ app.use(session({
 }));
 
 // ### GENERAL ERROR HANDLER ######
-app.use(function(err, req, res, next) {
-    console.error(err.stack);
-    pubnubManager.removeFromPool(function() {
-        mailer.sendErrorEmail(err.stack);
-        setTimeout(function() {
-            process.exit(1);
-        }, 10);
-    });
-
+process.on('uncaughtException', function (err) {
+    console.log('Caught exception: ' + err);
+    setTimeout(function () {
+        pubnubManager.removeFromPool(function () {
+            mailer.sendErrorEmail(err.stack);
+            process.exit(8);
+        });
+    }, 10);
 });
 
 function exitGracefully() {
-    pubnubManager.removeFromPool(function() {
+    pubnubManager.removeFromPool(function () {
         process.exit(0);
     });
 }
 
-process.on('SIGINT', function() {
+process.on('SIGINT', function () {
     exitGracefully();
 });
 
-process.on('SIGTERM', function() {
+process.on('SIGTERM', function () {
     exitGracefully();
 });
 // ################################
 
-setInterval(function() {
-    http.get("http://pubnub-balancer.herokuapp.com/").on('error', function(e) {
+setInterval(function () {
+    http.get("http://pubnub-balancer.herokuapp.com/").on('error', function (e) {
         console.log("Got error: " + e.message);
     });
 
@@ -186,17 +185,17 @@ app.get('/getTeams', ensureManager, teamContoller.getTeams);
 
 // #######################################
 
-app.get('/defaultLog', ensureAdmin, function(req, res) {
+app.get('/defaultLog', ensureAdmin, function (req, res) {
     res.sendFile('default.log');
 });
 
 if (app.get('host')) {
-    app.listen(app.get('port'), app.get('host'), function() {
+    app.listen(app.get('port'), app.get('host'), function () {
         logger.info(null, ["Node app is running at " + app.get('host') + ":" + app.get('port')]);
     });
 }
 else {
-    app.listen(app.get('port'), function() {
+    app.listen(app.get('port'), function () {
         logger.info(null, ["Node app is running at localhost:" + app.get('port')]);
     });
 }
