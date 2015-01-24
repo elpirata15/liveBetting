@@ -21,7 +21,6 @@ var app = express();
 var day = 1000 * 60 * 60 * 24;
 
 app.set('port', (process.env.PORT || 5000));
-exports.port = app.get('port');
 app.set('host', process.env.IP);
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
