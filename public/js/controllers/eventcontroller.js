@@ -2,10 +2,22 @@
 angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', '$location', 'PubNub', 'betManagerService', 'teamsService', 'authService', '$timeout', '$interval', 'localStorageService', 'dialogs',
     function ($scope, $rootScope, $location, PubNub, betManagerService, teamsService, authService, $timeout, $interval, localStorageService, dialogs) {
         PubNub.init($rootScope.keys);
-
+        $scope.gameStatus = [
+            {id:'firstHalf', text: 'First Half'},
+            {id:'halfTime', text: 'Half Time'},
+            {id:'secondHalf', text: 'Second Half'},
+            {id:'beforeExtraTime', text: 'Pending Extra Time'},
+            {id:'extra1', text: 'Extra Time 1'},
+            {id:'extraHalfTime', text: 'Extra Time Break'},
+            {id:'extra2', text: 'Extra Time 2'},
+            {id:'penalty', text: 'Penalty Shootout'}
+        ];
+        $scope.selectedStatus = null;
         $scope.connected = false;
         $scope.log = [];
         $scope.game = localStorageService.get('currentGame');
+        var scores = $scope.game.gameScore.split(':');
+        $scope.scores = {home: parseInt(scores[0],10), away: parseInt(scores[1],10)};
 
         // Update local storage in any event of game details change
         $scope.$watch('game', function (newVal) {
@@ -16,74 +28,45 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.gameScore = {home: 0, away: 0};
         $scope.selectedOption = null;
         $scope.currentEvent = null;
-        $scope.game.started = false;
-        $scope.game.paused = false;
         $scope.longBets = {};
         $scope.longBetsLength = 0;
         $scope.amounts = [10, 25, 50, 100];
 
-        $scope.startGame = function (resume) {
-            var now = null;
-            if(!resume){
-                now = new Date();
-            }
-            betManagerService.startGame($scope.game._id, now).success(function () {
-                $scope.started = true;
-                $scope.paused = false;
-                PubNub.ngPublish({
-                    channel: $scope.game._id,
-                    message: {
-                        pn_gcm: {
-                            data: {
-                                gameId: $scope.game._id,
-                                started: true,
-                                timestamp: now
-                            }
-                        },
-                        gameMessage: {
-                            gameId: $scope.game._id,
-                            started: true,
-                            timestamp: now
-                        }
-                    }
-                });
-                PubNub.ngPublish({
-                    channel: 'allGames',
-                    message: {gameId: $scope.game._id, started: true, timestamp: now}
-                });
-            });
-        };
-
-        $scope.pauseGame = function () {
+        $scope.setStatus = function () {
             var now = new Date();
-            betManagerService.pauseGame($scope.game._id, now).success(function(){
-                $scope.paused = true;
+            betManagerService.setStatus($scope.game._id, $scope.game.status, now).success(function(){
                 PubNub.ngPublish({
                     channel: $scope.game._id,
                 message: {
                     pn_gcm: {
                         data: {
                             gameId: $scope.game._id,
-                            halfTime: true,
+                            status: $scope.game.status,
                             timestamp: now
                         }
                     }, gameMessage: {
                         gameId: $scope.game._id,
-                        halfTime: true,
+                        status: $scope.game.status,
                         timestamp: now
                     }
                 }
             });
             PubNub.ngPublish({
                 channel: 'allGames',
-                message: {gameId: $scope.game._id, halfTime: true, timestamp: now}
+                message: {gameId: $scope.game._id, status: $scope.game.status, timestamp: now}
                 });
             });
         };
 
         $scope.updateScore = function () {
-            var score = $scope.gameScore.home + ":" + $scope.gameScore.away;
-            betManagerService.updateScore($scope.game._id, score);
+            var score = $scope.scores.home + ":" + $scope.scores.away;
+            $scope.game.gameScore = score;
+            betManagerService.updateScore($scope.game._id, score).success(function(){
+               PubNub.ngPublish({
+                   channel: 'allGames',
+                   message: {gameId: $scope.game._id, score: score}
+               })
+            });
         };
 
         $scope.doLogout = function () {

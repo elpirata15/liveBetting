@@ -138,9 +138,9 @@ app.get('/getGameTeams/:id', ensureManager, gameController.getGameTeams);
 
 app.post('/getGamesMap', reportingController.getRevenueReport);
 
-app.post('/startGame/:id', ensureManager, gameController.startGame);
+app.post('/setGameStatus/:id', ensureManager, gameController.setStatus);
 
-app.post('/setHalfTime/:id', ensureManager, gameController.setHalfTime);
+app.post('/setGameScore', ensureManager, gameController.gameScore);
 
 // #### BID FUNCTIONS #####
 

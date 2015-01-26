@@ -6,12 +6,8 @@ angular.module('liveBetManager').factory('betManagerService', ['$http', function
         return $http.post('/createGame', game);
     };
 
-    betManagerService.startGame = function(gameId, time){
-        return $http.post('/startGame/'+gameId, {startTime: time});
-    };
-
-    betManagerService.pauseGame = function(gameId, time){
-        return $http.post('/setHalfTime/'+gameId, {startTime: time});
+    betManagerService.setStatus = function(gameId, status, time){
+        return $http.post('/setGameStatus/'+gameId, {status: status, timestamp: time});
     };
 
     betManagerService.initGame = function(id, params){

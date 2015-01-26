@@ -8,7 +8,7 @@ var logger = new serverLogger();
 // For client - get games you can subscribe to
 exports.getGames = function (req, res) {
     logger.info(null, ["Getting all games"]);
-    dbOperations.GameModel.where('status').in(['Active', 'Waiting']).exec(function (err, docs) {
+    dbOperations.GameModel.find({status: {$ne: dbOperations.gameStatus.inactive}},function (err, docs) {
         if (!err && docs.length > 0) {
             return res.status(200).send(docs);
         }
@@ -61,7 +61,7 @@ exports.findGameByDateLeague = function (req, res) {
 };
 
 exports.getLiveGameList = function (req, res) {
-    dbOperations.GameModel.find({status: "Active"}, 'gameName gameLeague', function (err, docs) {
+    dbOperations.GameModel.find({status: {$ne: dbOperations.gameStatus.inactive}}, 'gameName gameLeague', function (err, docs) {
         if (err) {
             logger.error(null, ['Error getting active game list: ', err.toString()]);
             res.status(500).send(err);
@@ -230,31 +230,7 @@ exports.initGame = function (req, res) {
         });
 };
 
-exports.startGame = function (req, res) {
-    dbOperations.GameModel.findOne({_id: req.params.id}, function (err, game) {
-        if (err) {
-            logger.error(null, ["Could not start game", err.toString()]);
-            res.status(500).send(err);
-        }
-        if(!game){
-            logger.error(null, ["Could not start game: game not found"]);
-            res.status(500).send("Could not start game: game not found");
-        }
-        game.status = "Active";
-        if(req.body.startTime) {
-            game.timestamp = req.body.startTime;
-        }
-        game.save(function(err, savedGame){
-           if(err){
-               logger.error(null, ["Could not save game", err.toString()]);
-               res.status(500).send(err);
-           }
-            res.status(200).end();
-        });
-    });
-};
-
-exports.setHalfTime = function(req, res){
+exports.setStatus = function(req, res){
     dbOperations.GameModel.findOne({_id: req.params.id}, function(err, game){
         if (err) {
             logger.error(null, ["Could not pause game", err.toString()]);
@@ -264,7 +240,11 @@ exports.setHalfTime = function(req, res){
             logger.error(null, ["Could not pause game: game not found"]);
             res.status(500).send("Could not pause game: game not found");
         }
-        game.status = "HalfTime";
+        game.status = dbOperations.gameStatus[req.body.status];
+        game.statusTimestamp = req.body.timestamp;
+        if(req.body.status === dbOperations.gameStatus.firstHalf){
+            game.timestamp = req.body.timestamp;
+        }
         game.save(function(err, savedGame){
             if(err){
                 logger.error(null, ["Could not save game", err.toString()]);

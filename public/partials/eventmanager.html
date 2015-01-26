@@ -21,15 +21,10 @@
                 </ul>
             </li>
             <li>
-                <button type="button" ng-show="!started" class="btn btn-default" style="margin-top:8px;margin-right:20px"
-                        ng-click="startGame()"><span class="glyphicon glyphicon-time"></span> START GAME
-                </button>
-                <button type="button" ng-show="started && !paused" class="btn btn-default" style="margin-top:8px;margin-right:20px"
-                        ng-click="pauseGame()"><span class="glyphicon glyphicon-pause"></span> HALF-TIME
-                </button>
-                <button type="button" ng-show="started && paused" class="btn btn-default" style="margin-top:8px;margin-right:20px"
-                        ng-click="startGame()"><span class="glyphicon glyphicon-play"></span> RESUME
-                </button>
+                <select class="form-control" style="margin-top:8px" ng-model="game.status" ng-options="game.id as game.text for game in gameStatus"></select>
+            </li>
+            <li>
+            <button type="button" class="btn btn-default" style="margin-top:8px" ng-click="setStatus()" ng-disabled="!game.status"><span class="glyphicon glyphicon-arrow-up"></span></button>
             </li>
         </ul>
 
@@ -39,10 +34,10 @@
                 <div class="row" style="margin-top:8px;">
                     <div class="col-xs-1" style="margin-top:8px; padding-right:0px;padding-left:0px;text-align: center"><b>H</b></div>
                     <div class="col-xs-3" style="padding-left:0px; padding-right: 0px">
-                        <input type="number" class="form-control" placeholder="H" ng-model="gameScore.home">
+                        <input type="number" class="form-control" placeholder="H" ng-model="scores.home">
                     </div>
                     <div class="col-xs-1" style="margin-top:8px; padding-right:0px;padding-left:0px;text-align: center"><b> : </b></div>
-                    <div class="col-xs-3" style="padding-left:0px; padding-right: 0px"><input type="number" placeholder="A" class="form-control" ng-model="gameScore.away">
+                    <div class="col-xs-3" style="padding-left:0px; padding-right: 0px"><input type="number" placeholder="A" class="form-control" ng-model="scores.away">
                     </div>
                     <div class="col-xs-1" style="margin-top:8px; padding-right:0px;padding-left:0px;text-align: center"><b>A</b></div>
                     <button type="button" class="btn btn-default" style="margin-right:20px"
@@ -63,7 +58,7 @@
             <b><span class="glyphicon glyphicon-arrow-down"></span> Choose an event</b>
             <button type="button" class="btn btn-block"
                     ng-class="{'btn-default':currentEvent.eventName!=item.eventName, 'btn-info':currentEvent.eventName==item.eventName}"
-                    ng-disabled="betOpen || !started || paused"
+                    ng-disabled="betOpen"
                     style=" margin-bottom: 10px;"
                     ng-click="changeEventTemplate(item)" ng-repeat="item in events" ng-if="!item.alwaysLast">
                 {{item.eventName}}
@@ -71,7 +66,7 @@
             <button type="button" class="btn btn-block"
                     ng-class="{'btn-default':currentEvent.eventName!=events.customEvent.eventName, 'btn-info':currentEvent.eventName==events.customEvent.eventName} "
                     style=" margin-bottom: 10px;"
-                    ng-disabled="betOpen || !started || paused"
+                    ng-disabled="betOpen"
                     ng-click="changeEventTemplate(events.customEvent)">{{events.customEvent.eventName}}
             </button>
         </div>
