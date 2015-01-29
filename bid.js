@@ -285,10 +285,17 @@ var updateUserBalances = function(bid, gameName, gameDate) {
     // If there were winning users
     if (winningUsers > 0) {
 
-        // Calculate winning money  (take 20% off - this is how we make money :D). If there is only one user (entry amount equals the total pool) give user back his money (no winnings)
+        // Calculate winning money. If there is only one user (entry amount equals the total pool) give user back his money (no winnings)
         winningMoney = (bid.totalPoolAmount != bid.entryAmount && winningUsers != totalParticipants) ? bid.totalPoolAmount / winningUsers : 0;
     }
-
+    
+    // If the winning money is less than one cent over the entry amount
+    if(winningMoney < parseInt(bid.entryAmount, 10) + 0.01)
+    {
+        // Don't pay any money
+        winningMoney = 0;
+    }
+    
     // Loop through the options
     for (var i in bid.bidOptions) {
 
