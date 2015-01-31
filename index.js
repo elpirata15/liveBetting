@@ -38,11 +38,12 @@ app.use(session({
 
 // ### GENERAL ERROR HANDLER ######
 process.on('uncaughtException', function (err) {
-    console.log('Caught exception: ' + err);
+    console.error('Caught exception: ' + err);
     setTimeout(function () {
         pubnubManager.removeFromPool(function () {
-            mailer.sendErrorEmail(err.stack);
-            process.exit(8);
+            mailer.sendErrorEmail(err.stack, function(){
+                process.exit(8);
+            });
         });
     }, 10);
 });
