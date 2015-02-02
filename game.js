@@ -219,6 +219,7 @@ exports.initGame = function (req, res) {
                         };
                         game.teams[0] = team1;
                         game.teams[1] = team2;
+                        game.gameScore = "0:0";
                         logger.info(game._id, ["Activated game:", game.gameName, "with", game.tvDelay, "seconds of TV delay"]);
                         res.status(200).send(game);
                     }
