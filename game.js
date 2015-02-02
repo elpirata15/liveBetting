@@ -339,6 +339,7 @@ exports.closeGame = function (req, res) {
                         });
                         pubnub.publishMessage('allGames', {
                             gameId: game._id,
+                            gameName: game.gameName,
                             close: true
                         });
                         res.status(200).end();

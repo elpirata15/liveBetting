@@ -53,7 +53,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             });
             PubNub.ngPublish({
                 channel: 'allGames',
-                message: {gameId: $scope.game._id, status: $scope.game.status, timestamp: now}
+                message: {gameId: $scope.game._id, gameName: $scope.game.gameName, status: $scope.game.status, timestamp: now}
                 });
             });
         };
@@ -64,7 +64,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             betManagerService.updateScore($scope.game._id, score).success(function(){
                PubNub.ngPublish({
                    channel: 'allGames',
-                   message: {gameId: $scope.game._id, score: score}
+                   message: {gameId: $scope.game._id, gameName: $scope.game.gameName, score: score}
                })
             });
         };
