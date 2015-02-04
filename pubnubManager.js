@@ -3,7 +3,7 @@ var pubnub = require("pubnub").init({
     publish_key: process.env.PUBNUB_PUBLISH_KEY,
     subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY,
     uuid: instanceName,
-    heartbeat: 15
+    heartbeat: 20
 });
 var gameController = require('./game');
 var bidController = require('./bid');
