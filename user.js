@@ -77,7 +77,7 @@ exports.getUserBidsFromSession = function(req, res) {
             }
             else {
                 logger.error(null, [err.toString()]);
-                res.status(500).send(err.toString);
+                res.status(500).send(err.toString());
             }
         });
 };
@@ -93,7 +93,7 @@ exports.getAllUserBids = function(req, res) {
         }
         else {
             logger.error(null, [err.toString()]);
-            res.status(500).send(err.toString);
+            res.status(500).send(err.toString());
         }
     });
 };
