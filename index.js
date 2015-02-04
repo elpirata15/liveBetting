@@ -39,6 +39,7 @@ app.use(session({
 // ### GENERAL ERROR HANDLER ######
 process.on('uncaughtException', function (err) {
     console.error('Caught exception: ' + err);
+    console.error('stack:', err.stack);
     setTimeout(function () {
         pubnubManager.removeFromPool(function () {
             mailer.sendErrorEmail(err.stack, function(){
