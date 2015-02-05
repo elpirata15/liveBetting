@@ -157,7 +157,9 @@ app.get('/getUsers', ensureAdmin, userController.getUsers);
 
 app.get('/getUser/:id', ensureAdmin, userController.getUserById);
 
-app.post('/getUserBids', ensureUser, userController.getUserBidsFromSession);
+app.get('/getUserBidsForGame/:gameId', ensureUser, userController.getUserBidsFromGame);
+
+app.get('/getUserCompletedGames',ensureUser, userController.getCompletedGames);
 
 app.get('/getAllUserBids/:id', ensureAdmin, userController.getAllUserBids);
 

@@ -49,31 +49,55 @@ exports.getUserById = function(req, res) {
     });
 };
 
-exports.getUserBidsFromSession = function(req, res) {
-    if(!req.session.uid){
+exports.getCompletedGames = function(req, res) {
+    if (!req.session.uid) {
+        res.status(403).end();
+    }
+    logger.info(null, ["Getting completed games for user", req.session.uid]);
+    dbOperations.UserModel.findOne({
+        _id: req.session.uid
+    }).lean().exec(function(err, user) {
+        if (err) {
+            logger.error(null, ["Failed:", err.stack]);
+            res.status(500).send(err);
+        }
+        var foundBids = user.completedBids;
+        logger.info(null, ["Found", foundBids.length, "Bids"]);
+        var completedGames = {};
+        for (var i in foundBids) {
+            var currentBid = foundBids[i];
+            completedGames[currentBid.gameId] = true;
+        }
+        res.status(200).send(Object.keys(completedGames));
+    });
+};
+
+exports.getUserBidsFromGame = function(req, res) {
+    if (!req.session.uid) {
         res.status(403).end();
     }
     logger.info(null, ["Getting bids for user", req.session.uid]);
     dbOperations.UserModel
-        .findOne({_id:req.session.uid}).lean().exec(function(err, user) {
+        .findOne({
+            _id: req.session.uid
+        }).lean().exec(function(err, user) {
             if (!err && user) {
                 var foundBids = user.completedBids;
                 logger.info(null, ["Found", foundBids.length, "bids."]);
-                var selectedfoundBids = [];
-                if(req.body.startIndex >= 0 && req.body.bidNumber > 0 &&
-                ((req.body.bidNumber - req.body.startIndex) < foundBids.length)){
-                    selectedfoundBids = foundBids.splice(req.body.startIndex, req.body.bidNumber);
-                } else {
-                    selectedfoundBids = foundBids;
-                }
-                for (var i in selectedfoundBids) {
-                    var completedBidOptionsObject = {};
-                    for (var j in selectedfoundBids[i].bidOptions) {
-                        completedBidOptionsObject[j] = selectedfoundBids[i].bidOptions[j];
+                for (var i = 0; i < foundBids.length; i++) {
+                    if (foundBids[i].gameId != req.params.gameId) {
+                        foundBids.splice(i, 1);
+                        i--;
                     }
-                    selectedfoundBids[i].bidOptions = completedBidOptionsObject;
+                    else {
+                        var completedBidOptionsObject = {};
+                        for (var j in foundBids[i].bidOptions) {
+                            completedBidOptionsObject[j] = foundBids[i].bidOptions[j];
+                        }
+                        foundBids[i].bidOptions = completedBidOptionsObject;
+                    }
                 }
-                res.status(200).send(selectedfoundBids);
+                res.status(200).send(foundBids);
             }
             else {
                 logger.error(null, [err.toString()]);
