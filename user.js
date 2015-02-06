@@ -66,9 +66,13 @@ exports.getCompletedGames = function(req, res) {
         var completedGames = {};
         for (var i in foundBids) {
             var currentBid = foundBids[i];
-            completedGames[currentBid.gameId] = true;
+            completedGames[currentBid.gameId] = {gameName: currentBid.gameName,
+                                                    gameId: currentBid.gameId,
+                                                    gameDate: currentBid.gameDate};
         }
-        res.status(200).send(Object.keys(completedGames));
+        res.status(200).send(Object.keys(completedGames).map(function(game){
+            return completedGames[game];
+        }));
     });
 };
 
