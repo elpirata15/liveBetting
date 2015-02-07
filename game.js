@@ -4,11 +4,17 @@ var serverLogger = require('./serverLogger');
 
 // default server channel logger
 var logger = new serverLogger();
+var gameStatus = {inactive: 0, waiting: 1, firstHalf: 2, halfTime: 3, secondHalf: 4, beforeExtraTime: 5,
+    extra1: 6, extraHalfTime: 7, extra2:8,penalty:9};
+
+exports.gameStatus = function(req, res){
+    res.status(200).send(gameStatus);
+};
 
 // For client - get games you can subscribe to
 exports.getGames = function (req, res) {
     logger.info(null, ["Getting all games"]);
-    dbOperations.GameModel.find({status: {$ne: dbOperations.gameStatus.inactive}},function (err, docs) {
+    dbOperations.GameModel.find({status: {$ne: gameStatus.inactive}},function (err, docs) {
         if (!err && docs.length > 0) {
             return res.status(200).send(docs);
         }
@@ -61,7 +67,7 @@ exports.findGameByDateLeague = function (req, res) {
 };
 
 exports.getLiveGameList = function (req, res) {
-    dbOperations.GameModel.find({status: {$ne: dbOperations.gameStatus.inactive}}, 'gameName gameLeague', function (err, docs) {
+    dbOperations.GameModel.find({status: {$ne: gameStatus.inactive}}, 'gameName gameLeague', function (err, docs) {
         if (err) {
             logger.error(null, ['Error getting active game list: ', err.toString()]);
             res.status(500).send(err);
@@ -74,7 +80,7 @@ exports.getLiveGameList = function (req, res) {
 // For event managers - get waiting events
 exports.getWaitingGames = function (req, res) {
     dbOperations.GameModel.find({
-        status: "Waiting",
+        status: gameStatus.waiting,
         assignedTo: req.params.id
     }, function (err, docs) {
         if (!err && docs.length > 0) {
@@ -127,7 +133,7 @@ exports.createGame = function (req, res) {
                 game.gameLeague = req.body.gameLeague;
                 game.assignedTo = req.body.assignedTo;
                 game.location = req.body.location;
-                game.status = "Waiting";
+                game.status = gameStatus.waiting;
                 game.save(function (err, game) {
                     if (!err) {
                         logger.info(null, ["Updated game", game.gameName]);
@@ -152,7 +158,7 @@ exports.createGame = function (req, res) {
             teams: req.body.teams,
             timestamp: new Date(req.body.timestamp),
             location: req.body.location,
-            status: "Waiting"
+            status: gameStatus.waiting
         });
 
         newGame.save(function (err, game) {
@@ -241,9 +247,9 @@ exports.setStatus = function(req, res){
             logger.error(null, ["Could not pause game: game not found"]);
             res.status(500).send("Could not pause game: game not found");
         }
-        game.status = dbOperations.gameStatus[req.body.status];
+        game.status = req.body.status;
         game.statusTimestamp = req.body.timestamp;
-        if(req.body.status === dbOperations.gameStatus.firstHalf){
+        if(req.body.status === gameStatus.firstHalf){
             game.timestamp = req.body.timestamp;
         }
         game.save(function(err, savedGame){
@@ -322,7 +328,7 @@ exports.closeGame = function (req, res) {
     }, function (err, game) {
         if (!err) {
             if (game) {
-                game.status = "Inactive";
+                game.status = gameStatus.inactive;
                 game.save(function (err, game) {
                     if (!err) {
                         logger.info(null, ["closed game", game.gameName, "successfully"]);

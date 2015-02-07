@@ -18,6 +18,10 @@ angular.module('liveBetManager').factory('betManagerService', ['$http', function
       return $http.get('/newBidId');
     };
 
+    betManagerService.getGameStatus = function(){
+        return $http.get('/gameStatus');
+    };
+
     betManagerService.updateScore = function(gameId, gameScore){
         return $http.post('/setGameScore', {id: gameId, gameScore:gameScore});
     };

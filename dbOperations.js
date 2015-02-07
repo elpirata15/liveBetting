@@ -69,7 +69,7 @@ var gameEntity = new Schema({
     timestamp: Date,
     statusTimestamp: Date,
     gameLeague: String,
-    status: String,
+    status: Number,
     tvDelay: Number,
     bids: [bidEntity]
 });
@@ -119,8 +119,7 @@ mongoose.connect(process.env.MONGOLAB_URI, options);
 
 // ************** ENTITY CACHING *********************
 exports.caches = {gameCache: "activeGames", bidCache: "activeBids"};
-exports.gameStatus = {inactive: 'Inactive', waiting: 'Waiting', firstHalf: 'firstHalf', halfTime: 'halfTime', secondHalf: 'secondHalf', beforeExtraTime: 'beforeExtraTime',
-                    extra1: 'extra1', extraHalfTime: 'extraHalfTime', extra2:'extra2',penalty:'penalty'};
+
 
 // ** DB FUNCTION WITH CACHING **
 exports.updateDb = function (entity, cacheType, callback, errCallback) {

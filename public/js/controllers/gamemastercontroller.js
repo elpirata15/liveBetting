@@ -3,7 +3,9 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
     /* jshint ignore:end */
     $scope.selectedGame = null;
     $scope.games = [];
-
+    $scope.gameStatus = {
+        1: "Waiting"
+    };
     $scope.gameDate = undefined;
     $scope.gameTime = undefined;
     $scope.team1 = undefined;
@@ -36,7 +38,8 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
         betManagerService.getGames().success(function (data) {
             $scope.games = []; 
             for (var i in data) {
-                if (data[i].status == "Waiting") {
+                // game status of 1 = waiting
+                if (data[i].status == $scope.gameStatus[1]) {
                     $scope.games.push(data[i]);
                     $scope.games[$scope.games.length - 1].assignedTo = $scope.managers[data[i].assignedTo];
                 }
@@ -54,7 +57,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
             displayName: 'Date',
             cellTemplate: '<div class="ngCellText">{{row.getProperty(col.field) | date: "EEE, MMM d, y @ HH:mm"}}</div>'
         },
-        {field: 'status', displayName: 'Status'},
+        {field: 'status', displayName: 'Status', cellTemplate: '<div class="ngCellText">{{gameStatus[row.getProperty(col.field)]}}</div>'},
         {field: 'assignedTo', displayName: 'Assigned To'}
     ];
     $scope.gridOptions = {

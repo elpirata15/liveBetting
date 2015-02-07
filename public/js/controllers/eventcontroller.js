@@ -3,14 +3,14 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
     function ($scope, $rootScope, $location, PubNub, betManagerService, teamsService, authService, $timeout, $interval, localStorageService, dialogs) {
         PubNub.init($rootScope.keys);
         $scope.gameStatus = [
-            {id:'firstHalf', text: 'First Half'},
-            {id:'halfTime', text: 'Half Time'},
-            {id:'secondHalf', text: 'Second Half'},
-            {id:'beforeExtraTime', text: 'Pending Extra Time'},
-            {id:'extra1', text: 'Extra Time 1'},
-            {id:'extraHalfTime', text: 'Extra Time Break'},
-            {id:'extra2', text: 'Extra Time 2'},
-            {id:'penalty', text: 'Penalty Shootout'}
+            {id:2, text: 'First Half'},
+            {id:3, text: 'Half Time'},
+            {id:4, text: 'Second Half'},
+            {id:5, text: 'Pending Extra Time'},
+            {id:6, text: 'Extra Time 1'},
+            {id:7, text: 'Extra Time Break'},
+            {id:8, text: 'Extra Time 2'},
+            {id:9, text: 'Penalty Shootout'}
         ];
         $scope.selectedStatus = null;
         $scope.connected = false;

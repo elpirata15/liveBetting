@@ -83,7 +83,7 @@ function ensureAdmin(req, res, next) {
 }
 
 function ensureUser(req, res, next) {
-    if (req.session) {
+    if (req.session.uid) {
         return next();
     }
     else {
@@ -143,6 +143,8 @@ app.post('/getGamesMap', reportingController.getRevenueReport);
 app.post('/setGameStatus/:id', ensureManager, gameController.setStatus);
 
 app.post('/setGameScore', ensureManager, gameController.gameScore);
+
+app.get('/gameStatus', ensureUser, gameController.gameStatus);
 
 // #### BID FUNCTIONS #####
 
