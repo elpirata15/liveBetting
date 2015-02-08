@@ -39,7 +39,7 @@ angular.module('liveBetManager').controller('gameMasterController', ['$scope', '
             $scope.games = []; 
             for (var i in data) {
                 // game status of 1 = waiting
-                if (data[i].status == $scope.gameStatus[1]) {
+                if (data[i].status == 1) {
                     $scope.games.push(data[i]);
                     $scope.games[$scope.games.length - 1].assignedTo = $scope.managers[data[i].assignedTo];
                 }
