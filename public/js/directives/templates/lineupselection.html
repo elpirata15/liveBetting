@@ -1,6 +1,6 @@
 <h4><b>{{team.teamName}} Lineup</b></h4>
 <div class="col-xs-2" ng-repeat="player in team.players">
-    <button type="button" ng-click="setOption(player.playerName)" class="btn btn-block" ng-class="{'btn-default': selectedPlayers.indexOf(player.playerName) == -1, 'btn-info': selectedPlayers.indexOf(player.playerName) > -1}">
+    <button type="button" ng-click="setOption(player.playerName)" class="btn" ng-class="{'btn-default': selectedPlayers.indexOf(player.playerName) == -1, 'btn-info': selectedPlayers.indexOf(player.playerName) > -1}">
         {{player.playerName}}
     </button>
 </div>
