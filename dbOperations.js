@@ -37,7 +37,8 @@ exports.TeamModel = mongoose.model('teams', teamEntity);
 var participantEntity = new Schema({
     userId: ObjectId,
     amount: Number,
-    timestamp: Date
+    timestamp: Date,
+    optionIndex: Number
 });
 
 var optionEntity = new Schema({

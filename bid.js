@@ -76,7 +76,8 @@ var addParticipant = function(bidRequest, bidId) {
                     currentBid.bidOptions[bidRequest.option].participants.push({
                         userId: bidRequest.userId,
                         amount: bidRequest.amount,
-                        timestamp: new Date()
+                        timestamp: new Date(),
+                        optionIndex: bidRequest.option
                     });
                     logger.info(currentBid.gameId, ["bid request added successfully"]);
 
@@ -295,7 +296,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
         // Don't pay any money
         winningMoney = 0;
     }
-    
+
     // Loop through the options
     for (var i in bid.bidOptions) {
 
@@ -326,7 +327,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
                             totalPoolAmount: bid.totalPoolAmount,
                             entryAmount: bid.entryAmount,
                             bidOptions: completedBidOptions,
-                            selectedOption: i,
+                            selectedOption: participant.optionIndex,
                             winningOption: bid.winningOption,
                             moneyWon: winningMoney
                         };
@@ -379,7 +380,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
                 }
             });
 
-            // This is not a winning option
+        // This is not a winning option
         }
         else {
 
@@ -407,7 +408,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
                             totalPoolAmount: bid.totalPoolAmount,
                             entryAmount: bid.entryAmount,
                             bidOptions: completedBidOptions,
-                            selectedOption: i,
+                            selectedOption: participant.optionIndex,
                             winningOption: bid.winningOption,
                             moneyWon: 0
                         };
