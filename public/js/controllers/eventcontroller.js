@@ -42,11 +42,13 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         data: {
                             gameId: $scope.game._id,
                             status: $scope.game.status,
+                            gameName: $scope.game.gameName,
                             timestamp: now
                         }
                     }, gameMessage: {
                         gameId: $scope.game._id,
                         status: $scope.game.status,
+                        gameName: $scope.game.gameName,
                         timestamp: now
                     }
                 }
