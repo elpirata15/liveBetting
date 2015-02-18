@@ -72,6 +72,8 @@ exports.getCompletedGames = function(req, res) {
         }
         res.status(200).send(Object.keys(completedGames).map(function(game){
             return completedGames[game];
+        }).sort(function(a,b){
+            return new Date(b.gameDate) - new Date(a.gameDate);
         }));
     });
 };

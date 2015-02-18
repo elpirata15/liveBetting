@@ -14,7 +14,7 @@ exports.gameStatus = function(req, res){
 // For client - get games you can subscribe to
 exports.getGames = function (req, res) {
     logger.info(null, ["Getting all games"]);
-    dbOperations.GameModel.find({status: {$ne: gameStatus.inactive}},function (err, docs) {
+    dbOperations.GameModel.find({status: {$ne: gameStatus.inactive}}).sort({timestamp: 'asc'}).exec(function (err, docs) {
         if (!err && docs.length > 0) {
             return res.status(200).send(docs);
         }
