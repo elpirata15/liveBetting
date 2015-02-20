@@ -65,7 +65,7 @@ exports.getCompletedGames = function(req, res) {
         logger.info(null, ["Found", foundBids.length, "Bids"]);
         var completedGames = {};
         for (var i in foundBids) {
-            var curre?ntBid = foundBids[i];
+            var currentBid = foundBids[i];
             completedGames[currentBid.gameId] = {gameName: currentBid.gameName,
                                                     gameId: currentBid.gameId,
                                                     gameDate: currentBid.gameDate};
