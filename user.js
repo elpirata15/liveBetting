@@ -65,7 +65,7 @@ exports.getCompletedGames = function(req, res) {
         logger.info(null, ["Found", foundBids.length, "Bids"]);
         var completedGames = {};
         for (var i in foundBids) {
-            var currentBid = foundBids[i];
+            var curre?ntBid = foundBids[i];
             completedGames[currentBid.gameId] = {gameName: currentBid.gameName,
                                                     gameId: currentBid.gameId,
                                                     gameDate: currentBid.gameDate};
@@ -239,7 +239,7 @@ exports.loginUser = function(req, res) {
                         }
                     }
                     else {
-                        logger.error(err);
+                        logger.error(null,[err]);
                         res.status(500).send(err);
                     }
 
