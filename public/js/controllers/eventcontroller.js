@@ -86,7 +86,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     eventTeamSelector: {selectionCount: '1'}
                 },
                 toString: function () {
-                    return "Corner: " + $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName;
+                    return $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName;
                 },
                 eventOptions: ['Goal', 'Out', 'Corner Again', 'Foul', 'Block']
             },
@@ -96,7 +96,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     eventTeamSelector: {selectionCount: '1'}
                 },
                 toString: function () {
-                    return "Penalty: " + $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName;
+                    return $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName;
                 },
                 eventOptions: ['Goal', 'Out', 'Goalkeeper saves']
             },
@@ -107,7 +107,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     distanceParamInput: true
                 },
                 toString: function () {
-                    return "Free Kick: " + $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName + " from " + $scope.eventDescription.distance + "m";
+                    return $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName + " from " + $scope.eventDescription.distance + "m";
                 },
                 eventOptions: ['Goal', 'Out', 'Block']
             },
@@ -131,13 +131,13 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     substitutionOptions: true
                 },
                 toString: function () {
-                    return "Substitution - " + $scope.eventDescription.teamName + ": " + $scope.eventDescription.playerName + " is warming up. Who will he replace?";
+                    return $scope.eventDescription.teamName + ": " + $scope.eventDescription.playerName + " is warming up. Who will he replace?";
                 },
                 eventOptions: []
             },
             customEvent: {
                 alwaysLast: true,
-                eventName: 'Custom Event',
+                eventName: 'Question',
                 viewElements: {
                     customBet: true
                 },
@@ -154,7 +154,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             gameId: $scope.game._id,
             gameName: $scope.game.gameName,
             bidDescription: ($scope.currentEvent) ? $scope.currentEvent.toString() : "",
-            bidType: ($scope.currentEvent) ? $scope.currentEvent.title : "",
+            bidType: ($scope.currentEvent) ? $scope.currentEvent.eventName : "",
             entryAmount: 0
         };
 
