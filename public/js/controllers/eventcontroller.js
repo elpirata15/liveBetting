@@ -201,6 +201,8 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 for (var i in $scope.currentEvent.eventOptions) {
                     $scope.bidEntity.bidOptions[i] = {optionDescription: $scope.currentEvent.eventOptions[i]};
                 }
+                $scope.bidEntity.gameScore = $scope.scores.home + ":" +$scope.scores.away;
+                $scope.bidEntity.timestamp = new Date();
                 // publish to server
                 PubNub.ngPublish({
                     channel: 'bids',
@@ -258,7 +260,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             PubNub.ngPublish({
                 channel: 'requests',
                 message: {bidId: $scope.bidEntity.id, winningOption: optionIndex}
-            });
+            });op
 
             // publish to clients
             PubNub.ngPublish({
