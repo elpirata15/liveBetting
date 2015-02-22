@@ -260,7 +260,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             PubNub.ngPublish({
                 channel: 'requests',
                 message: {bidId: $scope.bidEntity.id, winningOption: optionIndex}
-            });op
+            });
 
             // publish to clients
             PubNub.ngPublish({
