@@ -85,6 +85,7 @@ var completedOptionEntity = new Schema({
 var completeBidEntity = new Schema({
     bidId: String,
     bidDescription: String,
+    bidType: String,
     gameName: String,
     gameId: ObjectId,
     gameDate: Date,
