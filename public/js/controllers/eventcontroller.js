@@ -80,7 +80,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             corner: {
                 eventName: 'Corner',
                 viewElements: {
-                    //eventTeamSelector: {selectionCount: '1'}
+                    eventTeamSelector: {selectionCount: '1'}
                 },
                 toString: function () {
                     return "Corner for " + $scope.eventDescription.teamName;
@@ -100,7 +100,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             freeKick: {
                 eventName: 'Free Kick',
                 viewElements: {
-                   // eventTeamSelector: {selectionCount: '1'},
+                    eventTeamSelector: {selectionCount: '1'},
                     distanceParamInput: true
                 },
                 toString: function () {
