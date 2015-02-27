@@ -4,6 +4,14 @@ angular.module('liveBetManager').controller('gameController', ['$scope', '$rootS
         $scope.game = {};
         $scope.team1 = "";
         $scope.team2 = "";
+        $scope.defaultPrices = [10, 25, 50, 100];
+        $scope.gamePrices = {
+            corner: $scope.defaultPrices,
+            freeKick: $scope.defaultPrices,
+            penalty: $scope.defaultPrices,
+            substitution: $scope.defaultPrices,
+            custom: $scope.defaultPrices
+        };
         $scope.availableTeams = [];
         $scope.displayTeams = [];
         $scope.leagues = $rootScope.leagues;
@@ -308,8 +316,8 @@ angular.module('liveBetManager').controller('gameController', ['$scope', '$rootS
             });
         };
 
-        $scope.filterStadiums = function(value, index){
-          return ($scope.team1.teamName.indexOf(value.teamName) > -1 || $scope.team2.teamName.indexOf(value.teamName) > -1);  
+        $scope.filterStadiums = function(value, index) {
+            return ($scope.team1.teamName.indexOf(value.teamName) > -1 || $scope.team2.teamName.indexOf(value.teamName) > -1);
         };
 
         betManagerService.getManagers().success(function(data) {

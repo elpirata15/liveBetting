@@ -61,6 +61,14 @@ var bidEntity = new Schema({
     winningOption: Number
 }, {_id: false});
 
+var gamePricesEntity = new Schema({
+   corner: [Number],
+   freeKick: [Number],
+   penalty: [Number],
+   substitution: [Number],
+   custom: [Number]
+});
+
 var gameEntity = new Schema({
     gameName: String,
     teams: [ObjectId],
@@ -72,7 +80,8 @@ var gameEntity = new Schema({
     gameLeague: String,
     status: Number,
     tvDelay: Number,
-    bids: [bidEntity]
+    bids: [bidEntity],
+    gamePrices: gamePricesEntity
 });
 
 var gameModel = exports.GameModel = mongoose.model('games', gameEntity);

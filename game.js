@@ -134,6 +134,7 @@ exports.createGame = function (req, res) {
                 game.assignedTo = req.body.assignedTo;
                 game.location = req.body.location;
                 game.status = gameStatus.waiting;
+                game.gamePrices = req.body.gamePrices;
                 game.save(function (err, game) {
                     if (!err) {
                         logger.info(null, ["Updated game", game.gameName]);
@@ -156,6 +157,7 @@ exports.createGame = function (req, res) {
             gameName: req.body.gameName,
             gameLeague: req.body.gameLeague,
             teams: req.body.teams,
+            gamePrices: req.body.gamePrices,
             timestamp: new Date(req.body.timestamp),
             location: req.body.location,
             status: gameStatus.waiting

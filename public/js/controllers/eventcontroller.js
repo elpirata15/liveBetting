@@ -31,10 +31,17 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.longBets = {};
         $scope.longBetsLength = 0;
         $scope.amounts = [10, 25, 50, 100];
+        $scope.statusTimestamp = null;
 
         $scope.setStatus = function () {
             var now = new Date();
+            
+            if($scope.game.status === 2){
+                $scope.game.timestamp = now;
+            }
+            
             betManagerService.setStatus($scope.game._id, $scope.game.status, now).success(function(){
+                $scope.statusTimestamp = now;
                 PubNub.ngPublish({
                     channel: $scope.game._id,
                 message: {
@@ -211,6 +218,11 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         bidEntity: $scope.bidEntity
                     }
                 });
+                
+                $scope.bidEntity.gameStatus = $scope.game.status;
+                $scope.bidEntity.gameStatusTimestamp = $scope.statusTimestamp;
+                $scope.bidEntity.gameTimestamp = $scope.game.timestamp;
+                
                 // publish to clients
                 PubNub.ngPublish({
                     channel: $scope.game._id,
