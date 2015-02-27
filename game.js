@@ -209,6 +209,7 @@ exports.initGame = function (req, res) {
                 var game = games[0];
 
                 game.tvDelay = parseInt(req.body.preGameParams.tvDelay);
+                game.gameScore = "0:0";
                 game.save(function (err, game) {
                     if (!err) {
                         var team1 = {
@@ -293,6 +294,10 @@ exports.assignGame = function (req, res) {
                     .where('assignedTo', req.body.managerId)
                     .limit(1)
                     .exec(function (err, docs) {
+                        if(err){
+                            logger.error(null, [err.toString()]);
+                            res.status(500).send(err);
+                        }
                         if (docs.length > 0) {
                             res.status(500).send("Manager has a game assigned during this time");
                         }
@@ -333,6 +338,10 @@ exports.closeGame = function (req, res) {
                     if (!err) {
                         logger.info(null, ["closed game", game.gameName, "successfully"]);
                         pubnub.publishMessage(game._id, {
+                            pn_apns: {
+                                    gameId: game._id,
+                                    close: true
+                                },
                             pn_gcm: {
                                 data: {
                                     gameId: game._id,

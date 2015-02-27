@@ -34,28 +34,25 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
 
         $scope.setStatus = function () {
             var now = new Date();
-            betManagerService.setStatus($scope.game._id, $scope.game.status, now).success(function(){
-                PubNub.ngPublish({
-                    channel: $scope.game._id,
-                message: {
-                    pn_gcm: {
-                        data: {
+            var statusData = {
                             gameId: $scope.game._id,
                             status: $scope.game.status,
                             gameName: $scope.game.gameName,
                             timestamp: now
-                        }
-                    }, gameMessage: {
-                        gameId: $scope.game._id,
-                        status: $scope.game.status,
-                        gameName: $scope.game.gameName,
-                        timestamp: now
-                    }
+                        };
+            betManagerService.setStatus($scope.game._id, $scope.game.status, now).success(function(){
+                PubNub.ngPublish({
+                    channel: $scope.game._id,
+                message: {
+                    pn_apns: statusData,
+                    pn_gcm: {
+                        data: statusData
+                    }, gameMessage: statusData
                 }
             });
             PubNub.ngPublish({
                 channel: 'allGames',
-                message: {gameId: $scope.game._id, gameName: $scope.game.gameName, status: $scope.game.status, timestamp: now}
+                message: statusData
                 });
             });
         };
@@ -83,17 +80,17 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             corner: {
                 eventName: 'Corner',
                 viewElements: {
-                    eventTeamSelector: {selectionCount: '1'}
+                    //eventTeamSelector: {selectionCount: '1'}
                 },
                 toString: function () {
-                    return $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName;
+                    return "Corner for " + $scope.eventDescription.teamName;
                 },
                 eventOptions: ['Goal', 'Out', 'Corner Again', 'Foul', 'Block']
             },
             penalty: {
                 eventName: 'Penalty',
                 viewElements: {
-                    eventTeamSelector: {selectionCount: '1'}
+                   eventTeamSelector: {selectionCount: '1'}
                 },
                 toString: function () {
                     return $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName;
@@ -103,11 +100,11 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             freeKick: {
                 eventName: 'Free Kick',
                 viewElements: {
-                    eventTeamSelector: {selectionCount: '1'},
+                   // eventTeamSelector: {selectionCount: '1'},
                     distanceParamInput: true
                 },
                 toString: function () {
-                    return $scope.eventDescription.playerName + " is kicking for " + $scope.eventDescription.teamName + " from " + $scope.eventDescription.distance + "m";
+                    return "Free kick for " + $scope.eventDescription.teamName + " from " + $scope.eventDescription.distance + "m";
                 },
                 eventOptions: ['Goal', 'Out', 'Block']
             },
@@ -215,6 +212,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 PubNub.ngPublish({
                     channel: $scope.game._id,
                     message: {
+                        pn_apns: {bidEntity: $scope.bidEntity},
                         pn_gcm: {data: {bidEntity: $scope.bidEntity}},
                         bidEntity: $scope.bidEntity
                     }
@@ -239,6 +237,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             PubNub.ngPublish({
                 channel: $scope.game._id,
                 message: {
+                    pn_apns: {bidId: $scope.bidEntity.id, close: true},
                     pn_gcm: {data: {bidId: $scope.bidEntity.id, close: true}},
                     bidId: $scope.bidEntity.id, close: true
                 }
