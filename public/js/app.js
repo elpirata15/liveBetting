@@ -885,6 +885,10 @@ var app = angular.module('liveBetManager', [
         'response': function(response) {
             if (--loadingCount === 0) $rootScope.$broadcast('loading:finish');
             return response || $q.when(response);
+        },
+        'responseError': function(response){
+            if (--loadingCount === 0) $rootScope.$broadcast('loading:finish');
+            return response || $q.when(response);
         }
     }
 });

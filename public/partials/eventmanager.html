@@ -75,6 +75,12 @@
                            teams="teams"
                            selection-count="currentEvent.viewElements.eventTeamSelector.selectionCount"
                            ng-model="eventDescription"></team-selector>
+           <div class="btn-group btn-group-justified" style="padding-bottom: 10px" ng-if="!currentEvent.viewElements.eventTeamSelector">
+               <a class="btn btn-lg" ng-class="{'btn-default': eventDescription.teamName !== teams[0], 'btn-primary': eventDescription.teamName === teams[0]}"
+               ng-click="eventDescription.teamName = teams[0]">{{teams[0]}}</a>
+               <a class="btn btn-lg" ng-class="{'btn-default': eventDescription.teamName !== teams[1], 'btn-primary': eventDescription.teamName === teams[1]}"
+               ng-click="eventDescription.teamName = teams[1]">{{teams[1]}}</a>
+           </div>
             <p align="center" ng-show="currentEvent.viewElements.distanceParamInput"><b>Distance</b></p>
 
             <div class="btn-group btn-group-justified col-xs-4" style="padding-bottom: 10px"

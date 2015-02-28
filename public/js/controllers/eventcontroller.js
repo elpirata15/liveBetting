@@ -80,12 +80,23 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             corner: {
                 eventName: 'Corner',
                 viewElements: {
-                    eventTeamSelector: {selectionCount: '1'}
+                    //eventTeamSelector: {selectionCount: '1'}
                 },
                 toString: function () {
                     return "Corner for " + $scope.eventDescription.teamName;
                 },
                 eventOptions: ['Goal', 'Out', 'Corner Again', 'Foul', 'Block']
+            },
+            freeKick: {
+                eventName: 'Free Kick',
+                viewElements: {
+                    //eventTeamSelector: {selectionCount: '1'},
+                    distanceParamInput: true
+                },
+                toString: function () {
+                    return "Free kick for " + $scope.eventDescription.teamName + " from " + $scope.eventDescription.distance + "m";
+                },
+                eventOptions: ['Goal', 'Out', 'Block']
             },
             penalty: {
                 eventName: 'Penalty',
@@ -97,17 +108,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 },
                 eventOptions: ['Goal', 'Out', 'Goalkeeper saves']
             },
-            freeKick: {
-                eventName: 'Free Kick',
-                viewElements: {
-                    eventTeamSelector: {selectionCount: '1'},
-                    distanceParamInput: true
-                },
-                toString: function () {
-                    return "Free kick for " + $scope.eventDescription.teamName + " from " + $scope.eventDescription.distance + "m";
-                },
-                eventOptions: ['Goal', 'Out', 'Block']
-            },
+            
             /*foul: {
              eventName: 'Foul',
              viewElements: {
