@@ -1,0 +1,94 @@
+<div class="navbar navbar-default navbar-fixed-top">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+    </div>
+    <div class="navbar-collapse collapse navbar-responsive-collapse">
+        <ul class="nav navbar-nav navbar-left" style="margin-left:50px">
+            <li class="dropdown">
+                <a data-toggle="dropdown" class="dropdown-toggle">Ongoing Long Bets <b class="caret"></b> <span
+                        class="badge" ng-show="longBetsLength > 0">{{longBetsLength}}</span></a>
+                <ul class="dropdown-menu" style="width:250px">
+                    <li><span class="col-xs-10" style="text-align: center; border-right:1px inset;padding-bottom: 10px"><b>Bet
+                        Description</b></span><span style="top:4px;padding-bottom: 10px"
+                                                    class="col-xs-2 glyphicon glyphicon-time"></span></li>
+                    <li ng-repeat="bet in longBets"><span class="col-xs-10" style="border-right:1px inset"><a
+                            ng-click="showLongBetModal(bet.bidEntity)" style="cursor:pointer">{{bet.bidEntity.bidDescription}}</a></span><span
+                            class="col-xs-2">{{bet.ttl}}</span></li>
+                </ul>
+            </li>
+            <li>
+                <select class="form-control" style="margin-top:8px" ng-model="game.status" ng-options="game.id as game.text for game in gameStatus"></select>
+            </li>
+            <li>
+            <button type="button" class="btn btn-default" style="margin-top:8px" ng-click="setStatus()" ng-disabled="!game.status"><span class="glyphicon glyphicon-arrow-up"></span></button>
+            </li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li class="active" style="margin-top:15px; margin-right:20px"><b>Game Score:</b></li>
+            <li>
+                <div class="row" style="margin-top:8px;">
+                    <div class="col-xs-1" style="margin-top:8px; padding-right:0px;padding-left:0px;text-align: center"><b>H</b></div>
+                    <div class="col-xs-3" style="padding-left:0px; padding-right: 0px">
+                        <input type="number" class="form-control" placeholder="H" ng-model="scores.home">
+                    </div>
+                    <div class="col-xs-1" style="margin-top:8px; padding-right:0px;padding-left:0px;text-align: center"><b> : </b></div>
+                    <div class="col-xs-3" style="padding-left:0px; padding-right: 0px"><input type="number" placeholder="A" class="form-control" ng-model="scores.away">
+                    </div>
+                    <div class="col-xs-1" style="margin-top:8px; padding-right:0px;padding-left:0px;text-align: center"><b>A</b></div>
+                    <button type="button" class="btn btn-default" style="margin-right:20px"
+                            ng-click="updateScore()"><span class="glyphicon glyphicon-open"></span></button>
+                </div>
+            </li>
+            <li>
+                <button type="button" class="btn btn-default" style="margin-top:8px;margin-right:20px"
+                        ng-click="closeGame()"><span class="glyphicon glyphicon-off"></span> CLOSE GAME
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="row" style="margin-top:50px!important">
+    <div class="col-xs-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading"  style="text-align:center;text-transform: capitalize"><b>{{teams[0].teamName}}</b></div>
+            <div class="panel-body">
+                <div class="btn-group btn-group-justified" style="padding-top:10px">
+                    <a class="btn btn-lg btn-default" ng-click="corner('left',teams[0].teamName)">Corner Left</a>
+                    <a class="btn btn-lg btn-default" ng-click="corner('right',teams[0].teamName)">Corner Right</a>
+                </div>
+                <div class="btn-group btn-group-justified" style="padding-top:20px">
+                    <a class="btn btn-lg btn-default" ng-click="freeKick(teams[0].teamName,30)">Free Kick<br/>30m</a>
+                    <a class="btn btn-lg btn-default" ng-click="freeKick(teams[0].teamName,20)">Free Kick<br/>20m</a>
+                    <a class="btn btn-lg btn-default" ng-click="freeKick(teams[0].teamName,10)">Free Kick<br/>10m</a>
+                </div>
+                 <button type="button" class="btn btn-block btn-lg" ng-class="{'btn-default': !penaltyLeftOpen, 'btn-primary': penaltyLeftOpen}"
+                style="margin-top:20px" ng-click="penaltyLeftOpen = !penaltyLeftOpen">Penalty</button>
+                <singleteamselector ng-if="penaltyLeftOpen" team="teams[0]" selected-player="eventDescription.playerName"></singleteamselector>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="panel panel-warning">
+            <div class="panel-heading"  style="text-align:center;text-transform: capitalize"><b>{{teams[1].teamName}}</b></div>
+            <div class="panel-body">
+                <div class="btn-group btn-group-justified" style="padding-top:10px">
+                    <a class="btn btn-lg btn-default" ng-click="corner('left',teams[1].teamName)">Corner Left</a>
+                    <a class="btn btn-lg btn-default" ng-click="corner('right',teams[1].teamName)">Corner Right</a>
+                </div>
+                <div class="btn-group btn-group-justified" style="padding-top:20px">
+                    <a class="btn btn-lg btn-default" ng-click="freeKick(teams[1].teamName,30)">Free Kick<br/>30m</a>
+                    <a class="btn btn-lg btn-default" ng-click="freeKick(teams[1].teamName,20)">Free Kick<br/>20m</a>
+                    <a class="btn btn-lg btn-default" ng-click="freeKick(teams[1].teamName,10)">Free Kick<br/>10m</a>
+                </div>
+                <button type="button" class="btn btn-block btn-lg" ng-class="{'btn-default': !penaltyRightOpen, 'btn-primary': penaltyRightOpen}"
+                style="margin-top:20px" ng-click="penaltyRightOpen = !penaltyRightOpen">Penalty</button>
+                <singleteamselector ng-if="penaltyRightOpen" team="teams[1]" selected-player="eventDescription.playerName"></singleteamselector>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,7 +1,7 @@
 require('newrelic');
 var throng = require("throng");
 
-var workers = process.env.WEB_CONCURRENCY;
+var workers = process.env.WEB_CONCURRENCY || 1;
 var options = {
     lifetime:Infinity
 };

@@ -47,6 +47,21 @@ angular.module('liveBetManager').directive('teamSelector', function() {
             };
         }
     }
+}).directive('singleteamselector', function(){
+    return {
+        restrict: 'E',
+        scope: {
+            team: '=',
+            selectedPlayer: '='
+        },
+        templateUrl: 'js/directives/templates/singleteamselector.html',
+        link: function(scope, element, attrs){
+            scope.selectPlayer = function(name){
+                scope.selectedPlayer = name;
+            }
+        }
+    }
+    
 }).directive('betOptions', function() {
     return {
         restrict: 'E',
