@@ -12,11 +12,11 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             {id:8, text: 'Extra Time 2'},
             {id:9, text: 'Penalty Shootout'}
         ];
-        $scope.statusTimestamp = $scope.game.timestamp;
         $scope.selectedStatus = null;
         $scope.connected = false;
         $scope.log = [];
         $scope.game = localStorageService.get('currentGame');
+        $scope.statusTimestamp = $scope.game.timestamp;
         var scores = $scope.game.gameScore.split(':');
         $scope.scores = {home: parseInt(scores[0],10), away: parseInt(scores[1],10)};
 
