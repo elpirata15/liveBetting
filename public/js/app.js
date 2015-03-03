@@ -13,8 +13,8 @@ var app = angular.module('liveBetManager', [
 ]).config(['$routeProvider', 'localStorageServiceProvider', '$httpProvider', function($routeProvider, localStorageServiceProvider, $httpProvider) {
 
     switch (location.hostname) {
-        //case "manager.alphabetters.co":
-        default:
+        case "manager.alphabetters.co":
+        //default:
             {
                 $routeProvider.when('/', {
                     templateUrl: 'partials/gamewaitinglist.html',
@@ -22,7 +22,8 @@ var app = angular.module('liveBetManager', [
                     restrict: ['Managers', 'Masters']
                 });
                 $routeProvider.when('/event', {
-                    templateUrl: 'partials/eventmanager.new.html',
+                    templateUrl: 'partials/eventmanager.html',
+                    //templateUrl: 'partials/eventmanager.new.html',
                     controller: 'eventController',
                     restrict: ['Managers', 'Masters']
                 });

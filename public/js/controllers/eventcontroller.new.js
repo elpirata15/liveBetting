@@ -1,7 +1,7 @@
 /* global angular */
 angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', '$location', 'PubNub', 'betManagerService', 'teamsService', 'authService', '$timeout', '$interval', 'localStorageService', 'dialogs',
     function ($scope, $rootScope, $location, PubNub, betManagerService, teamsService, authService, $timeout, $interval, localStorageService, dialogs) {
-        PubNub.init($rootScope.keys);
+        //PubNub.init($rootScope.keys);
         $scope.gameStatus = [
             {id:2, text: 'First Half'},
             {id:3, text: 'Half Time'},
@@ -23,6 +23,28 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
         $scope.$watch('game', function (newVal) {
             localStorageService.set('currentGame', newVal);
         }, true);
+
+        $scope.freeKickOption = 0;
+
+        $scope.freeKick = function(teamName){
+            if(teamName === $scope.teams[0].teamName){
+                if(!$scope.freeKickLeftOpen){
+                    $scope.freeKickLeftOpen = true;
+                } else {
+                    $scope.freeKickLeftOpen = !$scope.freeKickLeftOpen;
+                }
+            } else {
+                if(!$scope.freeKickRightOpen){
+                    $scope.freeKickRightOpen = true;
+                } else {
+                    $scope.freeKickRightOpen = !$scope.freeKickRightOpen;
+                }
+            }
+
+        };
+
+        $scope.substitutionLeftOpen = false;
+        $scope.substitutionRightOpen = false;
 
         $scope.eventDescription = {teams: []};
         $scope.gameScore = {home: 0, away: 0};
@@ -335,11 +357,9 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
     //-- Variables --//
 
     $scope.bidEntity = data;
-    $scope.bidOptions = [];
-    for(var i in Object.keys($scope.bidEntity.bidOptions)){
-        $scope.bidOptions.push($scope.bidEntity.bidOptions[i].optionDescription);
-    }
-    
+    $scope.bidOptions = $scope.bidEntity.bidOptions.map(function (el) {
+        return el.optionDescription;
+    });
     //-- Methods --//
 
     $scope.completed = false;
