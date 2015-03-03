@@ -12,6 +12,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             {id:8, text: 'Extra Time 2'},
             {id:9, text: 'Penalty Shootout'}
         ];
+        $scope.statusTimestamp = $scope.game.timestamp;
         $scope.selectedStatus = null;
         $scope.connected = false;
         $scope.log = [];
@@ -34,6 +35,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
 
         $scope.setStatus = function () {
             var now = new Date();
+            $scope.statusTimestamp = now;
             var statusData = {
                             gameId: $scope.game._id,
                             status: $scope.game.status,
@@ -209,6 +211,10 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                         bidEntity: $scope.bidEntity
                     }
                 });
+                
+                // Add gameStatus and gameStatusTimestamp
+                $scope.bidEntity.gameStatus = $scope.game.status;
+                $scope.bidEntity.gameStatusTimestamp = $scope.statusTimestamp;
                 // publish to clients
                 PubNub.ngPublish({
                     channel: $scope.game._id,
