@@ -31,3 +31,28 @@
     font-weight: bold;
 }
 
+.flipped {
+    -moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: "FlipH";
+    -ms-filter: "FlipH";
+}
+
+.freekick {
+    border: 2px solid #e2e2e2;
+    border-radius: 5px;
+}
+
+.selectedfreekick {
+    border: 2px solid #75caeb;
+    border-radius: 5px;
+}
+
+.nohoverborder {
+    font-size: 0.8em;
+    text-wrap: normal;
+    white-space: normal;
+}
+

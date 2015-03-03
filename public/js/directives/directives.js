@@ -47,7 +47,7 @@ angular.module('liveBetManager').directive('teamSelector', function() {
             };
         }
     }
-}).directive('singleteamselector', function(){
+}).directive('singleteamselector', function() {
     return {
         restrict: 'E',
         scope: {
@@ -55,13 +55,26 @@ angular.module('liveBetManager').directive('teamSelector', function() {
             selectedPlayer: '='
         },
         templateUrl: 'js/directives/templates/singleteamselector.html',
-        link: function(scope, element, attrs){
-            scope.selectPlayer = function(name){
+        link: function (scope, element, attrs) {
+            scope.selectPlayer = function (name) {
                 scope.selectedPlayer = name;
             }
         }
     }
-    
+}).directive('freeKickOptions', function() {
+    return {
+        restrict: 'E',
+        scope: {
+            selectedOption:'=ngModel',
+            left: '='
+        },
+        templateUrl: 'js/directives/templates/freekickoptions.html',
+        link: function(scope, element, attrs) {
+            scope.setOption = function(index) {
+                scope.selectedOption = index;
+            }
+        }
+    }
 }).directive('betOptions', function() {
     return {
         restrict: 'E',
