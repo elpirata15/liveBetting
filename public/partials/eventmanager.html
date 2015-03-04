@@ -75,7 +75,7 @@
                            teams="teams"
                            selection-count="currentEvent.viewElements.eventTeamSelector.selectionCount"
                            ng-model="eventDescription"></team-selector>
-           <div class="btn-group btn-group-justified" style="padding-bottom: 10px" ng-if="currentEvent && !currentEvent.viewElements.eventTeamSelector">
+           <div class="btn-group btn-group-justified" style="padding-bottom: 10px" ng-if="currentEvent && !currentEvent.viewElements.eventTeamSelector && current.eventType !== 'Question'">
                <a class="btn btn-lg" ng-class="{'btn-default': eventDescription.teamName !== teams[0].teamName, 'btn-primary': eventDescription.teamName === teams[0].teamName}"
                ng-click="eventDescription.teamName = teams[0].teamName">{{teams[0].teamName}}</a>
                <a class="btn btn-lg" ng-class="{'btn-default': eventDescription.teamName !== teams[1].teamName, 'btn-warning': eventDescription.teamName === teams[1].teamName}"
@@ -108,6 +108,7 @@
             <custom-bet ng-if="currentEvent.viewElements.customBet"
                         question="eventDescription.question"
                         time="currentEvent.time"
+                        teams="teams"
                         ng-model="currentEvent.eventOptions"></custom-bet>
             <div class="well well-lg col-xs-8 col-xs-offset-2" ng-show="currentEvent && !showResults">
                 <p align="center" class="text-primary" style="font-size:larger;font-weight:bold"

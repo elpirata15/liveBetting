@@ -150,6 +150,7 @@ angular.module('liveBetManager').directive('teamSelector', function() {
         scope: {
             question: '=',
             time: '=',
+            teams: '=',
             betOptions: '=ngModel'
         },
         templateUrl: 'js/directives/templates/custombet.html',
@@ -162,13 +163,29 @@ angular.module('liveBetManager').directive('teamSelector', function() {
             scope.setType = function(type) {
                 scope.eventType = type;
             };
-
+            
+            scope.addTeamsAndTie = function(){
+                scope.betValues = {};
+                for(var i in scope.teams){
+                    scope.addBetValue(scope.teams[i].teamName);
+                }
+                
+                scope.addBetValue("Tie");
+            }
+            
+            scope.addTeamPlayers = function(teamIndex){
+                scope.betValues = {};
+                for(var i in scope.teams[teamIndex].lineup){
+                    scope.addBetValue(scope.teams[teamIndex].lineup[i]);
+                }
+            }
+            
             scope.betValuesCounter = 0;
 
-            scope.addBetValue = function() {
+            scope.addBetValue = function(value) {
                 scope.betValues[scope.betValuesCounter] = {
                     id: scope.betValuesCounter,
-                    text: ""
+                    text: value || ""
                 };
                 scope.betValuesCounter++;
             };

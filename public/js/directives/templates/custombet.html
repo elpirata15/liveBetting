@@ -9,31 +9,43 @@
                 <input type="text" ng-model="question" class="form-control">
             </div>
         </div>
-        <br/><br/>
+        <br/>
+        <br/>
         <div class="row">
             <div class="col-xs-6">
                 <div class="well well-sm">
                     <div class="form-group" ng-repeat="value in betValues track by value.id">
                         <div class="input-group">
                             <input type="text" ng-model="value.text" class="form-control" placeholder="Option {{$index +1}}">
-                        <span class="input-group-btn">
+                            <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-click="removeBetValue(value.id)"><span
-                                class="glyphicon glyphicon-remove"></span></button>
+                                class="glyphicon glyphicon-remove"></span>
+                            </button>
                             </span>
                         </div>
                     </div>
                 </div>
-                <br/><br/>
-                <button class="btn btn-link col-xs-4 col-xs-offset-4" ng-click="addBetValue()">Add Bet Option</button>
+                <br/>
+                <br/>
+                <div class="btn-group col-xs-4 col-xs-offset-4">
+                    <a style="cursor:pointer" ng-click="addBetValue()" class="btn btn-primary">Add Bet Option</a>
+                    <a style="cursor:pointer" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a style="cursor:pointer" ng-click="addBetValue()">New Option</a></li>
+                        <li class="divider"></li>
+                        <li><a style="cursor:pointer" ng-click="addTeamsAndTie()">Team Names & Tie</a></li>
+                        <li><a style="cursor:pointer" ng-click="addTeamPlayers(0)">{{teams[0].teamName}} Players</a></li>
+                        <li><a style="cursor:pointer" ng-click="addTeamPlayers(1)">{{teams[1].teamName}} Players</a></li>
+                    </ul>
+                </div>
+                <!--<button class="btn btn-link col-xs-4 col-xs-offset-4" ng-click="addBetValue()">Add Bet Option</button>-->
             </div>
             <div class="col-xs-6">
                 <div class="form-group-lg" style="padding-bottom: 2px">
-                    <label class="control-label col-xs-6"
-                           style="text-align: right;font-weight: bold;top:6px">Bet Type:</label>
+                    <label class="control-label col-xs-6" style="text-align: right;font-weight: bold;top:6px">Bet Type:</label>
                     <div class="col-xs-6">
                         <div class="btn-group btn-group-justified">
-                            <a class="btn" ng-repeat="betType in betTypes" ng-click="setType(betType)"
-                               ng-class="{'btn-default':eventType!=betType,'btn-info':eventType==betType}">{{betType}}</a>
+                            <a class="btn" ng-repeat="betType in betTypes" ng-click="setType(betType)" ng-class="{'btn-default':eventType!=betType,'btn-info':eventType==betType}">{{betType}}</a>
                         </div>
                     </div>
                 </div>

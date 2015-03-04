@@ -1,7 +1,7 @@
 /* global angular */
 angular.module('liveBetManager').controller('eventController', ['$scope', '$rootScope', '$location', 'PubNub', 'betManagerService', 'teamsService', 'authService', '$timeout', '$interval', 'localStorageService', 'dialogs',
     function ($scope, $rootScope, $location, PubNub, betManagerService, teamsService, authService, $timeout, $interval, localStorageService, dialogs) {
-        PubNub.init($rootScope.keys);
+        //PubNub.init($rootScope.keys);
         $scope.gameStatus = [
             {id:2, text: 'First Half'},
             {id:3, text: 'Half Time'},
@@ -12,11 +12,11 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             {id:8, text: 'Extra Time 2'},
             {id:9, text: 'Penalty Shootout'}
         ];
-        $scope.statusTimestamp = $scope.game.timestamp;
         $scope.selectedStatus = null;
         $scope.connected = false;
         $scope.log = [];
         $scope.game = localStorageService.get('currentGame');
+        $scope.statusTimestamp = $scope.game.timestamp;
         var scores = $scope.game.gameScore.split(':');
         $scope.scores = {home: parseInt(scores[0],10), away: parseInt(scores[1],10)};
 
