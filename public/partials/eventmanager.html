@@ -86,10 +86,10 @@
             <div class="btn-group btn-group-justified col-xs-4" style="padding-bottom: 10px"
                  ng-if="currentEvent.viewElements.cornerSideSelector">
                 <a class="btn btn-lg"
-                   ng-class="{'btn-default': eventDescription.cornerSide !== 'Left', 'btn-info': eventDescription.distance === 'Left'}"
+                   ng-class="{'btn-default': eventDescription.cornerSide !== 'Left', 'btn-info': eventDescription.cornerSide === 'Left'}"
                    ng-click="eventDescription.cornerSide = 'Left'">Left</a>
                 <a class="btn btn-lg"
-                   ng-class="{'btn-default': eventDescription.cornerSide !== 'Right', 'btn-info': eventDescription.distance === 'Right'}"
+                   ng-class="{'btn-default': eventDescription.cornerSide !== 'Right', 'btn-info': eventDescription.cornerSide === 'Right'}"
                    ng-click="eventDescription.cornerSide = 'Right'">Right</a>
             </div>
                  
