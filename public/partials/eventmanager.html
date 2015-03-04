@@ -81,6 +81,18 @@
                <a class="btn btn-lg" ng-class="{'btn-default': eventDescription.teamName !== teams[1].teamName, 'btn-warning': eventDescription.teamName === teams[1].teamName}"
                ng-click="eventDescription.teamName = teams[1].teamName">{{teams[1].teamName}}</a>
            </div>
+            <p align="center" ng-show="currentEvent.viewElements.cornerSideSelector"><b>Corner Side</b></p>
+
+            <div class="btn-group btn-group-justified col-xs-4" style="padding-bottom: 10px"
+                 ng-if="currentEvent.viewElements.cornerSideSelector">
+                <a class="btn btn-lg"
+                   ng-class="{'btn-default': eventDescription.cornerSide !== 'Left', 'btn-info': eventDescription.distance === 'Left'}"
+                   ng-click="eventDescription.cornerSide = 'Left'">Left</a>
+                <a class="btn btn-lg"
+                   ng-class="{'btn-default': eventDescription.cornerSide !== 'Right', 'btn-info': eventDescription.distance === 'Right'}"
+                   ng-click="eventDescription.cornerSide = 'Right'">Right</a>
+            </div>
+                 
             <p align="center" ng-show="currentEvent.viewElements.distanceParamInput"><b>Distance</b></p>
 
             <div class="btn-group btn-group-justified col-xs-4" style="padding-bottom: 10px"

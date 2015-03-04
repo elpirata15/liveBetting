@@ -83,9 +83,10 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 eventName: 'Corner',
                 viewElements: {
                     //eventTeamSelector: {selectionCount: '1'}
+                    cornerSideSelector: true
                 },
                 toString: function () {
-                    return "Corner for " + $scope.eventDescription.teamName;
+                    return $scope.eventDescription.cornerSide + " Corner for " + $scope.eventDescription.teamName;
                 },
                 eventOptions: ['Goal', 'Out', 'Corner Again', 'Foul', 'Block']
             },
@@ -123,7 +124,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
              (($scope.eventDescription.teams[1]) ? $scope.eventDescription.teams[1].teamName : "undefined");
              },
              eventOptions: ['Red Card', 'Yellow Card', 'They Will Fight']
-             },*/
+             },
             substitution: {
                 eventName: 'Substitution',
                 viewElements: {
@@ -134,7 +135,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     return $scope.eventDescription.teamName + ": " + $scope.eventDescription.playerName + " is warming up. Who will he replace?";
                 },
                 eventOptions: []
-            },
+            },*/
             customEvent: {
                 alwaysLast: true,
                 eventName: 'Question',
