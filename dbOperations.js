@@ -166,7 +166,10 @@ exports.getGCMClients = function(callback){
 
         if(clients != null){
             callback(JSON.parse(clients));
+        } else {
+            callback(null);
         }
+        
     });
 };
 
