@@ -1,4 +1,4 @@
-var instanceName = "server_"+process.env.DYNO;
+var instanceName = "server_" + process.env.DYNO;
 var pubnub = require("pubnub").init({
     publish_key: process.env.PUBNUB_PUBLISH_KEY,
     subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY,
@@ -7,29 +7,71 @@ var pubnub = require("pubnub").init({
 });
 var gameController = require('./game');
 var bidController = require('./bid');
+var dbOperations = require('/.bidOperations');
 var gcm = require('node-gcm');
 var GCM_API_KEY = "AIzaSyD8Kwu0Ld_2K9meKX4xSbYKkGJgcl-vsAs";
-var gcmClients = {};
 var apnClients = {};
+
 var gcmSender = new gcm.Sender(GCM_API_KEY);
 
-var addClient = function(req, res){
+var addClient = function (req, res) {
     var gameId = req.params.id;
     var clientId = req.params.token;
-    if(req.params.type === 'gcm') {
-        if (!gcmClients[gameId]) {
-            gcmClients[gameId] = [];
-        }
+    if (req.params.type === 'gcm') {
+        dbOperations.getGCMClients(function (gcmClients) {
+            if(gcmClients == null){
+                gcmClients = {};
+            }
+            if (!gcmClients[gameId]) {
+                gcmClients[gameId] = [];
+            }
 
-        if (gcmClients[gameId].indexOf(clientId) === -1) {
-            gcmClients[gameId].push(clientId);
-        }
+            if (gcmClients[gameId].indexOf(clientId) === -1) {
+                gcmClients[gameId].push(clientId);
+            } else {
+                res.status(400).send("Client is already in list");
+            }
+            dbOperations.setGCMClients(gcmClients);
+            res.status(200).end();
+        });
     }
-
-    res.status(200).end();
 };
 
-var sendGcm = function(gcmMessage){
+var removeClient = function (req, res) {
+    var gameId = req.params.id;
+    var clientId = req.params.token;
+    if (req.params.type === 'gcm') {
+        dbOperations.getGCMClients(function(gcmClients){
+            if(gcmClients == null){
+                res.status(500).send("failed to get gcm clients");
+            }
+
+            var clientIndex = gcmClients[gameId].indexOf(clientId);
+            if (clientIndex > -1) {
+                gcmClients[gameId].splice(clientIndex, 1);
+            } else {
+                res.status(400).send("Client is not in list");
+            }
+
+            dbOperations.setGCMClients(gcmClients);
+            res.status(200).end();
+        });
+    }
+};
+
+var deleteClientsFromGame = function (gameId) {
+    dbOperations.getGCMClients(function(gcmClients) {
+        if (gcmClients == null) {
+            res.status(500).send("failed to get gcm clients");
+        }
+
+        delete gcmClients[gameId];
+
+        dbOperations.setGCMClients(gcmClients);
+    });
+};
+
+var sendGcm = function (gcmMessage) {
 
     var gameId = gcmMessage.data.gameId;
     var message = new gcm.Message({
@@ -38,12 +80,12 @@ var sendGcm = function(gcmMessage){
     });
 
     gcmSender.send(message, gcmClients[gameId], function (err, result) {
-        if(err) console.error(err);
+        if (err) console.error(err);
         else    console.log(result);
     });
 };
 
-if(!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
+if (!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
     pubnub.subscribe({
         channel: "servers",
         callback: function (m) {
@@ -60,7 +102,7 @@ if(!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
     pubnub.subscribe({
         channel: instanceName,
         message: function (m) {
-            if(m.lb_gcm){
+            if (m.lb_gcm) {
                 sendGcm(m.lb_gcm);
             }
             if (m.bidEntity) {
@@ -71,22 +113,29 @@ if(!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
         }
     });
 }
-var removeFromPool = function(callback){
-  pubnub.unsubscribe({
-      channel: 'servers',
-      callback: function(){
-          console.log("[INFO] Disconnected",instanceName, "from server pool");
-          callback();
-      }
-  });
+var removeFromPool = function (callback) {
+    pubnub.unsubscribe({
+        channel: 'servers',
+        callback: function () {
+            console.log("[INFO] Disconnected", instanceName, "from server pool");
+            callback();
+        }
+    });
 };
 
-var publishMessage = function(channel, message){
+var publishMessage = function (channel, message) {
     pubnub.publish({
         channel: channel,
         message: message
     });
 };
 
-module.exports = {publishMessage: publishMessage, removeFromPool: removeFromPool, sendGcm: sendGcm, addClient: addClient};
+module.exports = {
+    publishMessage: publishMessage,
+    removeFromPool: removeFromPool,
+    sendGcm: sendGcm,
+    addClient: addClient,
+    removeClient: removeClient,
+    deleteAllClientsFromGame: deleteClientsFromGame
+};
 
