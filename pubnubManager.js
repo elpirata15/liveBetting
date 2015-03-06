@@ -7,7 +7,7 @@ var pubnub = require("pubnub").init({
 });
 var gameController = require('./game');
 var bidController = require('./bid');
-var dbOperations = require('/.bidOperations');
+var dbOperations = require('/.dbOperations');
 var gcm = require('node-gcm');
 var GCM_API_KEY = "AIzaSyD8Kwu0Ld_2K9meKX4xSbYKkGJgcl-vsAs";
 var apnClients = {};
