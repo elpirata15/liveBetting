@@ -32,6 +32,7 @@ var addClient = function (req, res) {
                 res.status(400).send("Client is already in list");
             }
             dbOperations.setGCMClients(gcmClients);
+            console.log("added",clientId, "to gcm channel",gameId);
             res.status(200).end();
         });
     }
@@ -54,6 +55,7 @@ var removeClient = function (req, res) {
             }
 
             dbOperations.setGCMClients(gcmClients);
+            console.log("removed",clientId, "from gcm channel",gameId);
             res.status(200).end();
         });
     }
@@ -68,20 +70,26 @@ var deleteClientsFromGame = function (gameId) {
         delete gcmClients[gameId];
 
         dbOperations.setGCMClients(gcmClients);
+        console.log("removed gcm channel",gameId);
     });
 };
 
 var sendGcm = function (gcmMessage) {
+    dbOperations.getGCMClients(function(gcmClients) {
+        if (gcmClients == null) {
+            res.status(500).send("failed to get gcm clients");
+        }
 
-    var gameId = gcmMessage.data.gameId;
-    var message = new gcm.Message({
-        timeToLive: 2,
-        data: gcmMessage.data
-    });
+        var gameId = gcmMessage.data.gameId;
+        var message = new gcm.Message({
+            timeToLive: 2,
+            data: gcmMessage.data
+        });
 
-    gcmSender.send(message, gcmClients[gameId], function (err, result) {
-        if (err) console.error(err);
-        else    console.log(result);
+        gcmSender.send(message, gcmClients[gameId], function (err, result) {
+            if (err) console.error(err);
+            else    console.log(result);
+        });
     });
 };
 
