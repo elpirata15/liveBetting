@@ -26,7 +26,8 @@
     "pubnub": "^3.7.8",
     "throng": "^1.0.0",
     "redis": "^0.12.1",
-    "underscore": "^1.7.0"
+    "underscore": "^1.7.0",
+    "node-gcm": "^0.9.15"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

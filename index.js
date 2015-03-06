@@ -159,6 +159,8 @@ function start() {
 
     app.get('/gameStatus', ensureUser, gameController.gameStatus);
 
+    app.get('/subscribeToGame/:id/:token/:type', ensureUser, pubnubManager.addClient);
+
 // #### BID FUNCTIONS #####
 
 // Adds bid entity to game (receives bid entity as parameter)
