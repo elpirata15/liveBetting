@@ -9,7 +9,7 @@ var gameController = require('./game');
 var bidController = require('./bid');
 var dbOperations = require('./dbOperations');
 var gcm = require('node-gcm');
-var GCM_API_KEY = "AIzaSyD8Kwu0Ld_2K9meKX4xSbYKkGJgcl-vsAs";
+var GCM_API_KEY = "AIzaSyDITTr4o_RWyPmcHp81GNDbUZ3H-_azOqQ";
 var apnClients = {};
 
 var gcmSender = new gcm.Sender(GCM_API_KEY);
