@@ -213,7 +213,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 PubNub.ngPublish({
                     channel: 'bids',
                     message: {
-                        lb_gcm: $scope.bidEntity,
+                        lb_gcm: {data: {bidEntity: $scope.bidEntity}},
                         bidEntity: $scope.bidEntity
                     }
                 });
