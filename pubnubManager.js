@@ -79,7 +79,7 @@ var sendGcm = function (gcmMessage) {
         var gameId = gcmMessage.data.gameId;
     
         if (gcmClients == null || !gcmClients[gameId]) {
-            res.status(500).send("no gcm clients");
+            return;
         }
         
         var message = new gcm.Message({
