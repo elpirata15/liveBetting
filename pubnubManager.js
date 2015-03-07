@@ -74,7 +74,7 @@ exports.deleteClientsFromGame = function (gameId) {
     });
 };
 
-exports.sendGcm = function (gcmMessage) {
+exports.sendGcm = var sendGcm = function (gcmMessage) {
     dbOperations.getGCMClients(function(gcmClients) {
         var gameId = gcmMessage.data.gameId;
     
@@ -113,7 +113,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
         channel: instanceName,
         message: function (m) {
             if (m.lb_gcm) {
-                this.sendGcm(m.lb_gcm);
+                sendGcm(m.lb_gcm);
             }
             if (m.bidEntity) {
                 bidController.addBid(m);
