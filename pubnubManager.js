@@ -64,7 +64,7 @@ exports.removeClient = function (req, res) {
 exports.deleteClientsFromGame = function (gameId) {
     dbOperations.getGCMClients(function(gcmClients) {
         if (gcmClients == null) {
-            res.status(500).send("failed to get gcm clients");
+            console.error("failed to get gcm clients");
         }
 
         delete gcmClients[gameId];
@@ -77,7 +77,8 @@ exports.deleteClientsFromGame = function (gameId) {
 var sendGcm = exports.sendGcm = function (gcmMessage) {
     dbOperations.getGCMClients(function(gcmClients) {
         var gameId = gcmMessage.data.gameId;
-    
+        console.log("gameId:",gameId);
+        console.log("gcmClients:",gcmClients);
         if (gcmClients == null || !gcmClients[gameId]) {
             console.log("no gcm clients on channel");
             return;
