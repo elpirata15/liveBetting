@@ -76,11 +76,12 @@ var deleteClientsFromGame = function (gameId) {
 
 var sendGcm = function (gcmMessage) {
     dbOperations.getGCMClients(function(gcmClients) {
-        if (gcmClients == null) {
-            res.status(500).send("failed to get gcm clients");
-        }
-
         var gameId = gcmMessage.data.gameId;
+    
+        if (gcmClients == null || !gcmClients[gameId]) {
+            res.status(500).send("no gcm clients");
+        }
+        
         var message = new gcm.Message({
             timeToLive: 2,
             data: gcmMessage.data
