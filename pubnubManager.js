@@ -76,7 +76,7 @@ exports.deleteClientsFromGame = function (gameId) {
 
 var sendGcm = exports.sendGcm = function (gcmMessage) {
     dbOperations.getGCMClients(function(gcmClients) {
-        var gameId = gcmMessage.data.gameId;
+        var gameId = gcmMessage.data.bidEntity.gameId;
         console.log("gameId:",gameId);
         console.log("gcmClients:",gcmClients);
         if (gcmClients == null || !gcmClients[gameId]) {
