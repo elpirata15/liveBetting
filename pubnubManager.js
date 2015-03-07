@@ -74,7 +74,7 @@ exports.deleteClientsFromGame = function (gameId) {
     });
 };
 
-exports.sendGcm = var sendGcm = function (gcmMessage) {
+var sendGcm = exports.sendGcm = function (gcmMessage) {
     dbOperations.getGCMClients(function(gcmClients) {
         var gameId = gcmMessage.data.gameId;
     
