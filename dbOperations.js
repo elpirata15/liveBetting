@@ -163,7 +163,7 @@ exports.getGCMClients = function(callback){
             console.error("failed to get GCM clients", err);
             return null;
         }
-
+        console.log("gcm clients:",clients);
         if(clients != null){
             callback(JSON.parse(clients));
         } else {
