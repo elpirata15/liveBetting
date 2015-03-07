@@ -14,7 +14,7 @@ var apnClients = {};
 
 var gcmSender = new gcm.Sender(GCM_API_KEY);
 
-var addClient = function (req, res) {
+exports.addClient = function (req, res) {
     var gameId = req.params.id;
     var clientId = req.params.token;
     if (req.params.type === 'gcm') {
@@ -38,7 +38,7 @@ var addClient = function (req, res) {
     }
 };
 
-var removeClient = function (req, res) {
+exports.removeClient = function (req, res) {
     var gameId = req.params.id;
     var clientId = req.params.token;
     if (req.params.type === 'gcm') {
@@ -61,7 +61,7 @@ var removeClient = function (req, res) {
     }
 };
 
-var deleteClientsFromGame = function (gameId) {
+exports.deleteClientsFromGame = function (gameId) {
     dbOperations.getGCMClients(function(gcmClients) {
         if (gcmClients == null) {
             res.status(500).send("failed to get gcm clients");
@@ -74,11 +74,12 @@ var deleteClientsFromGame = function (gameId) {
     });
 };
 
-var sendGcm = function (gcmMessage) {
+exports.sendGcm = function (gcmMessage) {
     dbOperations.getGCMClients(function(gcmClients) {
         var gameId = gcmMessage.data.gameId;
     
         if (gcmClients == null || !gcmClients[gameId]) {
+            console.log("no gcm clients on channel");
             return;
         }
         
@@ -112,7 +113,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
         channel: instanceName,
         message: function (m) {
             if (m.lb_gcm) {
-                sendGcm(m.lb_gcm);
+                this.sendGcm(m.lb_gcm);
             }
             if (m.bidEntity) {
                 bidController.addBid(m);
@@ -122,7 +123,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
         }
     });
 }
-var removeFromPool = function (callback) {
+exports.removeFromPool = function (callback) {
     pubnub.unsubscribe({
         channel: 'servers',
         callback: function () {
@@ -132,19 +133,10 @@ var removeFromPool = function (callback) {
     });
 };
 
-var publishMessage = function (channel, message) {
+exports.publishMessage = function (channel, message) {
     pubnub.publish({
         channel: channel,
         message: message
     });
-};
-
-module.exports = {
-    publishMessage: publishMessage,
-    removeFromPool: removeFromPool,
-    sendGcm: sendGcm,
-    addClient: addClient,
-    removeClient: removeClient,
-    deleteAllClientsFromGame: deleteClientsFromGame
 };
 
