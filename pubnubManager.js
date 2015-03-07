@@ -113,8 +113,8 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
     pubnub.subscribe({
         channel: instanceName,
         message: function (m) {
-            if (m.lb_gcm) {
-                sendGcm(m.lb_gcm);
+            if (m.lb_gcm || m.bidRequest.lb_gcm) {
+                sendGcm(m.lb_gcm || m.bidRequest.lb_gcm);
             }
             if (m.bidEntity) {
                 bidController.addBid(m);
