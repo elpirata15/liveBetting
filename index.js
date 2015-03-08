@@ -32,6 +32,7 @@ function start() {
     var logger = new serverLogger();
     var app = express();
     var day = 1000 * 60 * 60 * 24;
+    var twoMonths = 60 * day;
 
     app.set('port', (process.env.PORT || 5000));
     app.set('host', process.env.IP);
@@ -41,7 +42,7 @@ function start() {
         secret: secretKey,
         cookie: {
             secure: true,
-            maxAge: day,
+            maxAge: twoMonths,
             signed: true,
             overwrite: true
         },
