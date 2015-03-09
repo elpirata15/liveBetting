@@ -153,6 +153,26 @@ exports.getEntity = function (entityId, cacheType, callback) {
     });
 };
 
+exports.setGCMClients = function(clients){
+    redisClient.set("gcm_clients",JSON.stringify(clients));
+};
+
+exports.getGCMClients = function(callback){
+    redisClient.get("gcm_clients",function(err, clients){
+        if(err){
+            console.error("failed to get GCM clients", err);
+            return null;
+        }
+        console.log("gcm clients:",clients);
+        if(clients != null){
+            callback(JSON.parse(clients));
+        } else {
+            callback(null);
+        }
+        
+    });
+};
+
 exports.uncacheEntity = function (cacheType, entity) {
     var key = entity._id || entity;
     redisClient.del(cacheType + "_" + key);

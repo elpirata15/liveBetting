@@ -45,18 +45,19 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             betManagerService.setStatus($scope.game._id, $scope.game.status, now).success(function(){
                 PubNub.ngPublish({
                     channel: $scope.game._id,
-                message: {
-                    pn_apns: statusData,
-                    pn_gcm: {
-                        data: statusData
-                    }, gameMessage: statusData
-                }
-            });
-            PubNub.ngPublish({
-                channel: 'allGames',
-                message: statusData
+                    message: {
+                        pn_apns: statusData,
+                        //pn_gcm: {
+                        //    data: statusData
+                        //},
+                        gameMessage: statusData
+                    }
                 });
-            });
+                PubNub.ngPublish({
+                    channel: 'allGames',
+                    message: statusData
+                    });
+                });
         };
 
         $scope.updateScore = function () {
@@ -204,24 +205,26 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 }
                 $scope.bidEntity.gameScore = $scope.scores.home + ":" +$scope.scores.away;
                 $scope.bidEntity.timestamp = new Date();
+                // Add gameStatus and gameStatusTimestamp
+                $scope.bidEntity.gameStatus = $scope.game.status;
+                $scope.bidEntity.gameStatusTimestamp = $scope.statusTimestamp;
+
                 // publish to server
                 PubNub.ngPublish({
                     channel: 'bids',
                     message: {
-                        pn_gcm: $scope.bidEntity,
+                        lb_gcm: {data: {bidEntity: $scope.bidEntity}},
                         bidEntity: $scope.bidEntity
                     }
                 });
                 
-                // Add gameStatus and gameStatusTimestamp
-                $scope.bidEntity.gameStatus = $scope.game.status;
-                $scope.bidEntity.gameStatusTimestamp = $scope.statusTimestamp;
+
                 // publish to clients
                 PubNub.ngPublish({
                     channel: $scope.game._id,
                     message: {
                         pn_apns: {bidEntity: $scope.bidEntity},
-                        pn_gcm: {data: {bidEntity: $scope.bidEntity}},
+                        //pn_gcm: {data: {bidEntity: $scope.bidEntity}},
                         bidEntity: $scope.bidEntity
                     }
                 });
@@ -238,7 +241,12 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             // Publish to server
             PubNub.ngPublish({
                 channel: 'requests',
-                message: {bidId: $scope.bidEntity.id, close: true}
+                message: {
+                    lb_gcm: {
+                        data: {bidId: $scope.bidEntity.id, gameId: $scope.game._id, close: true}
+                    },
+                    bidId: $scope.bidEntity.id, close: true
+                }
             });
 
             // Publish to game channel, in case player got the bid and didn't enter
@@ -246,7 +254,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 channel: $scope.game._id,
                 message: {
                     pn_apns: {bidId: $scope.bidEntity.id, close: true},
-                    pn_gcm: {data: {bidId: $scope.bidEntity.id, close: true}},
+                    //pn_gcm: {data: {bidId: $scope.bidEntity.id, close: true}},
                     bidId: $scope.bidEntity.id, close: true
                 }
             });

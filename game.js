@@ -257,6 +257,12 @@ exports.setStatus = function(req, res){
                 logger.error(null, ["Could not save game", err.toString()]);
                 res.status(500).send(err);
             }
+            pubnub.sendGcm({
+                gameId: savedGame._id,
+                status: savedGame.status,
+                gameName: savedGame.gameName,
+                timestamp: savedGame.statusTimestamp
+            });
             res.status(200).end();
         });
     });
@@ -336,17 +342,24 @@ exports.closeGame = function (req, res) {
                 game.save(function (err, game) {
                     if (!err) {
                         logger.info(null, ["closed game", game.gameName, "successfully"]);
+                        pubnub.sendGcm({
+                            data: {
+                                gameId: game._id,
+                                close: true
+                                }
+                        });
+                        pubnub.deleteAllClientsFromGame(game._id);
                         pubnub.publishMessage(game._id, {
                             pn_apns: {
                                     gameId: game._id,
                                     close: true
                                 },
-                            pn_gcm: {
-                                data: {
-                                    gameId: game._id,
-                                    close: true
-                                }
-                            },
+                            //lb_gcm: {
+                            //    data: {
+                            //        gameId: game._id,
+                            //        close: true
+                            //    }
+                            //},
                             gameMessage: {
                                 gameId: game._id,
                                 close: true
