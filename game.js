@@ -348,18 +348,18 @@ exports.closeGame = function (req, res) {
                                 close: true
                                 }
                         });
+                        pubnub.sendApn({
+                            data: {
+                                gameId: game._id,
+                                close: true
+                                }
+                        });
                         pubnub.deleteAllClientsFromGame(game._id);
                         pubnub.publishMessage(game._id, {
                             pn_apns: {
                                     gameId: game._id,
                                     close: true
                                 },
-                            //lb_gcm: {
-                            //    data: {
-                            //        gameId: game._id,
-                            //        close: true
-                            //    }
-                            //},
                             gameMessage: {
                                 gameId: game._id,
                                 close: true

@@ -7,94 +7,9 @@ var pubnub = require("pubnub").init({
 });
 var gameController = require('./game');
 var bidController = require('./bid');
-var dbOperations = require('./dbOperations');
-var gcm = require('node-gcm');
-var GCM_API_KEY = "AIzaSyDITTr4o_RWyPmcHp81GNDbUZ3H-_azOqQ";
-var apnClients = {};
+var mobileManager = require('./mobileManager');
 
-var gcmSender = new gcm.Sender(GCM_API_KEY);
 
-exports.addClient = function (req, res) {
-    var gameId = req.params.id;
-    var clientId = req.params.token;
-    if (req.params.type === 'gcm') {
-        dbOperations.getGCMClients(function (gcmClients) {
-            if(gcmClients == null){
-                gcmClients = {};
-            }
-            if (!gcmClients[gameId]) {
-                gcmClients[gameId] = [];
-            }
-
-            if (gcmClients[gameId].indexOf(clientId) === -1) {
-                gcmClients[gameId].push(clientId);
-            } else {
-                res.status(400).send("Client is already in list");
-            }
-            dbOperations.setGCMClients(gcmClients);
-            console.log("added",clientId, "to gcm channel",gameId);
-            res.status(200).end();
-        });
-    }
-};
-
-exports.removeClient = function (req, res) {
-    var gameId = req.params.id;
-    var clientId = req.params.token;
-    if (req.params.type === 'gcm') {
-        dbOperations.getGCMClients(function(gcmClients){
-            if(gcmClients == null){
-                res.status(500).send("failed to get gcm clients");
-            }
-
-            var clientIndex = gcmClients[gameId].indexOf(clientId);
-            if (clientIndex > -1) {
-                gcmClients[gameId].splice(clientIndex, 1);
-            } else {
-                res.status(400).send("Client is not in list");
-            }
-
-            dbOperations.setGCMClients(gcmClients);
-            console.log("removed",clientId, "from gcm channel",gameId);
-            res.status(200).end();
-        });
-    }
-};
-
-exports.deleteClientsFromGame = function (gameId) {
-    dbOperations.getGCMClients(function(gcmClients) {
-        if (gcmClients == null) {
-            console.error("failed to get gcm clients");
-        }
-
-        delete gcmClients[gameId];
-
-        dbOperations.setGCMClients(gcmClients);
-        console.log("removed gcm channel",gameId);
-    });
-};
-
-var sendGcm = exports.sendGcm = function (gcmMessage) {
-    dbOperations.getGCMClients(function(gcmClients) {
-        var gameId = gcmMessage.data.gameId || gcmMessage.data.bidEntity.gameId;
-        console.log("gameId:",gameId);
-        console.log("gcmClients:",gcmClients);
-        if (gcmClients == null || !gcmClients[gameId]) {
-            console.log("no gcm clients on channel");
-            return;
-        }
-        
-        var message = new gcm.Message({
-            timeToLive: 2,
-            data: gcmMessage.data
-        });
-
-        gcmSender.send(message, gcmClients[gameId], function (err, result) {
-            if (err) console.error(err);
-            else    console.log(result);
-        });
-    });
-};
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
     pubnub.subscribe({
@@ -114,7 +29,10 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV !== "dev") {
         channel: instanceName,
         message: function (m) {
             if (m.lb_gcm || m.bidRequest.lb_gcm) {
-                sendGcm(m.lb_gcm || m.bidRequest.lb_gcm);
+                mobileManager.sendGcm(m.lb_gcm || m.bidRequest.lb_gcm);
+            }
+            if (m.lb_apn || m.bidRequest.lb_apn) {
+                mobileManager.sendApn(m.lb_apn || m.bidRequest.lb_apn);
             }
             if (m.bidEntity) {
                 bidController.addBid(m);

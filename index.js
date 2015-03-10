@@ -23,6 +23,7 @@ function start() {
     var teamContoller = require('./team');
     var reportingController = require('./reports');
     var pubnubManager = require('./pubnubManager');
+    var mobileManager = require('./mobileManager');
     var mailer = require('./mailer');
     var http = require('http');
 
@@ -160,9 +161,9 @@ function start() {
 
     app.get('/gameStatus', ensureUser, gameController.gameStatus);
 
-    app.get('/subscribeToGame/:id/:token/:type', ensureUser, pubnubManager.addClient);
+    app.get('/subscribeToGame/:id/:token/:type', ensureUser, mobileManager.addClient);
 
-    app.get('/removeFromGame/:id/:token/:type', ensureUser, pubnubManager.removeClient);
+    app.get('/removeFromGame/:id/:token/:type', ensureUser, mobileManager.removeClient);
 
 // #### BID FUNCTIONS #####
 
