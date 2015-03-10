@@ -9,6 +9,84 @@ var apnConnection = new apn.Connection({
     pfx: 'sandbox.p12'
 });
 
+exports.addClients = function(req, res) {
+    var games = req.body.games;
+    var clientId = req.body.token;
+    var response = [];
+    if (req.body.type === 'gcm') {
+        dbOperations.getGCMClients(function(gcmClients) {
+            if (gcmClients == null) {
+                gcmClients = {};
+            }
+            for (var game in games) {
+                var gameId = games[game];
+                if (!gcmClients[gameId]) {
+                    gcmClients[gameId] = [];
+                }
+
+                if (gcmClients[gameId].indexOf(clientId) === -1) {
+                    gcmClients[gameId].push(clientId);
+                    console.log("added", clientId, "to gcm channel", gameId);
+                    response.push({
+                        gameId: gameId,
+                        status: 200
+                    });
+                }
+                else {
+                    response.push({
+                        gameId: gameId,
+                        status: 400,
+                        message: "Client is already in list"
+                    });
+                }
+
+
+            }
+            dbOperations.setGCMClients(gcmClients);
+        });
+
+    }
+    else if (req.body.type === 'apn') {
+
+        dbOperations.getAPNClients(function(apnClients) {
+            if (apnClients == null) {
+                apnClients = {};
+            }
+            for (var game in games) {
+                var gameId = games[game];
+                if (!apnClients[gameId]) {
+                    apnClients[gameId] = [];
+                }
+
+                if (apnClients[gameId].indexOf(clientId) === -1) {
+                    apnClients[gameId].push(clientId);
+                    console.log("added", clientId, "to apn channel", gameId);
+                    response.push({
+                        gameId: gameId,
+                        status: 200
+                    });
+                }
+                else {
+                    response.push({
+                        gameId: gameId,
+                        status: 400,
+                        message: "Client is already in list"
+                    });
+                }
+
+
+            }
+            dbOperations.setAPNClients(apnClients);
+        });
+
+    }
+    else {
+        res.status(400).send("Invalid notification type");
+    }
+
+    res.status(200).send(response);
+}
+
 exports.addClient = function(req, res) {
     var gameId = req.params.id;
     var clientId = req.params.token;
@@ -57,6 +135,81 @@ exports.addClient = function(req, res) {
     }
 };
 
+exports.removeClients = function(req, res) {
+    var games = req.body.games;
+    var clientId = req.body.token;
+    var response = [];
+    if (req.body.type === 'gcm') {
+        dbOperations.getGCMClients(function(gcmClients) {
+            if (gcmClients == null) {
+                gcmClients = {};
+            }
+            for (var game in games) {
+                var gameId = games[game];
+                if (!gcmClients[gameId]) {
+                    gcmClients[gameId] = [];
+                }
+
+                var clientIndex = gcmClients[gameId].indexOf(clientId);
+                if (clientIndex > -1) {
+                    gcmClients[gameId].splice(clientIndex, 1);
+                    console.log("removed", clientId, "from gcm channel", gameId);
+                    response.push({
+                        gameId: gameId,
+                        status: 200
+                    });
+                }
+                else {
+                    response.push({
+                        gameId: gameId,
+                        status: 400,
+                        message: "Client is not in list"
+                    });
+                }
+            }
+            dbOperations.setGCMClients(gcmClients);
+        });
+
+    }
+    else if (req.body.type === 'apn') {
+        dbOperations.getAPNClients(function(apnClients) {
+            if (apnClients == null) {
+                apnClients = {};
+            }
+            for (var game in games) {
+                var gameId = games[game];
+                if (!apnClients[gameId]) {
+                    apnClients[gameId] = [];
+                }
+
+                var clientIndex = apnClients[gameId].indexOf(clientId);
+                if (clientIndex > -1) {
+                    apnClients[gameId].splice(clientIndex, 1);
+                    console.log("removed", clientId, "from apn channel", gameId);
+                    response.push({
+                        gameId: gameId,
+                        status: 200
+                    });
+                }
+                else {
+                    response.push({
+                        gameId: gameId,
+                        status: 400,
+                        message: "Client is not in list"
+                    });
+                }
+            }
+            dbOperations.setAPNClients(apnClients);
+        });
+
+    }
+    else {
+        res.status(400).send("Invalid notification type");
+    }
+
+    res.status(200).send(response);
+}
+
 exports.removeClient = function(req, res) {
     var gameId = req.params.id;
     var clientId = req.params.token;
@@ -97,7 +250,8 @@ exports.removeClient = function(req, res) {
             console.log("removed", clientId, "from apn channel", gameId);
             res.status(200).end();
         });
-    } else {
+    }
+    else {
         res.status(400).send("Invalid notification type");
     }
 };
