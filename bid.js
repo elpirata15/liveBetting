@@ -316,7 +316,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
 
                         // Add the winning money to balance
                         user.balance += (winningMoney - bid.entryAmount);
-
+                        console.log(bid.bidType);
                         var completedBid = {
                             bidId: bid.id,
                             bidDescription: bid.bidDescription,
