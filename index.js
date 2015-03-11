@@ -165,9 +165,9 @@ function start() {
 
     app.get('/removeFromGame/:id/:token/:type', ensureUser, mobileManager.removeClient);
 
-    app.get('/subscribeToGames', ensureUser, mobileManager.addClients);
+    app.post('/subscribeToGames', ensureUser, mobileManager.addClients);
 
-    app.get('/removeFromGames', ensureUser, mobileManager.removeClients);
+    app.post('/removeFromGames', ensureUser, mobileManager.removeClients);
 
     // #### BID FUNCTIONS #####
 
