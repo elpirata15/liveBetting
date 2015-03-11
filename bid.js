@@ -266,7 +266,7 @@ var sendToDbAndUpdateUsers = function(bid) {
 var updateUserBalances = function(bid, gameName, gameDate) {
 
     var completedBidOptions = [];
-
+    console.log(bid);
     var totalParticipants = 0;
     
     for (var i in bid.bidOptions) {
