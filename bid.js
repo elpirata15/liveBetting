@@ -266,7 +266,6 @@ var sendToDbAndUpdateUsers = function(bid) {
 var updateUserBalances = function(bid, gameName, gameDate) {
 
     var completedBidOptions = [];
-    console.log(bid);
     var totalParticipants = 0;
     
     for (var i in bid.bidOptions) {
@@ -316,7 +315,6 @@ var updateUserBalances = function(bid, gameName, gameDate) {
 
                         // Add the winning money to balance
                         user.balance += (winningMoney - bid.entryAmount);
-                        console.log(bid.bidType);
                         var completedBid = {
                             bidId: bid.id,
                             bidDescription: bid.bidDescription,
@@ -402,6 +400,7 @@ var updateUserBalances = function(bid, gameName, gameDate) {
                         var completedBid = {
                             bidId: bid.id,
                             bidDescription: bid.bidDescription,
+                            bidType: bid.bidType,
                             gameName: gameName,
                             gameId: bid.gameId,
                             gameDate: gameDate,
