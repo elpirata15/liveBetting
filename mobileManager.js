@@ -6,7 +6,8 @@ var GCM_API_KEY = "AIzaSyDITTr4o_RWyPmcHp81GNDbUZ3H-_azOqQ";
 
 var gcmSender = new gcm.Sender(GCM_API_KEY);
 var apnConnection = new apn.Connection({
-    pfx: 'sandbox.p12'
+    pfx: 'sandbox.p12',
+    passphrase: '1'
 });
 
 exports.addClients = function(req, res) {
