@@ -20,6 +20,20 @@ apnConnection.on("transmissionError", function(errCode, notification, device) {
     }
 });
 
+apnConnection.on("connected", function() {
+    console.log("Connected");
+});
+
+apnConnection.on("timeout", function () {
+    console.log("Connection Timeout");
+});
+
+apnConnection.on("disconnected", function() {
+    console.log("Disconnected from APNS");
+});
+
+apnConnection.on("socketError", console.error);
+
 exports.addClients = function(req, res) {
     var games = req.body.games;
     var clientId = req.body.token;
