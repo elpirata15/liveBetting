@@ -323,7 +323,7 @@ exports.sendApn = function(apnMessage) {
         }
 
         async.each(apnClients[gameId], function(apnClient, callback) {
-            var device = new apn.Device(new Buffer(apnClient));
+            var device = new apn.Device(apnClient);
 
             var note = new apn.Notification();
 
