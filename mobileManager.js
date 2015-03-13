@@ -321,6 +321,7 @@ exports.sendApn = function(apnMessage) {
             };
 
             apnConnection.pushNotification(note, device);
+            callback();
         });
     });
 };
