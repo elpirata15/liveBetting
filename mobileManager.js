@@ -6,7 +6,8 @@ var GCM_API_KEY = "AIzaSyDITTr4o_RWyPmcHp81GNDbUZ3H-_azOqQ";
 
 var gcmSender = new gcm.Sender(GCM_API_KEY);
 var apnConnection = new apn.Connection({
-    passphrase: '1'
+    passphrase: '1',
+    production: false
 });
 apnConnection.on("transmitted", function(notification, device) {
     console.log("Notification transmitted to:" + device.token.toString("hex"));
