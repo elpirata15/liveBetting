@@ -31,6 +31,10 @@ angular.module('liveBetManager').controller('waitingListController', ['$scope', 
         };
 
         $scope.startGame = function(gameId) {
+            var localGame = localStorageService.get('currentGame');
+            if(localGame && localGame._id === gameId){
+                $location.path('/event');
+            }
             teamsService.getGameTeams(gameId).success(function(data) {
                 var dlg = dialogs.create('/modals/tvdelay.html', 'startGameModalCtrl', {teams:data}, 'lg');
                 dlg.result.then(function(data) {
