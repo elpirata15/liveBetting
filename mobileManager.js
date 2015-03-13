@@ -58,12 +58,6 @@ exports.addClients = function(req, res) {
 
     }
     else if (req.body.type === 'apn') {
-        var hex, i;
-        var apnClientId = "";
-        for (i=0; i<this.length; i++) {
-            hex = this.charCodeAt(i).toString(16);
-            apnClientId += ("000"+hex).slice(-4);
-        }
         dbOperations.getAPNClients(function(apnClients) {
             if (apnClients == null) {
                 apnClients = {};
@@ -74,9 +68,9 @@ exports.addClients = function(req, res) {
                     apnClients[gameId] = [];
                 }
 
-                if (apnClients[gameId].indexOf(apnClientId) === -1) {
-                    apnClients[gameId].push(apnClientId);
-                    console.log("added", apnClientId, "to apn channel", gameId);
+                if (apnClients[gameId].indexOf(clientId) === -1) {
+                    apnClients[gameId].push(clientId);
+                    console.log("added", clientId, "to apn channel", gameId);
                     response.push({
                         gameId: gameId,
                         status: 200
@@ -127,12 +121,7 @@ exports.addClient = function(req, res) {
         });
     }
     else if (req.params.type === 'apn') {
-        var hex, i;
-        var apnClientId = "";
-        for (i=0; i<clientId.length; i++) {
-            hex = clientId.charCodeAt(i).toString(16);
-            apnClientId += ("000"+hex).slice(-4);
-        }
+
         dbOperations.getAPNClients(function(apnClients) {
             if (apnClients == null) {
                 apnClients = {};
@@ -141,14 +130,14 @@ exports.addClient = function(req, res) {
                 apnClients[gameId] = [];
             }
 
-            if (apnClients[gameId].indexOf(apnClientId) === -1) {
-                apnClients[gameId].push(apnClientId);
+            if (apnClients[gameId].indexOf(clientId) === -1) {
+                apnClients[gameId].push(clientId);
             }
             else {
                 res.status(400).send("Client is already in list");
             }
             dbOperations.setAPNClients(apnClients);
-            console.log("added", apnClientId, "to apn channel", gameId);
+            console.log("added", clientId, "to apn channel", gameId);
             res.status(200).end();
         });
     }
@@ -194,12 +183,7 @@ exports.removeClients = function(req, res) {
 
     }
     else if (req.body.type === 'apn') {
-        var hex, i;
-        var apnClientId = "";
-        for (i=0; i<clientId.length; i++) {
-            hex = clientId.charCodeAt(i).toString(16);
-            apnClientId += ("000"+hex).slice(-4);
-        }
+
         dbOperations.getAPNClients(function(apnClients) {
             if (apnClients == null) {
                 apnClients = {};
@@ -210,10 +194,10 @@ exports.removeClients = function(req, res) {
                     apnClients[gameId] = [];
                 }
 
-                var clientIndex = apnClients[gameId].indexOf(apnClientId);
+                var clientIndex = apnClients[gameId].indexOf(clientId);
                 if (clientIndex > -1) {
                     apnClients[gameId].splice(clientIndex, 1);
-                    console.log("removed", apnClientId, "from apn channel", gameId);
+                    console.log("removed", clientId, "from apn channel", gameId);
                     response.push({
                         gameId: gameId,
                         status: 200
@@ -236,7 +220,7 @@ exports.removeClients = function(req, res) {
     }
 
     res.status(200).send(response);
-}
+};
 
 exports.removeClient = function(req, res) {
     
@@ -262,18 +246,13 @@ exports.removeClient = function(req, res) {
         });
     }
     else if (req.params.type === 'apn') {
-        var hex, i;
-        var apnClientId = "";
-        for (i=0; i<clientId.length; i++) {
-            hex = clientId.charCodeAt(i).toString(16);
-            apnClientId += ("000"+hex).slice(-4);
-        }
+
         dbOperations.getAPNClients(function(apnClients) {
             if (apnClients == null) {
                 res.status(500).send("failed to get apn clients");
             }
 
-            var clientIndex = apnClients[gameId].indexOf(apnClientId);
+            var clientIndex = apnClients[gameId].indexOf(clientId);
             if (clientIndex > -1) {
                 apnClients[gameId].splice(clientIndex, 1);
             }
@@ -282,7 +261,7 @@ exports.removeClient = function(req, res) {
             }
 
             dbOperations.setAPNClients(apnClients);
-            console.log("removed", apnClientId, "from apn channel", gameId);
+            console.log("removed", clientId, "from apn channel", gameId);
             res.status(200).end();
         });
     }
@@ -344,7 +323,7 @@ exports.sendApn = function(apnMessage) {
         }
 
         async.each(apnClients[gameId], function(apnClient, callback) {
-            var device = new apn.Device('<'+apnClient+'>');
+            var device = new apn.Device(new Buffer(apnClient));
 
             var note = new apn.Notification();
 
