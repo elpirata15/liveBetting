@@ -1,4 +1,5 @@
 var pubnub = require("./pubnubManager");
+var mobile = require("./mobileManager");
 var dbOperations = require("./dbOperations");
 var serverLogger = require('./serverLogger');
 
@@ -257,7 +258,7 @@ exports.setStatus = function(req, res){
                 logger.error(null, ["Could not save game", err.toString()]);
                 res.status(500).send(err);
             }
-            pubnub.sendGcm({
+            mobile.sendGcm({
                 gameId: savedGame._id,
                 status: savedGame.status,
                 gameName: savedGame.gameName,
