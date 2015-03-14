@@ -259,10 +259,12 @@ exports.setStatus = function(req, res){
                 res.status(500).send(err);
             }
             mobile.sendGcm({
-                gameId: savedGame._id,
-                status: savedGame.status,
-                gameName: savedGame.gameName,
-                timestamp: savedGame.statusTimestamp
+                data: {
+                    gameId: savedGame._id,
+                    status: savedGame.status,
+                    gameName: savedGame.gameName,
+                    timestamp: savedGame.statusTimestamp
+                }
             });
             res.status(200).end();
         });
