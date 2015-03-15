@@ -9,6 +9,7 @@ var apnConnection = new apn.Connection({
     passphrase: '1',
     production: false
 });
+/*
 apnConnection.on("transmitted", function(notification, device) {
     console.log("Notification transmitted to:" + device.token.toString("hex"));
 });
@@ -32,7 +33,7 @@ apnConnection.on("disconnected", function() {
     console.log("Disconnected from APNS");
 });
 
-apnConnection.on("socketError", console.error);
+apnConnection.on("socketError", console.error);*/
 
 exports.addClients = function(req, res) {
     var games = req.body.games;
