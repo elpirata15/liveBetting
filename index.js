@@ -3,9 +3,9 @@ var throng = require("throng");
 
 var workers = process.env.WEB_CONCURRENCY || 1;
 var options = {
-    lifetime:Infinity
+    lifetime: Infinity
 };
-if(workers){
+if (workers) {
     options.workers = workers;
 }
 
@@ -23,6 +23,7 @@ function start() {
     var teamContoller = require('./team');
     var reportingController = require('./reports');
     var pubnubManager = require('./pubnubManager');
+    var mobileManager = require('./mobileManager');
     var mailer = require('./mailer');
     var http = require('http');
 
@@ -50,13 +51,13 @@ function start() {
         resave: true
     }));
 
-// ### GENERAL ERROR HANDLER ######
-    process.on('uncaughtException', function (err) {
+    // ### GENERAL ERROR HANDLER ######
+    process.on('uncaughtException', function(err) {
         console.error('Caught exception: ' + err);
         console.error('stack:', err.stack);
-        setTimeout(function () {
-            pubnubManager.removeFromPool(function () {
-                mailer.sendErrorEmail(err.stack, function () {
+        setTimeout(function() {
+            pubnubManager.removeFromPool(function() {
+                mailer.sendErrorEmail(err.stack, function() {
                     process.exit(8);
                 });
             });
@@ -64,28 +65,28 @@ function start() {
     });
 
     function exitGracefully() {
-        pubnubManager.removeFromPool(function () {
+        pubnubManager.removeFromPool(function() {
             process.exit(0);
         });
     }
 
-    process.on('SIGINT', function () {
+    process.on('SIGINT', function() {
         exitGracefully();
     });
 
-    process.on('SIGTERM', function () {
+    process.on('SIGTERM', function() {
         exitGracefully();
     });
-// ################################
+    // ################################
 
-    setInterval(function () {
-        http.get("http://pubnub-balancer.herokuapp.com/").on('error', function (e) {
+    setInterval(function() {
+        http.get("http://pubnub-balancer.herokuapp.com/").on('error', function(e) {
             console.log("Got error: " + e.message);
         });
 
     }, 60000);
 
-// #### USER GROUP RESTRICTION HELPER FUNCTIONS ######
+    // #### USER GROUP RESTRICTION HELPER FUNCTIONS ######
 
     function ensureAdmin(req, res, next) {
         if (req.session && req.session.group == "Admins") {
@@ -123,29 +124,29 @@ function start() {
         }
     }
 
-// ##### GAME ACTIONS #####
+    // ##### GAME ACTIONS #####
 
-// For client - get games you can subscribe to
+    // For client - get games you can subscribe to
     app.get('/getGames', ensureUser, gameController.getGames);
 
-// Get single game info
+    // Get single game info
     app.get('/getGame/:id', ensureMaster, gameController.getGame);
 
-// For event managers - get waiting events
+    // For event managers - get waiting events
     app.get('/getWaitingGames/:id', ensureManager, gameController.getWaitingGames);
 
     app.get('/getActiveGamesId', ensureMaster, gameController.getLiveGameList);
 
-// ## Create game entity in DB and start game
+    // ## Create game entity in DB and start game
     app.post('/createGame', ensureMaster, gameController.createGame);
 
-// Initialize previously created game
-//app.post('/initGame/', ensureManager, gameController.initGame);
+    // Initialize previously created game
+    //app.post('/initGame/', ensureManager, gameController.initGame);
 
-// Initialize previously created game: FOR DEV
+    // Initialize previously created game: FOR DEV
     app.post('/initGame/:id', ensureManager, gameController.initGame);
 
-// Assign specified game to specified manager
+    // Assign specified game to specified manager
     app.post('/assignGame/', ensureMaster, gameController.assignGame);
 
     app.post('/closeGame/:id', ensureManager, gameController.closeGame);
@@ -160,19 +161,23 @@ function start() {
 
     app.get('/gameStatus', ensureUser, gameController.gameStatus);
 
-    app.get('/subscribeToGame/:id/:token/:type', ensureUser, pubnubManager.addClient);
+    app.get('/subscribeToGame/:id/:token/:type', ensureUser, mobileManager.addClient);
 
-    app.get('/removeFromGame/:id/:token/:type', ensureUser, pubnubManager.removeClient);
+    app.get('/removeFromGame/:id/:token/:type', ensureUser, mobileManager.removeClient);
 
-// #### BID FUNCTIONS #####
+    app.post('/subscribeToGames', ensureUser, mobileManager.addClients);
 
-// Adds bid entity to game (receives bid entity as parameter)
+    app.post('/removeFromGames', ensureUser, mobileManager.removeClients);
+
+    // #### BID FUNCTIONS #####
+
+    // Adds bid entity to game (receives bid entity as parameter)
     app.post('/addBid', ensureManager, bidController.addBid);
 
-// Creates a new ID object to send with bidEntity
+    // Creates a new ID object to send with bidEntity
     app.get('/newBidId', ensureManager, bidController.newId);
 
-// ###### USER FUNCTIONS ######
+    // ###### USER FUNCTIONS ######
     app.get('/getUsers', ensureAdmin, userController.getUsers);
 
     app.get('/getUser/:id', ensureAdmin, userController.getUserById);
@@ -193,7 +198,7 @@ function start() {
 
     app.post('/changeGroup', userController.changeUserGroup);
 
-// ######### TEAM FUNCTIONS #########
+    // ######### TEAM FUNCTIONS #########
 
     app.post('/createOrUpdateTeam', ensureMaster, teamContoller.newTeam);
 
@@ -205,19 +210,19 @@ function start() {
 
     app.get('/getTeams', ensureManager, teamContoller.getTeams);
 
-// #######################################
+    // #######################################
 
-    app.get('/defaultLog', ensureAdmin, function (req, res) {
+    app.get('/defaultLog', ensureAdmin, function(req, res) {
         res.sendFile('default.log');
     });
 
     if (app.get('host')) {
-        app.listen(app.get('port'), app.get('host'), function () {
+        app.listen(app.get('port'), app.get('host'), function() {
             logger.info(null, ["Node app is running at " + app.get('host') + ":" + app.get('port')]);
         });
     }
     else {
-        app.listen(app.get('port'), function () {
+        app.listen(app.get('port'), function() {
             logger.info(null, ["Node app is running at localhost:" + app.get('port')]);
         });
     }

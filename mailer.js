@@ -13,7 +13,7 @@ var transporter = nodemailer.createTransport({
 // setup e-mail data with unicode symbols
 var mailOptions = {
     from: 'LIVEBETTING MANAGER <manager@alphabetters.com>', // sender address
-    to: 'elirankon@gmail.com, fishondor@gmail.com, adi.millis@gmail.com', // list of receivers
+    to: 'elirankon@gmail.com, fishondor@gmail.com, adi.millis@gmail.com, lior.blacky@gmail.com', // list of receivers
     subject: 'LIVEBETTING HAS CRASHED', // Subject line
     text: 'Unknown Error' // plaintext body
 };

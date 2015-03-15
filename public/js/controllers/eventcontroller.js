@@ -214,6 +214,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     channel: 'bids',
                     message: {
                         lb_gcm: {data: {bidEntity: $scope.bidEntity}},
+                        lb_apn: {data: {bidEntity: $scope.bidEntity}},
                         bidEntity: $scope.bidEntity
                     }
                 });
@@ -223,7 +224,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                 PubNub.ngPublish({
                     channel: $scope.game._id,
                     message: {
-                        pn_apns: {bidEntity: $scope.bidEntity},
+                        //pn_apns: {bidEntity: $scope.bidEntity},
                         //pn_gcm: {data: {bidEntity: $scope.bidEntity}},
                         bidEntity: $scope.bidEntity
                     }
@@ -245,6 +246,9 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
                     lb_gcm: {
                         data: {bidId: $scope.bidEntity.id, gameId: $scope.game._id, close: true}
                     },
+                    lb_apn: {
+                        data: {bidId: $scope.bidEntity.id, gameId: $scope.game._id, close: true}
+                    },
                     bidId: $scope.bidEntity.id, close: true
                 }
             });
@@ -253,7 +257,7 @@ angular.module('liveBetManager').controller('eventController', ['$scope', '$root
             PubNub.ngPublish({
                 channel: $scope.game._id,
                 message: {
-                    pn_apns: {bidId: $scope.bidEntity.id, close: true},
+                    //pn_apns: {bidId: $scope.bidEntity.id, close: true},
                     //pn_gcm: {data: {bidId: $scope.bidEntity.id, close: true}},
                     bidId: $scope.bidEntity.id, close: true
                 }

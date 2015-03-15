@@ -1,4 +1,5 @@
 var pubnub = require("./pubnubManager");
+var mobile = require("./mobileManager");
 var dbOperations = require("./dbOperations");
 var serverLogger = require('./serverLogger');
 
@@ -257,11 +258,21 @@ exports.setStatus = function(req, res){
                 logger.error(null, ["Could not save game", err.toString()]);
                 res.status(500).send(err);
             }
-            pubnub.sendGcm({
-                gameId: savedGame._id,
-                status: savedGame.status,
-                gameName: savedGame.gameName,
-                timestamp: savedGame.statusTimestamp
+            mobile.sendGcm({
+                data: {
+                    gameId: savedGame._id,
+                    status: savedGame.status,
+                    gameName: savedGame.gameName,
+                    timestamp: savedGame.statusTimestamp
+                }
+            });
+            mobile.sendApn({
+                data: {
+                    gameId: savedGame._id,
+                    status: savedGame.status,
+                    gameName: savedGame.gameName,
+                    timestamp: savedGame.statusTimestamp
+                }
             });
             res.status(200).end();
         });
@@ -348,18 +359,14 @@ exports.closeGame = function (req, res) {
                                 close: true
                                 }
                         });
+                        pubnub.sendApn({
+                            data: {
+                                gameId: game._id,
+                                close: true
+                                }
+                        });
                         pubnub.deleteAllClientsFromGame(game._id);
                         pubnub.publishMessage(game._id, {
-                            pn_apns: {
-                                    gameId: game._id,
-                                    close: true
-                                },
-                            //lb_gcm: {
-                            //    data: {
-                            //        gameId: game._id,
-                            //        close: true
-                            //    }
-                            //},
                             gameMessage: {
                                 gameId: game._id,
                                 close: true

@@ -137,6 +137,9 @@ exports.updateDb = function (entity, cacheType, callback, errCallback) {
 
 exports.getEntity = function (entityId, cacheType, callback) {
     redisClient.get(cacheType + "_" + entityId, function (err, cachedEntity) {
+        if(err){
+            console.error("couldn't get entity:",err);
+        }
         if (cachedEntity) {
             callback(JSON.parse(cachedEntity));
         } else {
@@ -163,7 +166,27 @@ exports.getGCMClients = function(callback){
             console.error("failed to get GCM clients", err);
             return null;
         }
-        console.log("gcm clients:",clients);
+        //console.log("gcm clients:",clients);
+        if(clients != null){
+            callback(JSON.parse(clients));
+        } else {
+            callback(null);
+        }
+        
+    });
+};
+
+exports.setAPNClients = function(clients){
+    redisClient.set("apn_clients",JSON.stringify(clients));
+};
+
+exports.getAPNClients = function(callback){
+    redisClient.get("apn_clients",function(err, clients){
+        if(err){
+            console.error("failed to get apn clients", err);
+            return null;
+        }
+        //console.log("gcm clients:",clients);
         if(clients != null){
             callback(JSON.parse(clients));
         } else {
