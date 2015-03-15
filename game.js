@@ -353,19 +353,19 @@ exports.closeGame = function (req, res) {
                 game.save(function (err, game) {
                     if (!err) {
                         logger.info(null, ["closed game", game.gameName, "successfully"]);
-                        pubnub.sendGcm({
+                        mobile.sendGcm({
                             data: {
                                 gameId: game._id,
                                 close: true
                                 }
                         });
-                        pubnub.sendApn({
+                        mobile.sendApn({
                             data: {
                                 gameId: game._id,
                                 close: true
                                 }
                         });
-                        pubnub.deleteAllClientsFromGame(game._id);
+                        mobile.deleteAllClientsFromGame(game._id);
                         pubnub.publishMessage(game._id, {
                             gameMessage: {
                                 gameId: game._id,
