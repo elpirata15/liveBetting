@@ -81,7 +81,7 @@ exports.getLiveGameList = function (req, res) {
 // For event managers - get waiting events
 exports.getWaitingGames = function (req, res) {
     dbOperations.GameModel.find({
-        status: gameStatus.waiting,
+        status: {$ne: gameStatus.inactive},
         assignedTo: req.params.id
     }, function (err, docs) {
         if (!err && docs.length > 0) {
