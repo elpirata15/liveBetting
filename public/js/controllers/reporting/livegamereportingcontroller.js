@@ -71,6 +71,7 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
         
         if(message[0].close){
             $scope.activeBids[message[0].bidId].status = "Inactive";
+            return;
         }
         
         if (!$scope.currentGame.bids) {
