@@ -64,19 +64,23 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
 
     $scope.addBid = function(message) {
         
-        if(message.score){
-            $scope.currentGame.gameScore = message.score;
+        if(message[0].score){
+            $scope.currentGame.gameScore = message[0].score;
             return;
         }
         
-        if (!$scope.game.bids) {
-            $scope.game.bids = [];
+        if(message[0].close){
+            $scope.activeBids[message[0].bidId].status = "Inactive";
+        }
+        
+        if (!$scope.currentGame.bids) {
+            $scope.currentGame.bids = [];
         }
 
-        $scope.activeBids[message.bidEntity.id] = message.bidEntity;
+        $scope.activeBids[message[0].bidEntity.id] = message[0].bidEntity;
 
         PubNub.ngSubscribe({
-            channel: message.bidEntity.id + "_msg",
+            channel: message[0].bidEntity.id + "_msg",
             message: $scope.updateBid
         });
 
@@ -101,14 +105,14 @@ angular.module('liveBetManager').controller('liveGameReportingController', ['$sc
 
     $scope.updateBid = function(message) {
         if (message.close) {
-            $scope.activeBids[message.bidId].status = "Inactive";
+            $scope.activeBids[message[0].bidId].status = "Inactive";
         }
-        else if (message.hasOwnProperty("winningOption")) {
-            $scope.activeBids[message.bidId].winningOption = message.winningOption;
-            $scope.currentGame.bids.push($scope.activeBids[message.bidId]);
-            delete $scope.activeBids[message.bidId];
+        else if (message[0].hasOwnProperty("winningOption")) {
+            $scope.activeBids[message[0].bidId].winningOption = message[0].winningOption;
+            $scope.currentGame.bids.push($scope.activeBids[message[0].bidId]);
+            delete $scope.activeBids[message[0].bidId];
             PubNub.ngUnsubscribe({
-                channel: message.bidId + "_msg," + message.bidId + "_status"
+                channel: message[0].bidId + "_msg," + message[0].bidId + "_status"
             });
         }
     };
