@@ -35,7 +35,7 @@
                         <div class="col-xs-9">
                             <h4><b>Score: </b>{{currentGame.gameScore}}</h4>
                             <h4><b>Money wagered in game: </b>${{totalGameMoney}}</h4>
-                            <div ng-repeat="bid in activeBids" ng-class="{'panel panel-success':bid.status === 'Active','panel panel-warning':bid.status === 'Inactive'}">
+                            <div ng-repeat="(key, bid) in activeBids" ng-class="{'panel panel-success':bid.status === 'Active','panel panel-warning':bid.status === 'Inactive'}">
                                 <div class="panel-heading" role="tab" id="heading{{bid.id}}">
                                     <h4 class="panel-title">
                                         <a style="cursor: pointer" ng-click="subscribeStatus(bid.id)" data-toggle="collapse" data-target="#{{bid.id}}" aria-expanded="false"
